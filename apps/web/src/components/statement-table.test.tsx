@@ -1,0 +1,119 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
+import { datasetSchema, searchRows } from "@/lib/contracts";
+import fixture from "../../../../contracts/fixtures/synthetic-dataset.v1.json";
+import { StatementTable } from "./statement-table";
+import { SourceDrawer } from "./source-drawer";
+import { QualityView } from "./collection-views";
+import { useReview } from "./review-client";
+vi.mock("./review-client", () => ({
+  useReview: vi.fn(() => ({ loading: true })),
+}));
+
+describe("statement and evidence rendering with synthetic data", () => {
+  beforeEach(() => {
+    vi.mocked(useReview).mockReset();
+    vi.mocked(useReview).mockReturnValue({ loading: true });
+  });
+  it("distinguishes evidence/coverage failures from loading or unpublished coverage", () => {
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      error: { code: "DATA_UNAVAILABLE", message: "Unavailable" },
+    });
+    const statement = datasetSchema.parse(fixture).statements[0];
+    const cell = Object.values(
+      statement.rows.find((r) => Object.keys(r.cells).length)!.cells,
+    )[0];
+    const drawer = renderToStaticMarkup(
+      <SourceDrawer
+        cell={cell}
+        company="synthetic"
+        version={"a".repeat(64)}
+        close={() => undefined}
+      />,
+    );
+    expect(drawer).toContain("Period and units unavailable");
+    expect(drawer).not.toContain("Loading period and units");
+    const quality = renderToStaticMarkup(
+      <QualityView company="synthetic" retry={0} />,
+    );
+    expect(quality).toContain("Coverage could not load");
+    expect(quality).not.toContain("Coverage is not established");
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      error: { code: "NO_PUBLISHED_DATASET", message: "Unpublished" },
+    });
+    expect(
+      renderToStaticMarkup(<QualityView company="synthetic" retry={0} />),
+    ).toContain("Coverage is not established");
+  });
+  it("renders exact large decimals, row units, original order, and source action labels", () => {
+    const statement = datasetSchema
+      .parse(fixture)
+      .statements.find((s) => s.id === "income")!;
+    const row = statement.rows.find((r) => r.kind !== "section")!;
+    const period = statement.periods.find((p) => row.cells[p.id])!;
+    row.currency = "XXX";
+    row.unit = "per share";
+    row.cells[period.id].value = "9007199254740993.123456789";
+    const html = renderToStaticMarkup(
+      <StatementTable
+        statement={statement}
+        rows={statement.rows}
+        inspect={() => undefined}
+      />,
+    );
+    expect(html).toContain("9,007,199,254,740,993.123456789");
+    expect(html).toContain("XXX · per share");
+    expect(html).toContain(
+      "9007199254740993.123456789 XXX per share; inspect source",
+    );
+    expect(html).toContain('<th scope="col">Line item</th>');
+    for (let index = 1; index < statement.rows.length; index++)
+      expect(html.indexOf(`>${statement.rows[index - 1].label}<`)).toBeLessThan(
+        html.indexOf(`>${statement.rows[index].label}<`),
+      );
+  });
+  it("keeps alias matching row structure and historical visibility", () => {
+    const statement = datasetSchema.parse(fixture).statements[0];
+    const row = statement.rows.find((r) => r.kind !== "section")!;
+    row.aliases = ["Synthetic old label"];
+    const matched = searchRows(statement.rows, "Synthetic old label", false);
+    const html = renderToStaticMarkup(
+      <StatementTable
+        statement={statement}
+        rows={matched}
+        inspect={() => undefined}
+      />,
+    );
+    expect(html).toContain(row.label);
+    row.historical = true;
+    expect(
+      searchRows(statement.rows, "Synthetic old label", false),
+    ).toHaveLength(0);
+    expect(
+      searchRows(statement.rows, "Synthetic old label", true).some(
+        (r) => r.id === row.id,
+      ),
+    ).toBe(true);
+  });
+  it("uses a named native dialog and visible close control for evidence", () => {
+    const statement = datasetSchema.parse(fixture).statements[0];
+    const cell = Object.values(
+      statement.rows.find((r) => Object.keys(r.cells).length)!.cells,
+    )[0];
+    const html = renderToStaticMarkup(
+      <SourceDrawer
+        cell={cell}
+        company="synthetic"
+        version={"a".repeat(64)}
+        close={() => undefined}
+      />,
+    );
+    expect(html).toContain("<dialog");
+    expect(html).toContain('aria-labelledby="source-title"');
+    expect(html).toContain('aria-label="Close source inspector"');
+    expect(html).toContain(cell.rawLabel);
+    expect(html).toContain(`PDF page ${cell.pdfPage}`);
+  });
+});
