@@ -4,6 +4,10 @@ Next.js review workspace and a Python ingestion pipeline for source-grounded con
 
 This milestone implements the application shell, exact decimal transformations, independent source validation, comparative selection, migrations, and guarded publication. **No ten-year company dataset has been extracted or verified.** The interface exposes this gap. Committed financial fixtures are synthetic test inputs, never company results. `restore-demo` deliberately exits unsuccessfully until a source-reviewed snapshot exists.
 
+## Review the current milestone
+
+The local review session uses [the app](http://127.0.0.1:3100/) and a separate [HTML verification report](http://127.0.0.1:3101/verification/). Read the [detailed verification document](docs/verification-report.md) for the requirement matrix, human walkthrough, reproducible commands, and remaining release gates. [Recorded evidence](docs/verification/evidence/results.json) includes logs, test totals, HTTP checks and protected-document hashes. These are local addresses, not a public deployment.
+
 ## Local setup
 
 Install Node 22.14 or later (22.23.4 is the tested version), npm, Python 3.12, and uv 0.13.5. Docker Compose is the optional database/container path. No cloud credentials are required for review or tests.
