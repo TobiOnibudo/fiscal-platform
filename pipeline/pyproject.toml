@@ -6,9 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "fiscal-pipeline"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["typer==0.15.1", "pydantic==2.10.6", "SQLAlchemy==2.0.38", "alembic==1.14.1", "psycopg[binary]==3.2.5", "httpx==0.28.1", "python-dotenv==1.0.1"]
+dependencies = ["typer==0.15.1", "click==8.1.8", "pydantic==2.10.6", "SQLAlchemy==2.0.38", "alembic==1.14.1", "psycopg[binary]==3.2.5", "httpx==0.28.1", "python-dotenv==1.0.1"]
 
 [project.optional-dependencies]
+extraction = ["openai==3.37.0", "pdfplumber==0.11.10"]
 dev = ["pytest==8.3.4", "hypothesis==6.127.2", "ruff==0.9.6", "mypy==1.15.0", "pre-commit==4.1.0"]
 
 [project.scripts]
