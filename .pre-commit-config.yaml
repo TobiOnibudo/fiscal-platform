@@ -20,7 +20,7 @@ repos:
     hooks:
       - id: eslint
         name: Staged frontend ESLint
-        entry: npm exec --workspace=@fiscal/web -- eslint --fix
+        entry: node scripts/lint-staged-web.mjs
         language: system
         files: ^apps/web/.*\.[cm]?[jt]sx?$
       - id: prettier

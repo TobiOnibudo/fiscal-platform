@@ -6,7 +6,6 @@ uv.lock
 archive/
 pipeline/
 contracts/
-apps/web/src/lib/db-types.ts
 apps/web/src/lib/db.generated.ts
 docs/problem-statement.md
 docs/engineering-design.md
