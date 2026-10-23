@@ -26,6 +26,10 @@ Open <http://localhost:3000>. Database service readiness does not apply migratio
 
 The root `dev` and `start` scripts load the root `.env` and bind to loopback. Production hosting supplies its own environment variables. Do not commit credentials or add the extraction key to the hosted web application.
 
+### Local OpenAI key
+
+Put your key on the `OPENAI_API_KEY=` line in `fiscal-platform/.env`. This local file is ignored by Git; `.env.example` contains only an empty template. Do not paste keys into chat, commit them, or prefix them with `NEXT_PUBLIC_`. The ingestion CLI loads the file when run from the repository root. Adding a key does not start extraction or spend credits; fresh model requests still require an explicit extraction command. The key alone does not complete the remaining ingestion and publication workflow.
+
 For native Postgres, set `MIGRATION_DATABASE_URL` and `INGEST_DATABASE_URL` to explicit `postgresql+psycopg://...` connections and `DATABASE_URL` to a read-only `postgresql://...` connection. Run:
 
 ```powershell
