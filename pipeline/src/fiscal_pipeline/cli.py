@@ -17,7 +17,7 @@ from fiscal_pipeline.models import Company, CompanyPublication
 from fiscal_pipeline.repository import publish as publish_dataset
 from fiscal_pipeline.repository import seed_companies as seed
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
 
 @app.command()
