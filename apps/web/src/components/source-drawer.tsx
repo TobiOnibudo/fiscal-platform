@@ -135,7 +135,11 @@ export function SourceDrawer({
                 The clean view follows the latest approved statement structure
                 and latest compatible observation for each period.
               </p>
-              <p>{evidence.data?.historyStatus}</p>
+              <p>
+                {evidence.data?.previousObservations.length
+                  ? "Previously reported values are shown below."
+                  : "No previously reported values are available."}
+              </p>
               {evidence.data?.previousObservations.length ? (
                 <ul className="gap-list">
                   {evidence.data.previousObservations.map((previous) => (
@@ -145,29 +149,16 @@ export function SourceDrawer({
                         : displayDecimal(previous.cell.value)}{" "}
                       {previous.currency} {previous.unit} · original label:{" "}
                       {previous.cell.rawLabel} · PDF page{" "}
-                      {previous.cell.pdfPage} · dataset{" "}
-                      {previous.datasetVersion.slice(0, 12)}
+                      {previous.cell.pdfPage} · printed{" "}
+                      {previous.cell.printedPage}
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p>No alternative published observations are available.</p>
-              )}
+              ) : null}
               <p>
                 Historical aliases:{" "}
                 {evidence.data?.row.aliases.join(", ") || "None recorded"}
               </p>
-            </details>
-            <details>
-              <summary>Publication identifiers</summary>
-              <dl>
-                <dt>Dataset</dt>
-                <dd className="mono wrap">{version}</dd>
-                <dt>Observation</dt>
-                <dd className="mono wrap">{cell.observationId}</dd>
-                <dt>Document hash</dt>
-                <dd className="mono wrap">{source?.sha256 ?? "Unavailable"}</dd>
-              </dl>
             </details>
           </>
         )}

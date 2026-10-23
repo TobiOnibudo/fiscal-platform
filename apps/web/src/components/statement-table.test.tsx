@@ -4,7 +4,8 @@ import { datasetSchema, searchRows } from "@/lib/contracts";
 import fixture from "../../../../contracts/fixtures/synthetic-dataset.v1.json";
 import { StatementTable } from "./statement-table";
 import { SourceDrawer } from "./source-drawer";
-import { QualityView } from "./collection-views";
+import { FilingsView, QualityView } from "./collection-views";
+import { Workspace } from "./workspace";
 import { useReview } from "./review-client";
 vi.mock("./review-client", () => ({
   useReview: vi.fn(() => ({ loading: true })),
@@ -14,6 +15,127 @@ describe("statement and evidence rendering with synthetic data", () => {
   beforeEach(() => {
     vi.mocked(useReview).mockReset();
     vi.mocked(useReview).mockReturnValue({ loading: true });
+  });
+  it.each([
+    ["NO_PUBLISHED_DATASET", "No statements available"],
+    ["DATA_UNAVAILABLE", "Unable to load statements"],
+  ])("keeps %s workspace messages free of diagnostics", (code, heading) => {
+    const message =
+      "DEBUG: Start Postgres; apply migrations; internal pipeline failure";
+    const requestId = "d2cc1dc5-54f6-47ef-a93e-b931d5399500";
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      error: { code, message, requestId },
+    });
+    const html = renderToStaticMarkup(<Workspace />);
+    expect(html).toContain(heading);
+    expect(html).toContain("Try again");
+    expect(html).not.toContain(message);
+    expect(html).not.toContain(requestId);
+    expect(html).not.toMatch(
+      /local setup|Postgres|migrations|pipeline|demonstration snapshot|ten-year coverage|Request /i,
+    );
+  });
+  it("shows review status and coverage without raw validation details", () => {
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      data: {
+        datasetVersion: "b".repeat(64),
+        coverage: {
+          verifiedPeriods: 8,
+          expectedPeriods: 10,
+          gaps: ["FY2017 income statement"],
+        },
+        validation: {
+          reviewed: true,
+          issues: [{ debug: "private-validation-detail" }],
+        },
+      },
+    });
+    const html = renderToStaticMarkup(
+      <QualityView company="synthetic" retry={0} />,
+    );
+    expect(html).toContain("8 of 10 target periods verified");
+    expect(html).toContain("FY2017 income statement");
+    expect(html).toContain("Recorded source review:");
+    expect(html).toContain("Complete");
+    expect(html).not.toContain("<pre");
+    expect(html).not.toContain("private-validation-detail");
+    expect(html).not.toContain("Validation results");
+  });
+  it("keeps source documents and comparative history without technical identifiers", () => {
+    const statement = datasetSchema.parse(fixture).statements[0];
+    const cell = Object.values(
+      statement.rows.find((row) => Object.keys(row.cells).length)!.cells,
+    )[0];
+    const version = "b".repeat(64);
+    const source = {
+      id: cell.filingId,
+      title: "Synthetic annual report",
+      source_url: "https://example.com/annual-report.pdf",
+      classification: "annual_report",
+      published_on: "2025-03-31",
+      sha256: "c".repeat(64),
+    };
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      data: {
+        datasetVersion: version,
+        selected: cell,
+        period: statement.periods[0],
+        row: { label: cell.rawLabel, aliases: ["Earlier revenue label"] },
+        units: statement,
+        source,
+        historyStatus: "DEBUG scanned 100 datasets and hashes",
+        previousObservations: [
+          {
+            datasetVersion: version,
+            cell: {
+              ...cell,
+              value: "123.45",
+              rawLabel: "Earlier reported label",
+            },
+            currency: "GBP",
+            unit: "millions",
+          },
+        ],
+      },
+    });
+    const drawer = renderToStaticMarkup(
+      <SourceDrawer
+        cell={cell}
+        company="synthetic"
+        version={version}
+        close={() => undefined}
+      />,
+    );
+    expect(drawer).toContain(source.title);
+    expect(drawer).toContain(
+      `href="${source.source_url}#page=${cell.pdfPage}"`,
+    );
+    expect(drawer).toContain("Full publisher document");
+    expect(drawer).toContain(cell.rawLabel);
+    expect(drawer).toContain(cell.rawText);
+    expect(drawer).toContain(`PDF page ${cell.pdfPage}`);
+    expect(drawer).toContain(`printed ${cell.printedPage}`);
+    expect(drawer).toContain("123.45 GBP millions");
+    expect(drawer).toContain("Earlier reported label");
+    expect(drawer).toContain("Earlier revenue label");
+    expect(drawer).not.toContain("DEBUG");
+    expect(drawer).not.toContain("Publication identifiers");
+    expect(drawer).not.toContain(version);
+    expect(drawer).not.toContain(source.sha256);
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      data: { items: [source], nextCursor: null },
+    });
+    const filings = renderToStaticMarkup(
+      <FilingsView company="synthetic" retry={0} />,
+    );
+    expect(filings).toContain(source.title);
+    expect(filings).toContain(`href="${source.source_url}"`);
+    expect(filings).not.toContain("Source hash");
+    expect(filings).not.toContain(source.sha256);
   });
   it("distinguishes evidence/coverage failures from loading or unpublished coverage", () => {
     vi.mocked(useReview).mockReturnValue({

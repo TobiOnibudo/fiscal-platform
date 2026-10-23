@@ -101,7 +101,6 @@ export function FilingsView({
                     {filing.published_on?.slice(0, 10) ??
                       "Publication date not established"}
                   </p>
-                  <small>Source hash: {filing.sha256 || "Not archived"}</small>
                 </div>
                 {safeSource(filing.source_url) ? (
                   <a
@@ -186,8 +185,8 @@ export function QualityView({
           </h3>
           <p>
             {state.error.code === "NO_PUBLISHED_DATASET"
-              ? "No published coverage result is available. The ten-year requirement remains unmet until all required periods and statements have reviewed source evidence."
-              : "Published coverage may exist, but the request failed. Check the database connection and use Retry data above."}
+              ? "No coverage results are available for this company yet."
+              : "Please use Retry data above to try again."}
           </p>
         </div>
       ) : (
@@ -205,10 +204,6 @@ export function QualityView({
               ? "Complete"
               : "Not recorded as complete"}
           </p>
-          <details>
-            <summary>Validation results</summary>
-            <pre>{JSON.stringify(state.data?.validation, null, 2)}</pre>
-          </details>
         </>
       )}
     </section>

@@ -42,34 +42,16 @@ function EmptyState({ error, retry }: { error?: Failure; retry: () => void }) {
         <BookOpen size={28} aria-hidden="true" />
       </div>
       <h2>
-        {unpublished
-          ? "Ready for reviewed statements"
-          : "Review data is not connected"}
+        {unpublished ? "No statements available" : "Unable to load statements"}
       </h2>
       <p>
         {unpublished
-          ? "No reviewed statement has been published for this selection. Financial amounts will appear here once source and comparative review is complete."
-          : "The workspace is available, but it cannot load financial data. Check the local database and apply its migrations, then retry."}
+          ? "There are no financial statements to display for this company yet."
+          : "Please try again in a moment."}
       </p>
       <button className="button" onClick={retry}>
         Try again
       </button>
-      <details className="setup">
-        <summary>Local setup and evidence standard</summary>
-        <p>
-          Start Postgres, apply migrations, and seed company configuration using
-          the repository’s local development instructions. Publish an approved,
-          source-reviewed dataset through the pipeline.
-        </p>
-        <p>
-          There is no verified demonstration snapshot bundled here. Ten-year
-          coverage is a target, and will only be shown as complete when
-          supported by published evidence.
-        </p>
-        {error?.requestId ? (
-          <p className="mono">Request {error.requestId}</p>
-        ) : null}
-      </details>
     </div>
   );
 }
@@ -286,7 +268,7 @@ export function Workspace() {
                     <button
                       className="button"
                       disabled
-                      title="Publish a reviewed statement to enable export"
+                      title="Export will be available when statements are ready."
                     >
                       <ArrowDownToLine size={16} />
                       Export CSV
@@ -464,7 +446,7 @@ export function Workspace() {
             <span>Source evidence before certainty.</span>
             <span>
               {data
-                ? `Dataset ${data.datasetVersion.slice(0, 12)}`
+                ? "Financial statements available"
                 : "No financial values published"}
             </span>
           </footer>
