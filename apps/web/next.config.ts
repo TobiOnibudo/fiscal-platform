@@ -1,3 +1,8 @@
 import type { NextConfig } from "next";
-const config: NextConfig = { poweredByHeader: false, output: "standalone" };
+import path from "node:path";
+const config: NextConfig = {
+  poweredByHeader: false,
+  output: "standalone",
+  outputFileTracingRoot: path.resolve(__dirname, "../.."),
+};
 export default config;
