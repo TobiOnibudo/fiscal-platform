@@ -1,0 +1,1987 @@
+{
+  "issues": [],
+  "reviewed": true,
+  "ruleVersion": "1",
+  "sourceBundles": [
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2016-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2016",
+          "mapping_reviewed": true,
+          "period_end": "2016-03-31",
+          "period_start": "2015-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2016-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2016-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2016-03-31": "2015-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2017-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2017",
+          "mapping_reviewed": true,
+          "period_end": "2017-03-31",
+          "period_start": "2016-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2017-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2017-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2017-03-31": "2016-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2018-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2018",
+          "mapping_reviewed": true,
+          "period_end": "2018-03-31",
+          "period_start": "2017-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2018-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2018-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2018-03-31": "2017-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2019-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2019",
+          "mapping_reviewed": true,
+          "period_end": "2019-03-31",
+          "period_start": "2018-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2019-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2019-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2019-03-31": "2018-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2020-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2020",
+          "mapping_reviewed": true,
+          "period_end": "2020-03-31",
+          "period_start": "2019-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2020-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2020-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2020-03-31": "2019-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2021-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2021",
+          "mapping_reviewed": true,
+          "period_end": "2021-03-31",
+          "period_start": "2020-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2021-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2021-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2021-03-31": "2020-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2022-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2022",
+          "mapping_reviewed": true,
+          "period_end": "2022-03-31",
+          "period_start": "2021-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2022-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2022-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2022-03-31": "2021-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2023-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2023",
+          "mapping_reviewed": true,
+          "period_end": "2023-03-31",
+          "period_start": "2022-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2023-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2023-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2023-03-31": "2022-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2024-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2024",
+          "mapping_reviewed": true,
+          "period_end": "2024-03-31",
+          "period_start": "2023-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2024-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2024-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2024-03-31": "2023-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2025-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "income-2025",
+          "mapping_reviewed": true,
+          "period_end": "2025-03-31",
+          "period_start": "2024-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "income",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2025-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2025-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2025-03-31": "2024-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "income"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2016-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2016",
+          "mapping_reviewed": true,
+          "period_end": "2016-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2016-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2016-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2016-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2017-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2017",
+          "mapping_reviewed": true,
+          "period_end": "2017-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2017-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2017-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2017-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2018-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2018",
+          "mapping_reviewed": true,
+          "period_end": "2018-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2018-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2018-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2018-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2019-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2019",
+          "mapping_reviewed": true,
+          "period_end": "2019-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2019-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2019-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2019-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2020-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2020",
+          "mapping_reviewed": true,
+          "period_end": "2020-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2020-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2020-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2020-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2021-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2021",
+          "mapping_reviewed": true,
+          "period_end": "2021-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2021-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2021-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2021-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2022-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2022",
+          "mapping_reviewed": true,
+          "period_end": "2022-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2022-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2022-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2022-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2023-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2023",
+          "mapping_reviewed": true,
+          "period_end": "2023-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2023-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2023-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2023-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2024-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2024",
+          "mapping_reviewed": true,
+          "period_end": "2024-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2024-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2024-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2024-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2025-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "balance-2025",
+          "mapping_reviewed": true,
+          "period_end": "2025-03-31",
+          "period_start": null,
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "balance",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2025-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2025-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2025-03-31": null
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "balance"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2016-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2016",
+          "mapping_reviewed": true,
+          "period_end": "2016-03-31",
+          "period_start": "2015-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2016-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2016-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2016-03-31": "2015-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2017-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2017",
+          "mapping_reviewed": true,
+          "period_end": "2017-03-31",
+          "period_start": "2016-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2017-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2017-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2017-03-31": "2016-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2018-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2018",
+          "mapping_reviewed": true,
+          "period_end": "2018-03-31",
+          "period_start": "2017-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2018-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2018-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2018-03-31": "2017-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2019-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2019",
+          "mapping_reviewed": true,
+          "period_end": "2019-03-31",
+          "period_start": "2018-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2019-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2019-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2019-03-31": "2018-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2020-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2020",
+          "mapping_reviewed": true,
+          "period_end": "2020-03-31",
+          "period_start": "2019-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2020-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2020-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2020-03-31": "2019-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2021-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2021",
+          "mapping_reviewed": true,
+          "period_end": "2021-03-31",
+          "period_start": "2020-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2021-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2021-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2021-03-31": "2020-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2022-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2022",
+          "mapping_reviewed": true,
+          "period_end": "2022-03-31",
+          "period_start": "2021-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2022-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2022-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2022-03-31": "2021-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2023-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2023",
+          "mapping_reviewed": true,
+          "period_end": "2023-03-31",
+          "period_start": "2022-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2023-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2023-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2023-03-31": "2022-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2024-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2024",
+          "mapping_reviewed": true,
+          "period_end": "2024-03-31",
+          "period_start": "2023-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2024-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2024-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2024-03-31": "2023-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    },
+    {
+      "cells": [
+        {
+          "amount": "123.456",
+          "basis": "IFRS",
+          "company_id": "wise",
+          "concept_id": "synthetic",
+          "currency": "GBP",
+          "evidence": {
+            "column": "2025-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          },
+          "filing_id": "test",
+          "id": "cashflow-2025",
+          "mapping_reviewed": true,
+          "period_end": "2025-03-31",
+          "period_start": "2024-04-01",
+          "published_on": "2026-06-01",
+          "raw_label": "Synthetic",
+          "raw_text": "123.456",
+          "scope": "consolidated",
+          "statement": "cashflow",
+          "unit": "units",
+          "value_state": "reported"
+        }
+      ],
+      "inventory": {
+        "basis": "IFRS",
+        "boundaries_reviewed": true,
+        "cells": [
+          {
+            "column": "2025-03-31",
+            "label": "Synthetic",
+            "page": 1,
+            "raw_text": "123.456",
+            "reviewed": true,
+            "row": "r1",
+            "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "unit": "units"
+          }
+        ],
+        "columns": [
+          "2025-03-31"
+        ],
+        "company_id": "wise",
+        "currency": "GBP",
+        "pages": [
+          1
+        ],
+        "period_starts": {
+          "2025-03-31": "2024-04-01"
+        },
+        "rows": [
+          "r1"
+        ],
+        "scope": "consolidated",
+        "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "statement": "cashflow"
+      }
+    }
+  ]
+}

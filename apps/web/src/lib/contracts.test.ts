@@ -64,8 +64,14 @@ const rows: Row[] = [
 describe("financial read contracts", () => {
   it("accepts the shared pipeline synthetic publication contract", () => {
     const dataset = datasetSchema.parse(sharedSyntheticFixture);
-    expect(dataset.statements.map(statement => statement.id).sort()).toEqual(["balance", "cashflow", "income"]);
-    expect(dataset.statements.every(statement => statement.periods.length === 10)).toBe(true);
+    expect(dataset.statements.map((statement) => statement.id).sort()).toEqual([
+      "balance",
+      "cashflow",
+      "income",
+    ]);
+    expect(
+      dataset.statements.every((statement) => statement.periods.length === 10),
+    ).toBe(true);
   });
   it("preserves decimal precision and rejects numeric coercion", () => {
     expect(decimal.parse(cell.value)).toBe(cell.value);
@@ -142,7 +148,7 @@ describe("financial read contracts", () => {
   it("pins CSV identity, precision, sources, filters and protects text cells", () => {
     const statement = {
       id: "income" as const,
-      title: "Synthetic",
+      title: " =SYNTHETIC()",
       scope: "consolidated" as const,
       basis: "Synthetic",
       currency: "XXX",
@@ -165,6 +171,7 @@ describe("financial read contracts", () => {
     };
     const csv = statementCsv(snapshot, statement);
     expect(csv).toContain(cell.value);
+    expect(csv).toContain("' =SYNTHETIC()");
     expect(csv).toContain("' =".replace(" ", ""));
     expect(csv).toContain(snapshot.version);
     expect(csv).toContain("PDF page 2");
