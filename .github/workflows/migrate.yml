@@ -27,4 +27,4 @@ jobs:
           python-version: "3.12"
       - run: pip install uv==0.13.5
       - run: uv sync --project pipeline --frozen --no-dev
-      - run: uv run --project pipeline alembic -c pipeline/alembic.ini upgrade head
+      - run: uv run --no-sync --project pipeline alembic -c pipeline/alembic.ini upgrade head

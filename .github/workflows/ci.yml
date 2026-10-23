@@ -32,11 +32,11 @@ jobs:
       - run: uv sync --project pipeline --frozen --extra dev --extra extraction
       - working-directory: pipeline
         run: |
-          uv run --frozen --extra dev ruff check .
-          uv run --frozen --extra dev ruff format --check .
-          uv run --frozen --extra dev mypy src/fiscal_pipeline
-          uv run --frozen --extra dev pytest -m 'not integration'
-          uv run --frozen python -m fiscal_pipeline.contracts --check
+          uv run --no-sync ruff check .
+          uv run --no-sync ruff format --check .
+          uv run --no-sync mypy src/fiscal_pipeline
+          uv run --no-sync pytest -m 'not integration'
+          uv run --no-sync python -m fiscal_pipeline.contracts --check
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -66,9 +66,9 @@ jobs:
           cache: npm
       - run: pip install uv==0.13.5
       - run: uv sync --project pipeline --frozen --extra dev --extra extraction
-      - run: uv run --project pipeline alembic -c pipeline/alembic.ini upgrade head
-      - run: uv run --project pipeline alembic -c pipeline/alembic.ini check
-      - run: uv run --project pipeline pytest pipeline/tests -m integration
+      - run: uv run --no-sync --project pipeline alembic -c pipeline/alembic.ini upgrade head
+      - run: uv run --no-sync --project pipeline alembic -c pipeline/alembic.ini check
+      - run: uv run --no-sync --project pipeline pytest pipeline/tests -m integration
       - run: npm ci && npm run db:types:check
   required:
     if: always()
