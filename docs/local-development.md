@@ -215,3 +215,13 @@ Document service logs, run IDs, and artifact locations. Logs may include source 
 - Local linting, type checking, tests, and production build complete successfully.
 - Ordinary shutdown preserves data; destructive reset is separate and documented.
 - Documentation records commands actually exercised and any platform limitations discovered.
+
+## Implemented milestone — October 23, 2026
+
+The preceding sections are the full local-execution plan. Use the repository [README](../README.md) for commands actually implemented in the first milestone. In particular, `restore-demo` deliberately fails until an independently reviewed snapshot exists; `estimate`, full `run`, and automated backfill/reconciliation orchestration are future work. Setup does not create or verify financial data.
+
+The implementation session installed a local Python 3.12 runtime and project dependencies through uv, then ran the offline financial tests and real PostgreSQL integration tests against an isolated loopback-only PostgreSQL 16 cluster. Alembic upgraded an empty database and reported no schema drift. The tests include source-grounding failures, exact NUMERIC round trips, strict public payloads, offline logical hashes, concurrent publisher rejection, immutable publication and sparse historical concepts. No test made a model request.
+
+The host's original Node 22.1 runtime was below newer tooling requirements. A checksum-verified Node 22.23.4 runtime was used for current application checks. The repository requires Node 22.14 or newer and records 22.23.4 in `.node-version`. npm 10.7 encountered a peer-resolution bug while updating Vitest; npm 10.9.4 completed the installation. A normal current supported npm installation does not need machine-specific executable paths.
+
+Docker client commands were present, but Engine container/version endpoints returned internal errors during readiness attempts. Container service startup has therefore not been demonstrated by the native test results. No cloud database, GitHub Actions run, production migration or Vercel deployment has been performed in this milestone.
