@@ -6,7 +6,7 @@
     "apps/web"
   ],
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.14.0"
   },
   "scripts": {
     "dev": "npm run dev --workspace=@fiscal/web",
