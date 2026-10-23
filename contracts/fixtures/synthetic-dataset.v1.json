@@ -1,0 +1,594 @@
+{
+  "companyId": "wise",
+  "coverage": {
+    "expectedPeriods": 10,
+    "gaps": [],
+    "verifiedPeriods": 10
+  },
+  "kind": "verified",
+  "schemaVersion": "1",
+  "statements": [
+    {
+      "basis": "IFRS",
+      "currency": "GBP",
+      "id": "income",
+      "periods": [
+        {
+          "end": "2016-03-31",
+          "id": "2016",
+          "label": "FY2016",
+          "start": "2015-04-01"
+        },
+        {
+          "end": "2017-03-31",
+          "id": "2017",
+          "label": "FY2017",
+          "start": "2016-04-01"
+        },
+        {
+          "end": "2018-03-31",
+          "id": "2018",
+          "label": "FY2018",
+          "start": "2017-04-01"
+        },
+        {
+          "end": "2019-03-31",
+          "id": "2019",
+          "label": "FY2019",
+          "start": "2018-04-01"
+        },
+        {
+          "end": "2020-03-31",
+          "id": "2020",
+          "label": "FY2020",
+          "start": "2019-04-01"
+        },
+        {
+          "end": "2021-03-31",
+          "id": "2021",
+          "label": "FY2021",
+          "start": "2020-04-01"
+        },
+        {
+          "end": "2022-03-31",
+          "id": "2022",
+          "label": "FY2022",
+          "start": "2021-04-01"
+        },
+        {
+          "end": "2023-03-31",
+          "id": "2023",
+          "label": "FY2023",
+          "start": "2022-04-01"
+        },
+        {
+          "end": "2024-03-31",
+          "id": "2024",
+          "label": "FY2024",
+          "start": "2023-04-01"
+        },
+        {
+          "end": "2025-03-31",
+          "id": "2025",
+          "label": "FY2025",
+          "start": "2024-04-01"
+        }
+      ],
+      "rows": [
+        {
+          "aliases": [],
+          "cells": {
+            "2016": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2016",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2017": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2017",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2018": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2018",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2019": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2019",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2020": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2020",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2021": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2021",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2022": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2022",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2023": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2023",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2024": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2024",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2025": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "income-2025",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            }
+          },
+          "currency": "GBP",
+          "depth": 0,
+          "historical": false,
+          "id": "synthetic",
+          "kind": "item",
+          "label": "Synthetic",
+          "unit": "units"
+        }
+      ],
+      "scope": "consolidated",
+      "title": "Synthetic test statement",
+      "unit": "units"
+    },
+    {
+      "basis": "IFRS",
+      "currency": "GBP",
+      "id": "balance",
+      "periods": [
+        {
+          "end": "2016-03-31",
+          "id": "2016",
+          "label": "FY2016",
+          "start": null
+        },
+        {
+          "end": "2017-03-31",
+          "id": "2017",
+          "label": "FY2017",
+          "start": null
+        },
+        {
+          "end": "2018-03-31",
+          "id": "2018",
+          "label": "FY2018",
+          "start": null
+        },
+        {
+          "end": "2019-03-31",
+          "id": "2019",
+          "label": "FY2019",
+          "start": null
+        },
+        {
+          "end": "2020-03-31",
+          "id": "2020",
+          "label": "FY2020",
+          "start": null
+        },
+        {
+          "end": "2021-03-31",
+          "id": "2021",
+          "label": "FY2021",
+          "start": null
+        },
+        {
+          "end": "2022-03-31",
+          "id": "2022",
+          "label": "FY2022",
+          "start": null
+        },
+        {
+          "end": "2023-03-31",
+          "id": "2023",
+          "label": "FY2023",
+          "start": null
+        },
+        {
+          "end": "2024-03-31",
+          "id": "2024",
+          "label": "FY2024",
+          "start": null
+        },
+        {
+          "end": "2025-03-31",
+          "id": "2025",
+          "label": "FY2025",
+          "start": null
+        }
+      ],
+      "rows": [
+        {
+          "aliases": [],
+          "cells": {
+            "2016": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2016",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2017": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2017",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2018": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2018",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2019": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2019",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2020": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2020",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2021": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2021",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2022": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2022",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2023": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2023",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2024": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2024",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2025": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "balance-2025",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            }
+          },
+          "currency": "GBP",
+          "depth": 0,
+          "historical": false,
+          "id": "synthetic",
+          "kind": "item",
+          "label": "Synthetic",
+          "unit": "units"
+        }
+      ],
+      "scope": "consolidated",
+      "title": "Synthetic test statement",
+      "unit": "units"
+    },
+    {
+      "basis": "IFRS",
+      "currency": "GBP",
+      "id": "cashflow",
+      "periods": [
+        {
+          "end": "2016-03-31",
+          "id": "2016",
+          "label": "FY2016",
+          "start": "2015-04-01"
+        },
+        {
+          "end": "2017-03-31",
+          "id": "2017",
+          "label": "FY2017",
+          "start": "2016-04-01"
+        },
+        {
+          "end": "2018-03-31",
+          "id": "2018",
+          "label": "FY2018",
+          "start": "2017-04-01"
+        },
+        {
+          "end": "2019-03-31",
+          "id": "2019",
+          "label": "FY2019",
+          "start": "2018-04-01"
+        },
+        {
+          "end": "2020-03-31",
+          "id": "2020",
+          "label": "FY2020",
+          "start": "2019-04-01"
+        },
+        {
+          "end": "2021-03-31",
+          "id": "2021",
+          "label": "FY2021",
+          "start": "2020-04-01"
+        },
+        {
+          "end": "2022-03-31",
+          "id": "2022",
+          "label": "FY2022",
+          "start": "2021-04-01"
+        },
+        {
+          "end": "2023-03-31",
+          "id": "2023",
+          "label": "FY2023",
+          "start": "2022-04-01"
+        },
+        {
+          "end": "2024-03-31",
+          "id": "2024",
+          "label": "FY2024",
+          "start": "2023-04-01"
+        },
+        {
+          "end": "2025-03-31",
+          "id": "2025",
+          "label": "FY2025",
+          "start": "2024-04-01"
+        }
+      ],
+      "rows": [
+        {
+          "aliases": [],
+          "cells": {
+            "2016": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2016",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2017": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2017",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2018": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2018",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2019": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2019",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2020": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2020",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2021": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2021",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2022": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2022",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2023": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2023",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2024": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2024",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            },
+            "2025": {
+              "comparative": "original",
+              "filingId": "test",
+              "observationId": "cashflow-2025",
+              "pdfPage": 1,
+              "printedPage": "",
+              "rawLabel": "Synthetic",
+              "rawText": "123.456",
+              "state": "reported",
+              "value": "123.456"
+            }
+          },
+          "currency": "GBP",
+          "depth": 0,
+          "historical": false,
+          "id": "synthetic",
+          "kind": "item",
+          "label": "Synthetic",
+          "unit": "units"
+        }
+      ],
+      "scope": "consolidated",
+      "title": "Synthetic test statement",
+      "unit": "units"
+    }
+  ]
+}
