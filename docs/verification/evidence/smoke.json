@@ -1,0 +1,58 @@
+[
+  {
+    "path": "/api/v1/health",
+    "status": 200,
+    "expected": 200,
+    "received": "ready",
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies",
+    "status": 200,
+    "expected": 200,
+    "received": null,
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies/wise/statements",
+    "status": 404,
+    "expected": 404,
+    "received": "NO_PUBLISHED_DATASET",
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies/adyen/statements",
+    "status": 404,
+    "expected": 404,
+    "received": "NO_PUBLISHED_DATASET",
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies/wise/filings",
+    "status": 200,
+    "expected": 200,
+    "received": null,
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies/wise/quality",
+    "status": 404,
+    "expected": 404,
+    "received": "NO_PUBLISHED_DATASET",
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies/wise/export",
+    "status": 400,
+    "expected": 400,
+    "received": "VERSION_REQUIRED",
+    "passed": true
+  },
+  {
+    "path": "/api/v1/companies?unexpected=1",
+    "status": 400,
+    "expected": 400,
+    "received": "INVALID_REQUEST",
+    "passed": true
+  }
+]

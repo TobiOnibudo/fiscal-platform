@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Implementation verification | Fiscal platform</title>
+    <style>
+      /* Report-local tokens reference apps/web/src/app/globals.css. */
+      :root {
+        color-scheme: dark;
+        --report-background: #101315;
+        --report-surface: #171b1e;
+        --report-raised: #1d2327;
+        --report-border: #2c3439;
+        --report-foreground: #edf0ee;
+        --report-muted: #a4afad;
+        --report-accent: #b9dbb1;
+        --report-space: 16px;
+        --report-pad: 20px;
+        --report-section: 40px;
+        font:
+          14px/1.7 "Segoe UI",
+          Arial,
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--report-background);
+        color: var(--report-foreground);
+        overflow-wrap: anywhere;
+      }
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: var(--report-section) var(--report-pad) 80px;
+        min-width: 0;
+      }
+      a {
+        color: var(--report-accent);
+        text-underline-offset: 4px;
+      }
+      a:focus-visible,
+      summary:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 2px solid var(--report-accent);
+        outline-offset: 4px;
+      }
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        left: var(--report-space);
+        padding: var(--report-space);
+        background: var(--report-accent);
+        color: var(--report-background);
+      }
+      .skip-link:focus {
+        top: var(--report-space);
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: 34px;
+        line-height: 1.2;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+      h2 {
+        font-size: 22px;
+        line-height: 1.4;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        margin-bottom: var(--report-space);
+      }
+      h3 {
+        font-size: 16px;
+        margin: var(--report-pad) 0 var(--report-space);
+      }
+      header {
+        padding-bottom: var(--report-section);
+      }
+      .eyebrow,
+      .muted {
+        color: var(--report-muted);
+      }
+      .eyebrow {
+        margin-bottom: var(--report-space);
+      }
+      .verdict {
+        margin-top: var(--report-pad);
+        padding: var(--report-pad);
+        border-left: 4px solid var(--report-accent);
+        background: var(--report-surface);
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .intro {
+        margin-top: var(--report-space);
+        max-width: 80ch;
+        color: var(--report-muted);
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--report-space) var(--report-pad);
+        margin-top: var(--report-pad);
+      }
+      nav a {
+        padding-block: 4px;
+      }
+      section {
+        border-top: 1px solid var(--report-border);
+        padding-top: var(--report-section);
+        margin-top: var(--report-section);
+        min-width: 0;
+      }
+      section:first-of-type {
+        margin-top: 0;
+      }
+      .table-wrap {
+        overflow-x: auto;
+        max-width: 100%;
+        margin-top: var(--report-pad);
+        border: 1px solid var(--report-border);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 14px;
+      }
+      caption {
+        text-align: left;
+        padding: var(--report-space);
+        background: var(--report-surface);
+        color: var(--report-muted);
+      }
+      th,
+      td {
+        padding: var(--report-space);
+        vertical-align: top;
+        border-bottom: 1px solid var(--report-border);
+        min-width: 100px;
+      }
+      thead {
+        background: var(--report-raised);
+      }
+      tbody th {
+        font-weight: 600;
+      }
+      tbody tr:last-child > * {
+        border-bottom: 0;
+      }
+      td code {
+        white-space: pre-wrap;
+      }
+      code {
+        font-family: "Cascadia Mono", Consolas, monospace;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+      }
+      .status {
+        font-size: 12px;
+        letter-spacing: 0.04em;
+      }
+      .pass {
+        color: var(--report-accent);
+      }
+      .fail {
+        color: var(--report-foreground);
+        text-decoration: underline double;
+      }
+      .skipped {
+        color: var(--report-muted);
+      }
+      ol,
+      ul {
+        padding-left: var(--report-pad);
+        margin: var(--report-space) 0 0;
+      }
+      li + li {
+        margin-top: var(--report-space);
+      }
+      details {
+        padding: var(--report-pad);
+        background: var(--report-surface);
+        margin-top: var(--report-pad);
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      dl {
+        display: grid;
+        grid-template-columns: 140px minmax(0, 1fr);
+        gap: var(--report-space);
+        margin: var(--report-pad) 0 0;
+      }
+      dt {
+        color: var(--report-muted);
+      }
+      dd {
+        margin: 0;
+        min-width: 0;
+      }
+      footer {
+        margin-top: var(--report-section);
+        color: var(--report-muted);
+      }
+      @media (max-width: 600px) {
+        main {
+          padding-top: var(--report-pad);
+        }
+        h1 {
+          font-size: 30px;
+        }
+        dl {
+          grid-template-columns: 1fr;
+        }
+        dd {
+          margin-bottom: var(--report-space);
+        }
+        th,
+        td {
+          padding: var(--report-space);
+        }
+      }
+      @media print {
+        :root {
+          color-scheme: light;
+          --report-background: #fff;
+          --report-surface: #fff;
+          --report-raised: #eee;
+          --report-foreground: #111;
+          --report-muted: #444;
+          --report-border: #aaa;
+          --report-accent: #234c20;
+        }
+        main {
+          max-width: none;
+          padding: 0;
+        }
+        .skip-link {
+          display: none;
+        }
+        .table-wrap {
+          overflow: visible;
+        }
+        table {
+          table-layout: fixed;
+          font-size: 10px;
+        }
+        th,
+        td {
+          min-width: 0;
+          padding: 8px;
+        }
+        code {
+          font-size: 9px;
+        }
+        section {
+          margin-top: 20px;
+          padding-top: 20px;
+        }
+        h2,
+        summary {
+          break-after: avoid;
+        }
+        tr {
+          break-inside: avoid;
+        }
+        details > * {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#report">Skip to verification report</a>
+    <main id="report" tabindex="-1">
+      <header>
+        <p class="eyebrow">Fiscal platform · Local evidence</p>
+        <h1>Implementation verification</h1>
+        <p class="verdict">Foundation implemented; assessment incomplete</p>
+        <p class="intro">
+          This report records engineering checks for the application and
+          ingestion foundation. Wise and Adyen have no verified published
+          financial dataset. Passing software checks does not establish
+          financial accuracy or completion of the assessment.
+        </p>
+        <nav aria-label="Report navigation">
+          <a href="http://127.0.0.1:3100">Open local app</a>
+          <a href="../verification-report.md">Written verification report</a>
+          <a href="evidence/results.json">Raw evidence JSON</a>
+          <a href="#results">Check results</a>
+          <a href="#scope">Implemented vs remaining</a>
+          <a href="#walkthrough">Human walkthrough</a>
+          <a href="#limitations">Limitations</a>
+          <a href="#metadata">Technical metadata</a>
+        </nav>
+      </header>
+      <section id="results" aria-labelledby="results-title">
+        <h2 id="results-title">Verification results</h2>
+        <p>
+          15 PASS · 0 FAIL · 0 SKIPPED. These totals reflect only the recorded
+          commands below.
+        </p>
+        <div
+          class="table-wrap"
+          role="region"
+          aria-label="Recorded command results"
+          tabindex="0"
+        >
+          <table>
+            <caption>
+              Command evidence, generated 2026-10-23T09:48:01.111Z
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Check</th>
+                <th scope="col">Result</th>
+                <th scope="col">Command</th>
+                <th scope="col">Duration</th>
+                <th scope="col">Exit code</th>
+                <th scope="col">Evidence log</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Python runtime</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td><code>python --version</code></td>
+                <td>0.07 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/python-runtime.log">python-runtime.log</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Base Git commit</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >git -c safe.directory=C:/Users/onibu/OneDrive - Dalhousie
+                    University/Coded
+                    Projects/fiscal_ai_take_home/fiscal-platform rev-parse
+                    HEAD</code
+                  >
+                </td>
+                <td>0.08 s</td>
+                <td>0</td>
+                <td><a href="evidence/revision.log">revision.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Python lint</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td><code>python -m ruff check pipeline</code></td>
+                <td>0.22 s</td>
+                <td>0</td>
+                <td><a href="evidence/python-lint.log">python-lint.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Python formatting</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td><code>python -m ruff format --check pipeline</code></td>
+                <td>0.18 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/python-format.log">python-format.log</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Strict Python types</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >python -m mypy --config-file pipeline/pyproject.toml
+                    pipeline/src/fiscal_pipeline</code
+                  >
+                </td>
+                <td>21.52 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/python-types.log">python-types.log</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  Python tests including PostgreSQL integration
+                </th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >python -m pytest pipeline/tests -q -p no:cacheprovider
+                    --junitxml=C:\Users\onibu\OneDrive - Dalhousie
+                    University\Coded
+                    Projects\fiscal_ai_take_home\fiscal-platform\docs\verification\evidence\pytest.xml</code
+                  >
+                </td>
+                <td>5.14 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/python-tests.log">python-tests.log</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Generated extraction contracts</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code>python -m fiscal_pipeline.contracts --check</code>
+                </td>
+                <td>0.47 s</td>
+                <td>0</td>
+                <td><a href="evidence/contracts.log">contracts.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Alembic schema drift</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code>python -m alembic -c pipeline/alembic.ini check</code>
+                </td>
+                <td>1.79 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/migration-drift.log">migration-drift.log</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">PostgreSQL server version</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >python -c import os; from sqlalchemy import create_engine,
+                    text;
+                    e=create_engine(os.environ[&#39;TEST_DATABASE_URL&#39;]);
+                    c=e.connect(); print(c.scalar(text(&quot;select
+                    current_setting(&#39;server_version&#39;)&quot;)));
+                    c.close(); e.dispose()</code
+                  >
+                </td>
+                <td>0.96 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/postgres-runtime.log"
+                    >postgres-runtime.log</a
+                  >
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Frontend ESLint</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >node C:\Users\onibu\OneDrive - Dalhousie University\Coded
+                    Projects\fiscal_ai_take_home\fiscal-platform\node_modules\eslint\bin\eslint.js
+                    .</code
+                  >
+                </td>
+                <td>5.70 s</td>
+                <td>0</td>
+                <td><a href="evidence/web-lint.log">web-lint.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Frontend TypeScript</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >node C:\Users\onibu\OneDrive - Dalhousie University\Coded
+                    Projects\fiscal_ai_take_home\fiscal-platform\node_modules\typescript\bin\tsc
+                    --noEmit</code
+                  >
+                </td>
+                <td>2.98 s</td>
+                <td>0</td>
+                <td><a href="evidence/web-types.log">web-types.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Frontend API and rendering tests</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >node C:\Users\onibu\OneDrive - Dalhousie University\Coded
+                    Projects\fiscal_ai_take_home\fiscal-platform\node_modules\vitest\vitest.mjs
+                    run --configLoader native</code
+                  >
+                </td>
+                <td>3.69 s</td>
+                <td>0</td>
+                <td><a href="evidence/web-tests.log">web-tests.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Generated database types</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td><code>node apps/web/scripts/db-types.mjs --check</code></td>
+                <td>1.05 s</td>
+                <td>0</td>
+                <td><a href="evidence/db-types.log">db-types.log</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Verification report safety tests</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code>node --test scripts/verification-report.test.mjs</code>
+                </td>
+                <td>0.20 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/report-tests.log">report-tests.log</a>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Next.js production build</th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>
+                  <code
+                    >node C:\Users\onibu\OneDrive - Dalhousie University\Coded
+                    Projects\fiscal_ai_take_home\fiscal-platform\node_modules\next\dist\bin\next
+                    build apps/web --webpack</code
+                  >
+                </td>
+                <td>41.28 s</td>
+                <td>0</td>
+                <td>
+                  <a href="evidence/production-build.log"
+                    >production-build.log</a
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>HTTP smoke checks</h3>
+        <p class="muted">
+          Endpoint observations are shown separately from command totals.
+        </p>
+        <div
+          class="table-wrap"
+          role="region"
+          aria-label="HTTP smoke results"
+          tabindex="0"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Path</th>
+                <th scope="col">Result</th>
+                <th scope="col">Observed status</th>
+                <th scope="col">Expected</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><code>/api/v1/health</code></th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>200</td>
+                <td>200</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>/api/v1/companies</code></th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>200</td>
+                <td>200</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>/api/v1/companies/wise/statements</code>
+                </th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>404</td>
+                <td>404</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <code>/api/v1/companies/adyen/statements</code>
+                </th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>404</td>
+                <td>404</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>/api/v1/companies/wise/filings</code></th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>200</td>
+                <td>200</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>/api/v1/companies/wise/quality</code></th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>404</td>
+                <td>404</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>/api/v1/companies/wise/export</code></th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>400</td>
+                <td>400</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>/api/v1/companies?unexpected=1</code></th>
+                <td><strong class="status pass">PASS</strong></td>
+                <td>400</td>
+                <td>400</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section id="scope" aria-labelledby="scope-title">
+        <h2 id="scope-title">Implemented vs remaining</h2>
+        <p>
+          Read the <a href="../verification-report.md">written report</a> for
+          the full assessment and evidence context.
+        </p>
+        <div
+          class="table-wrap"
+          role="region"
+          aria-label="Implementation scope"
+          tabindex="0"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Area</th>
+                <th scope="col">Implemented foundation</th>
+                <th scope="col">Remaining assessment work</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Review workspace</th>
+                <td>
+                  Next.js statement workspace, company selection and explicit
+                  empty states.
+                </td>
+                <td>
+                  Verified Wise and Adyen data; source-backed human review of
+                  populated screens.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Source acquisition</th>
+                <td>
+                  Configured official-index discovery and guarded PDF download
+                  commands.
+                </td>
+                <td>
+                  Actual official-report scraping, annual-report classification
+                  and complete historical coverage.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Extraction and review</th>
+                <td>
+                  Optional extraction adapter, exact decimal transformations,
+                  independent inventory validation and provenance contracts.
+                </td>
+                <td>
+                  Real extraction, independently reviewed mappings and financial
+                  accuracy evaluation. No AI call was made.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Publication</th>
+                <td>
+                  Migrations, deterministic comparative selection and guarded
+                  snapshot publication.
+                </td>
+                <td>
+                  Ten-year company backfill, approved real-company snapshots and
+                  a complete backfill orchestrator.
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">Operations</th>
+                <td>Local checks and deployment workflow configuration.</td>
+                <td>
+                  Public deployment, container execution and remote CI
+                  verification.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section id="walkthrough" aria-labelledby="walkthrough-title">
+        <h2 id="walkthrough-title">Human walkthrough</h2>
+        <p>
+          Use the locally running app at
+          <a href="http://127.0.0.1:3100">127.0.0.1:3100</a>. These are review
+          instructions, not a claim that a person completed them.
+        </p>
+        <ol>
+          <li>
+            Select Wise, then Adyen. Each issuer should show an honest
+            unpublished or empty state with no verified financial amounts.
+          </li>
+          <li>
+            Move through the available statement tabs and supporting views.
+            Check that missing source coverage remains visible and that the
+            interface does not imply completed ingestion.
+          </li>
+          <li>
+            Use the keyboard to reach company selection, navigation and report
+            links. Reduce the viewport width and check that the page remains
+            usable.
+          </li>
+          <li>
+            Inspect command logs and raw evidence above. Optional fixture or
+            replay tests exercise synthetic test data; they do not establish
+            real company results.
+          </li>
+        </ol>
+      </section>
+      <section id="limitations" aria-labelledby="limitations-title">
+        <h2 id="limitations-title">Limitations</h2>
+        <ul>
+          <li>
+            No AI provider was called and no paid extraction usage was incurred
+            during this verification.
+          </li>
+          <li>
+            No verified company financial dataset, actual scraping run,
+            classified report inventory or completed backfill is delivered.
+          </li>
+          <li>
+            Container execution, remote CI and a public deployment are not
+            verified by these local checks.
+          </li>
+          <li>
+            A passing test establishes only the behavior it checks. It does not
+            establish financial accuracy, completeness of historical sources or
+            readiness for financial decisions.
+          </li>
+          <li>
+            Evidence describes the recorded revision and local runtime. The app
+            link requires a running local server; it is not a hosted deployment.
+          </li>
+        </ul>
+      </section>
+      <section id="metadata" aria-labelledby="metadata-title">
+        <h2 id="metadata-title">Technical metadata</h2>
+        <details>
+          <summary>Revision, runtime and preserved-document hashes</summary>
+          <dl>
+            <dt>Generated at</dt>
+            <dd><code>2026-10-23T09:48:01.111Z</code></dd>
+            <dt>Base Git commit</dt>
+            <dd><code>e6fc56ca051ba69f8459bc3d3fa783d3fa429a54</code></dd>
+            <dt>Working tree</dt>
+            <dd>
+              <code
+                >?? docs/verification/evidence/ ??
+                docs/verification/index.html</code
+              >
+            </dd>
+            <dt>Node</dt>
+            <dd><code>v22.23.4</code></dd>
+            <dt>Python</dt>
+            <dd><code>Python 3.12.15</code></dd>
+            <dt>Postgres</dt>
+            <dd><code>16.4</code></dd>
+            <dt>Recorded app URL</dt>
+            <dd><code>http://127.0.0.1:3100</code></dd>
+          </dl>
+          <p class="muted">
+            The Git commit identifies the base checkout, not uncommitted or
+            untracked files. Working-tree status is recorded separately; this is
+            not a cryptographic manifest of every tested input.
+          </p>
+          <div
+            class="table-wrap"
+            role="region"
+            aria-label="Preserved document hashes"
+            tabindex="0"
+          >
+            <table>
+              <caption>
+                SHA-256 comparison against the recorded expected values
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Document</th>
+                  <th scope="col">Result</th>
+                  <th scope="col">Observed SHA-256</th>
+                  <th scope="col">Expected SHA-256</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row"><code>docs/problem-statement.md</code></th>
+                  <td><strong class="status pass">PASS</strong></td>
+                  <td>
+                    <code
+                      >dc4f4c30986f6b5eb29a07e8bd31a431c43f299244e1513950ba9ab20e73dee7</code
+                    >
+                  </td>
+                  <td>
+                    <code
+                      >dc4f4c30986f6b5eb29a07e8bd31a431c43f299244e1513950ba9ab20e73dee7</code
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"><code>docs/engineering-design.md</code></th>
+                  <td><strong class="status pass">PASS</strong></td>
+                  <td>
+                    <code
+                      >6e65e3ebb1e8ee3256f0c004e280247ea54cc021c6062a96ce3ef1daf82bfe25</code
+                    >
+                  </td>
+                  <td>
+                    <code
+                      >6e65e3ebb1e8ee3256f0c004e280247ea54cc021c6062a96ce3ef1daf82bfe25</code
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+      <footer>
+        <p>
+          Standalone static report. No network assets or browser JavaScript are
+          required to read it.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

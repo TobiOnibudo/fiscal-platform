@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-23T09:48:01.111Z",
+  "sourceRevision": "e6fc56ca051ba69f8459bc3d3fa783d3fa429a54",
+  "sourceRevisionMeaning": "Base Git commit, not a hash of the working tree",
+  "workingTree": {
+    "recordedAt": "2026-10-23T09:46:30.988Z",
+    "status": "?? docs/verification/evidence/\n?? docs/verification/index.html",
+    "dirty": true
+  },
+  "runtime": {
+    "node": "v22.23.4",
+    "python": "Python 3.12.15",
+    "postgres": "16.4"
+  },
+  "appUrl": "http://127.0.0.1:3100",
+  "testCounts": {
+    "pythonPassed": 34,
+    "frontendPassed": 18
+  },
+  "checks": [
+    {
+      "id": "python-runtime",
+      "label": "Python runtime",
+      "status": "pass",
+      "command": "python --version",
+      "exitCode": 0,
+      "durationMs": 75,
+      "log": "python-runtime.log"
+    },
+    {
+      "id": "revision",
+      "label": "Base Git commit",
+      "status": "pass",
+      "command": "git -c safe.directory=C:/Users/onibu/OneDrive - Dalhousie University/Coded Projects/fiscal_ai_take_home/fiscal-platform rev-parse HEAD",
+      "exitCode": 0,
+      "durationMs": 79,
+      "log": "revision.log"
+    },
+    {
+      "id": "python-lint",
+      "label": "Python lint",
+      "status": "pass",
+      "command": "python -m ruff check pipeline",
+      "exitCode": 0,
+      "durationMs": 218,
+      "log": "python-lint.log"
+    },
+    {
+      "id": "python-format",
+      "label": "Python formatting",
+      "status": "pass",
+      "command": "python -m ruff format --check pipeline",
+      "exitCode": 0,
+      "durationMs": 178,
+      "log": "python-format.log"
+    },
+    {
+      "id": "python-types",
+      "label": "Strict Python types",
+      "status": "pass",
+      "command": "python -m mypy --config-file pipeline/pyproject.toml pipeline/src/fiscal_pipeline",
+      "exitCode": 0,
+      "durationMs": 21523,
+      "log": "python-types.log"
+    },
+    {
+      "id": "python-tests",
+      "label": "Python tests including PostgreSQL integration",
+      "status": "pass",
+      "command": "python -m pytest pipeline/tests -q -p no:cacheprovider --junitxml=C:\\Users\\onibu\\OneDrive - Dalhousie University\\Coded Projects\\fiscal_ai_take_home\\fiscal-platform\\docs\\verification\\evidence\\pytest.xml",
+      "exitCode": 0,
+      "durationMs": 5145,
+      "log": "python-tests.log"
+    },
+    {
+      "id": "contracts",
+      "label": "Generated extraction contracts",
+      "status": "pass",
+      "command": "python -m fiscal_pipeline.contracts --check",
+      "exitCode": 0,
+      "durationMs": 466,
+      "log": "contracts.log"
+    },
+    {
+      "id": "migration-drift",
+      "label": "Alembic schema drift",
+      "status": "pass",
+      "command": "python -m alembic -c pipeline/alembic.ini check",
+      "exitCode": 0,
+      "durationMs": 1786,
+      "log": "migration-drift.log"
+    },
+    {
+      "id": "postgres-runtime",
+      "label": "PostgreSQL server version",
+      "status": "pass",
+      "command": "python -c import os; from sqlalchemy import create_engine, text; e=create_engine(os.environ['TEST_DATABASE_URL']); c=e.connect(); print(c.scalar(text(\"select current_setting('server_version')\"))); c.close(); e.dispose()",
+      "exitCode": 0,
+      "durationMs": 963,
+      "log": "postgres-runtime.log"
+    },
+    {
+      "id": "web-lint",
+      "label": "Frontend ESLint",
+      "status": "pass",
+      "command": "node C:\\Users\\onibu\\OneDrive - Dalhousie University\\Coded Projects\\fiscal_ai_take_home\\fiscal-platform\\node_modules\\eslint\\bin\\eslint.js .",
+      "exitCode": 0,
+      "durationMs": 5703,
+      "log": "web-lint.log"
+    },
+    {
+      "id": "web-types",
+      "label": "Frontend TypeScript",
+      "status": "pass",
+      "command": "node C:\\Users\\onibu\\OneDrive - Dalhousie University\\Coded Projects\\fiscal_ai_take_home\\fiscal-platform\\node_modules\\typescript\\bin\\tsc --noEmit",
+      "exitCode": 0,
+      "durationMs": 2977,
+      "log": "web-types.log"
+    },
+    {
+      "id": "web-tests",
+      "label": "Frontend API and rendering tests",
+      "status": "pass",
+      "command": "node C:\\Users\\onibu\\OneDrive - Dalhousie University\\Coded Projects\\fiscal_ai_take_home\\fiscal-platform\\node_modules\\vitest\\vitest.mjs run --configLoader native",
+      "exitCode": 0,
+      "durationMs": 3686,
+      "log": "web-tests.log"
+    },
+    {
+      "id": "db-types",
+      "label": "Generated database types",
+      "status": "pass",
+      "command": "node apps/web/scripts/db-types.mjs --check",
+      "exitCode": 0,
+      "durationMs": 1050,
+      "log": "db-types.log"
+    },
+    {
+      "id": "report-tests",
+      "label": "Verification report safety tests",
+      "status": "pass",
+      "command": "node --test scripts/verification-report.test.mjs",
+      "exitCode": 0,
+      "durationMs": 203,
+      "log": "report-tests.log"
+    },
+    {
+      "id": "production-build",
+      "label": "Next.js production build",
+      "status": "pass",
+      "command": "node C:\\Users\\onibu\\OneDrive - Dalhousie University\\Coded Projects\\fiscal_ai_take_home\\fiscal-platform\\node_modules\\next\\dist\\bin\\next build apps/web --webpack",
+      "exitCode": 0,
+      "durationMs": 41283,
+      "log": "production-build.log"
+    }
+  ],
+  "smoke": [
+    {
+      "path": "/api/v1/health",
+      "status": 200,
+      "expected": 200,
+      "received": "ready",
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies",
+      "status": 200,
+      "expected": 200,
+      "received": null,
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies/wise/statements",
+      "status": 404,
+      "expected": 404,
+      "received": "NO_PUBLISHED_DATASET",
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies/adyen/statements",
+      "status": 404,
+      "expected": 404,
+      "received": "NO_PUBLISHED_DATASET",
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies/wise/filings",
+      "status": 200,
+      "expected": 200,
+      "received": null,
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies/wise/quality",
+      "status": 404,
+      "expected": 404,
+      "received": "NO_PUBLISHED_DATASET",
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies/wise/export",
+      "status": 400,
+      "expected": 400,
+      "received": "VERSION_REQUIRED",
+      "passed": true
+    },
+    {
+      "path": "/api/v1/companies?unexpected=1",
+      "status": 400,
+      "expected": 400,
+      "received": "INVALID_REQUEST",
+      "passed": true
+    }
+  ],
+  "preservedDocuments": [
+    {
+      "path": "docs/problem-statement.md",
+      "sha256": "dc4f4c30986f6b5eb29a07e8bd31a431c43f299244e1513950ba9ab20e73dee7",
+      "expected": "dc4f4c30986f6b5eb29a07e8bd31a431c43f299244e1513950ba9ab20e73dee7",
+      "passed": true
+    },
+    {
+      "path": "docs/engineering-design.md",
+      "sha256": "6e65e3ebb1e8ee3256f0c004e280247ea54cc021c6062a96ce3ef1daf82bfe25",
+      "expected": "6e65e3ebb1e8ee3256f0c004e280247ea54cc021c6062a96ce3ef1daf82bfe25",
+      "passed": true
+    }
+  ]
+}

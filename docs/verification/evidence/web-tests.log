@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 C:/Users/onibu/OneDrive - Dalhousie University/Coded Projects/fiscal_ai_take_home/fiscal-platform/apps/web
+
+
+ Test Files  3 passed (3)
+      Tests  18 passed (18)
+   Start at  05:47:10
+   Duration  2.85s (transform 1.39s, setup 0ms, import 2.26s, tests 78ms, environment 0ms)
+
