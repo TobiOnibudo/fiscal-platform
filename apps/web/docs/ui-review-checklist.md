@@ -8,10 +8,10 @@ Scope: one new statement review workspace, with secondary filings/quality views 
 - Fiscal range: progressive controls use published period end years, default to latest ten available years; export carries the same from/to range. No invented period columns.
 - Filings manifest: download current filtered page with source hashes and cursor metadata; the label identifies its page scope.
 - Row units: mixed currency/unit rows show their own units beside the label and in source inspection/export; values never converted to Number.
-- States: loading, unpublished selection, database failure, search no matches, no filings, no quality result. No invented Wise/Adyen financial amounts; synthetic data only in test files.
+- States: loading, unpublished selection, load failure, search no matches, no filings, no quality result. Keep messages concise and user-facing; do not display setup steps, request IDs, internal hashes, raw validation JSON, or API debug messages. No invented Wise/Adyen financial amounts; synthetic data only in test files.
 - Coverage: a complete ten-year claim requires evidence. Unpublished state clearly describes unmet coverage; quality defines verified and records gaps.
 - Source: amounts are buttons with row/period/unit labels; native dialog traps focus and closes with Escape and visible close button; essential amount, raw label/text, period, units, document title and PDF/printed pages first; metadata expanded later. Safe publisher links, fallback full document link.
-- Versioning: displayed dataset version travels to history/export; CSV identifies dataset, units, periods, sources, query and historical inclusion. Spreadsheet-active text escaped; exact decimal string preserved.
+- Versioning: the active dataset version travels internally to history/export without displaying internal identifiers. CSV identifies dataset, units, periods, sources, query and historical inclusion. Spreadsheet-active text escaped; exact decimal string preserved.
 - Accessibility: semantic labels, visible focus, keyboard tabs with arrow/Home/End, touch controls, contrast using muted #a4afad on #101315/#171b1e, reduced-motion rule.
 - Responsive: sidebar becomes compact top navigation at 700px; table scroll preserved; source drawer is full width on phone, fixed side drawer on desktop. No page-wide overflow.
 - Visual: restrained dark palette, subtle green accent, readable body text, tabular numeric data; spacing and typography defined centrally in globals.css; no decorative effects.
