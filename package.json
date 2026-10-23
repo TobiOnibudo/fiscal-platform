@@ -1,0 +1,27 @@
+{
+  "name": "fiscal-platform",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@fiscal/web",
+    "lint": "npm run lint --workspace=@fiscal/web",
+    "typecheck": "npm run typecheck --workspace=@fiscal/web",
+    "test": "npm run test --workspace=@fiscal/web",
+    "build": "npm run build --workspace=@fiscal/web",
+    "start": "npm run start --workspace=@fiscal/web",
+    "format:check": "prettier --check .",
+    "db:migrate": "docker compose run --rm migrate",
+    "db:types": "npm run db:types --workspace=@fiscal/web",
+    "db:types:check": "npm run db:types:check --workspace=@fiscal/web"
+  },
+  "devDependencies": {
+    "kysely-codegen": "^0.20.0",
+    "prettier": "3.5.3"
+  }
+}

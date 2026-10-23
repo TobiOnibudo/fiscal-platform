@@ -1,0 +1,12 @@
+package-lock.json
+uv.lock
+.cache/
+.tools/
+.venv/
+archive/
+pipeline/
+docs/problem-statement.md
+docs/engineering-design.md
+docs/implementation-plan.md
+docs/local-development.md
+docs/data-sources.md
