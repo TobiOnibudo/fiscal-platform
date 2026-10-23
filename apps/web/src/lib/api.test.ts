@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GET } from "../app/api/v1/[...path]/route";
-import { published } from "./repository";
+import { published, filings } from "./repository";
 vi.mock("./repository", async (importOriginal) => ({
   ...(await importOriginal<typeof import("./repository")>()),
   published: vi.fn(),
@@ -74,6 +74,21 @@ describe("public API boundary", () => {
     const response = await call("observations/synthetic/history");
     expect(response.status).toBe(400);
     expect(published).not.toHaveBeenCalled();
+  });
+  it("downloads a bounded filtered filing manifest with pagination metadata", async () => {
+    vi.mocked(filings).mockResolvedValue({ items: [], nextCursor: null });
+    const response = await call(
+      "companies/synthetic/filings",
+      "?download=manifest&q=report&limit=30",
+    );
+    expect(response.headers.get("Content-Disposition")).toContain(
+      "source-manifest-page.json",
+    );
+    const body = await response.json();
+    expect(body.companyId).toBe("synthetic");
+    expect(body.filters.search).toBe("report");
+    expect(body.filters.limit).toBe(30);
+    expect(body.nextCursor).toBeNull();
   });
   it("redacts unexpected database failures", async () => {
     vi.mocked(published).mockRejectedValue(

@@ -102,19 +102,45 @@ export async function GET(
     )
       throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
     const company = path[1];
-    if (!["filings", "statements", "quality", "export"].includes(path[2])) throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
-    if (path[2] === "export" && !q.version) throw new ReviewError("VERSION_REQUIRED", "Exports require the displayed dataset version.");
-    if (path[2] === "filings")
-      return Response.json({
-        ...(await filings(company, {
-          search: q.q,
-          classification: q.classification,
-          year: q.year,
-          cursor: q.cursor,
-          limit: q.limit,
-        })),
-        requestId,
+    if (!["filings", "statements", "quality", "export"].includes(path[2]))
+      throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
+    if (path[2] === "export" && !q.version)
+      throw new ReviewError(
+        "VERSION_REQUIRED",
+        "Exports require the displayed dataset version.",
+      );
+    if (path[2] === "filings") {
+      const page = await filings(company, {
+        search: q.q,
+        classification: q.classification,
+        year: q.year,
+        cursor: q.cursor,
+        limit: q.limit,
       });
+      return Response.json(
+        {
+          ...page,
+          companyId: company,
+          filters: {
+            search: q.q ?? "",
+            classification: q.classification ?? null,
+            year: q.year ?? null,
+            cursor: q.cursor ?? null,
+            limit: q.limit,
+          },
+          requestId,
+        },
+        {
+          headers:
+            q.download === "manifest"
+              ? {
+                  "Content-Disposition": `attachment; filename="${company}-source-manifest-page.json"`,
+                  "Cache-Control": "no-store",
+                }
+              : { "Cache-Control": "no-store" },
+        },
+      );
+    }
     const snapshot = await published(company, q.version);
     if (path[2] === "quality")
       return Response.json({
@@ -140,6 +166,17 @@ export async function GET(
           (!q.to || p.end.slice(0, 4) <= q.to),
       ),
     };
+    const visiblePeriods = new Set(
+      statement.periods.map((period) => period.id),
+    );
+    statement.rows = statement.rows.map((row) => ({
+      ...row,
+      cells: Object.fromEntries(
+        Object.entries(row.cells).filter(([period]) =>
+          visiblePeriods.has(period),
+        ),
+      ),
+    }));
     if (path[2] === "export") {
       return new Response(
         statementCsv(snapshot, statement, q.q, q.historical === "true"),

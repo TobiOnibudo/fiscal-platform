@@ -1,6 +1,9 @@
 import { searchRows, type Published, type Statement } from "./contracts";
 function csvCell(value: string, numeric = false): string {
-  const safe = !numeric && /^[=+\-@\t\r\n]/.test(value) ? `'${value}` : value;
+  const safe =
+    !numeric && /^(?:[ \t\r\n]*[=+\-@]|[\t\r\n])/.test(value)
+      ? `'${value}`
+      : value;
   return `"${safe.replaceAll('"', '""')}"`;
 }
 export function statementCsv(

@@ -9,6 +9,7 @@ export const querySchema = z
       .optional(),
     statement: z.enum(["income", "balance", "cashflow"]).default("income"),
     historical: z.enum(["true", "false"]).default("false"),
+    download: z.literal("manifest").optional(),
     limit: z.coerce.number().int().min(1).max(100).default(30),
     cursor: z.string().max(200).optional(),
     classification: z.string().max(100).optional(),
