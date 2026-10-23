@@ -1,0 +1,323 @@
+{
+  "$defs": {
+    "PublicCell": {
+      "additionalProperties": false,
+      "properties": {
+        "comparative": {
+          "enum": [
+            "original",
+            "updated",
+            "restated"
+          ],
+          "title": "Comparative",
+          "type": "string"
+        },
+        "filingId": {
+          "title": "Filingid",
+          "type": "string"
+        },
+        "observationId": {
+          "title": "Observationid",
+          "type": "string"
+        },
+        "pdfPage": {
+          "minimum": 1,
+          "title": "Pdfpage",
+          "type": "integer"
+        },
+        "printedPage": {
+          "title": "Printedpage",
+          "type": "string"
+        },
+        "rawLabel": {
+          "title": "Rawlabel",
+          "type": "string"
+        },
+        "rawText": {
+          "title": "Rawtext",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "reported",
+            "not_reported",
+            "unreadable"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value",
+        "state",
+        "observationId",
+        "filingId",
+        "rawLabel",
+        "rawText",
+        "pdfPage",
+        "printedPage",
+        "comparative"
+      ],
+      "title": "PublicCell",
+      "type": "object"
+    },
+    "PublicCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "expectedPeriods": {
+          "minimum": 0,
+          "title": "Expectedperiods",
+          "type": "integer"
+        },
+        "gaps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Gaps",
+          "type": "array"
+        },
+        "verifiedPeriods": {
+          "minimum": 0,
+          "title": "Verifiedperiods",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "expectedPeriods",
+        "verifiedPeriods",
+        "gaps"
+      ],
+      "title": "PublicCoverage",
+      "type": "object"
+    },
+    "PublicPeriod": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "start",
+        "end"
+      ],
+      "title": "PublicPeriod",
+      "type": "object"
+    },
+    "PublicRow": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aliases",
+          "type": "array"
+        },
+        "cells": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PublicCell"
+          },
+          "title": "Cells",
+          "type": "object"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "depth": {
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Depth",
+          "type": "integer"
+        },
+        "historical": {
+          "title": "Historical",
+          "type": "boolean"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "item",
+            "subtotal",
+            "section"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "currency",
+        "unit",
+        "aliases",
+        "depth",
+        "kind",
+        "historical",
+        "cells"
+      ],
+      "title": "PublicRow",
+      "type": "object"
+    },
+    "PublicStatement": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "id": {
+          "enum": [
+            "income",
+            "balance",
+            "cashflow"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "periods": {
+          "items": {
+            "$ref": "#/$defs/PublicPeriod"
+          },
+          "maxItems": 50,
+          "title": "Periods",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/PublicRow"
+          },
+          "maxItems": 5000,
+          "title": "Rows",
+          "type": "array"
+        },
+        "scope": {
+          "const": "consolidated",
+          "title": "Scope",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "scope",
+        "basis",
+        "currency",
+        "unit",
+        "periods",
+        "rows"
+      ],
+      "title": "PublicStatement",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "companyId": {
+      "minLength": 1,
+      "title": "Companyid",
+      "type": "string"
+    },
+    "coverage": {
+      "$ref": "#/$defs/PublicCoverage"
+    },
+    "kind": {
+      "enum": [
+        "sample",
+        "verified"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "statements": {
+      "items": {
+        "$ref": "#/$defs/PublicStatement"
+      },
+      "title": "Statements",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "companyId",
+    "kind",
+    "statements",
+    "coverage"
+  ],
+  "title": "PublicDataset",
+  "type": "object"
+}

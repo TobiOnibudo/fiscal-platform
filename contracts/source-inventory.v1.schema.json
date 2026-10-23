@@ -1,0 +1,179 @@
+{
+  "$defs": {
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "comparative": {
+          "default": "original",
+          "enum": [
+            "original",
+            "updated",
+            "restated"
+          ],
+          "title": "Comparative",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "page": {
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "printed_page": {
+          "default": "",
+          "title": "Printed Page",
+          "type": "string"
+        },
+        "raw_text": {
+          "title": "Raw Text",
+          "type": "string"
+        },
+        "reviewed": {
+          "default": false,
+          "title": "Reviewed",
+          "type": "boolean"
+        },
+        "row": {
+          "title": "Row",
+          "type": "string"
+        },
+        "source_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Source Hash",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_hash",
+        "page",
+        "row",
+        "label",
+        "column",
+        "raw_text",
+        "unit"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Independent reviewed layout inventory, never derived from candidate rows.",
+  "properties": {
+    "basis": {
+      "title": "Basis",
+      "type": "string"
+    },
+    "boundaries_reviewed": {
+      "title": "Boundaries Reviewed",
+      "type": "boolean"
+    },
+    "cells": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "title": "Cells",
+      "type": "array"
+    },
+    "columns": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Columns",
+      "type": "array"
+    },
+    "company_id": {
+      "title": "Company Id",
+      "type": "string"
+    },
+    "currency": {
+      "title": "Currency",
+      "type": "string"
+    },
+    "decimal_separator": {
+      "default": ".",
+      "enum": [
+        ".",
+        ","
+      ],
+      "title": "Decimal Separator",
+      "type": "string"
+    },
+    "pages": {
+      "items": {
+        "type": "integer"
+      },
+      "title": "Pages",
+      "type": "array"
+    },
+    "period_starts": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "format": "date",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Period Starts",
+      "type": "object"
+    },
+    "rows": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rows",
+      "type": "array"
+    },
+    "scope": {
+      "enum": [
+        "consolidated",
+        "parent"
+      ],
+      "title": "Scope",
+      "type": "string"
+    },
+    "source_hash": {
+      "title": "Source Hash",
+      "type": "string"
+    },
+    "statement": {
+      "enum": [
+        "income",
+        "balance",
+        "cashflow"
+      ],
+      "title": "Statement",
+      "type": "string"
+    }
+  },
+  "required": [
+    "company_id",
+    "source_hash",
+    "statement",
+    "scope",
+    "basis",
+    "rows",
+    "columns",
+    "period_starts",
+    "currency",
+    "pages",
+    "cells",
+    "boundaries_reviewed"
+  ],
+  "title": "SourceInventory",
+  "type": "object"
+}

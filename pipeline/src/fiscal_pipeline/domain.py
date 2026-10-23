@@ -25,6 +25,8 @@ class Evidence(StrictModel):
     raw_text: str
     unit: str
     reviewed: bool = False
+    printed_page: str = ""
+    comparative: Literal["original", "updated", "restated"] = "original"
 
 
 class Cell(StrictModel):

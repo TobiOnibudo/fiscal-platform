@@ -1,0 +1,205 @@
+{
+  "$defs": {
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "comparative": {
+          "default": "original",
+          "enum": [
+            "original",
+            "updated",
+            "restated"
+          ],
+          "title": "Comparative",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "page": {
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "printed_page": {
+          "default": "",
+          "title": "Printed Page",
+          "type": "string"
+        },
+        "raw_text": {
+          "title": "Raw Text",
+          "type": "string"
+        },
+        "reviewed": {
+          "default": false,
+          "title": "Reviewed",
+          "type": "boolean"
+        },
+        "row": {
+          "title": "Row",
+          "type": "string"
+        },
+        "source_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Source Hash",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_hash",
+        "page",
+        "row",
+        "label",
+        "column",
+        "raw_text",
+        "unit"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "amount": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Amount"
+    },
+    "basis": {
+      "title": "Basis",
+      "type": "string"
+    },
+    "company_id": {
+      "title": "Company Id",
+      "type": "string"
+    },
+    "concept_id": {
+      "title": "Concept Id",
+      "type": "string"
+    },
+    "currency": {
+      "pattern": "^[A-Z]{3}$",
+      "title": "Currency",
+      "type": "string"
+    },
+    "evidence": {
+      "$ref": "#/$defs/Evidence"
+    },
+    "filing_id": {
+      "title": "Filing Id",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "mapping_reviewed": {
+      "default": false,
+      "title": "Mapping Reviewed",
+      "type": "boolean"
+    },
+    "period_end": {
+      "format": "date",
+      "title": "Period End",
+      "type": "string"
+    },
+    "period_start": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Period Start"
+    },
+    "published_on": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Published On"
+    },
+    "raw_label": {
+      "title": "Raw Label",
+      "type": "string"
+    },
+    "raw_text": {
+      "title": "Raw Text",
+      "type": "string"
+    },
+    "scope": {
+      "enum": [
+        "consolidated",
+        "parent"
+      ],
+      "title": "Scope",
+      "type": "string"
+    },
+    "statement": {
+      "enum": [
+        "income",
+        "balance",
+        "cashflow"
+      ],
+      "title": "Statement",
+      "type": "string"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    },
+    "value_state": {
+      "enum": [
+        "reported",
+        "not_reported",
+        "unreadable"
+      ],
+      "title": "Value State",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "company_id",
+    "filing_id",
+    "concept_id",
+    "statement",
+    "period_start",
+    "period_end",
+    "published_on",
+    "raw_label",
+    "raw_text",
+    "value_state",
+    "amount",
+    "unit",
+    "currency",
+    "scope",
+    "basis",
+    "evidence"
+  ],
+  "title": "Cell",
+  "type": "object"
+}
