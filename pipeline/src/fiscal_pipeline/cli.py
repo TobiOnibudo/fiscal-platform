@@ -116,6 +116,12 @@ def ingest_extraction(
         filing_id=filing_id,
         expected_statement=expected_statement,
     )
+    extracted = [cell for cell in extracted if cell.raw_label.strip()]
+    if not extracted:
+        raise typer.BadParameter("model output contains no labeled statement rows")
+    binding_hash = logical_hash(
+        [cell.model_dump(mode="json", exclude={"id"}) for cell in extracted]
+    )
     cells = []
     periods = sorted({cell.period_end for cell in extracted}, reverse=True)
     by_period = {
@@ -150,7 +156,7 @@ def ingest_extraction(
             previous_end = cell.period_end.replace(year=cell.period_end.year - 1)
             period_start = previous_end + timedelta(days=1)
         identity = sha256(
-            f"{filing_id}:{source_hash}:{model}:{expected_statement}:{concept_id}:"
+            f"{filing_id}:{source_hash}:{model}:{binding_hash}:{expected_statement}:{concept_id}:"
             f"{cell.period_end}:{index}".encode()
         ).hexdigest()
         cells.append(
@@ -187,9 +193,19 @@ def ingest_extraction(
             cells=cells,
             expected_statement=expected_statement,
         )
-        attempt.status = "approved"
         attempt_id = attempt.id
-    typer.echo(json.dumps({"attemptId": attempt_id, "status": "approved", "cells": len(cells)}))
+        dataset = materialize_automated_dataset(session, company)
+        dataset_id = dataset.id
+    typer.echo(
+        json.dumps(
+            {
+                "attemptId": attempt_id,
+                "datasetId": dataset_id,
+                "status": "published",
+                "cells": len(cells),
+            }
+        )
+    )
 
 
 @app.command("ingest-recorded")
@@ -239,8 +255,19 @@ def ingest_recorded(
             model=model,
             cells=cells,
         )
-        attempt.status = "approved"
-    typer.echo(json.dumps({"attemptId": attempt.id, "status": "approved", "cells": len(cells)}))
+        attempt_id = attempt.id
+        dataset = materialize_automated_dataset(session, company)
+        dataset_id = dataset.id
+    typer.echo(
+        json.dumps(
+            {
+                "attemptId": attempt_id,
+                "datasetId": dataset_id,
+                "status": "published",
+                "cells": len(cells),
+            }
+        )
+    )
 
 
 @app.command("materialize")

@@ -142,6 +142,8 @@ def record_extraction(
         raise ValueError("only consolidated statement cells may be published")
     if any(not cell.basis.strip() for cell in cells):
         raise ValueError("statement basis is required for every cell")
+    if any(not cell.raw_label.strip() or not cell.concept_id.strip() for cell in cells):
+        raise ValueError("statement rows require non-empty labels and concept identities")
     coordinates = [(cell.evidence.row, cell.evidence.column) for cell in cells]
     if len(coordinates) != len(set(coordinates)):
         raise ValueError("statement contains duplicate row and column coordinates")
@@ -149,6 +151,8 @@ def record_extraction(
     columns = {cell.evidence.column for cell in cells}
     if not rows or not columns:
         raise ValueError("statement extraction must contain rows and annual columns")
+    if len(columns) < 2:
+        raise ValueError("annual report extraction must include its comparative column")
     minimum_rows = {"income": 8, "balance": 10, "cashflow": 15}
     statement = next(iter(statements))
     if len(rows) < minimum_rows[statement]:
@@ -238,6 +242,8 @@ def validate_automated_attempts(session: Session, company_id: str) -> dict[str, 
             issues.append("non_consolidated_scope")
         if any(not item.basis.strip() for item in observations):
             issues.append("missing_basis")
+        if any(not item.raw_label.strip() or not item.concept_id.strip() for item in observations):
+            issues.append("missing_row_identity")
         coordinates = [
             (str(item.evidence.get("row", "")), str(item.evidence.get("column", "")))
             for item in observations
@@ -248,6 +254,8 @@ def validate_automated_attempts(session: Session, company_id: str) -> dict[str, 
         stored_columns = {column for _, column in coordinates}
         if not stored_rows or not stored_columns:
             issues.append("incomplete_grid")
+        if len(stored_columns) < 2:
+            issues.append("too_few_annual_columns")
         stored_statements = {item.statement for item in observations}
         if len(stored_statements) == 1:
             minimum_rows = {"income": 8, "balance": 10, "cashflow": 15}
@@ -271,6 +279,9 @@ def validate_automated_attempts(session: Session, company_id: str) -> dict[str, 
 def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
     """Build the current read model from typed observations without a manual gate."""
     validate_automated_attempts(session, company_id)
+    company = session.get(Company, company_id)
+    if company is None:
+        raise ValueError("company not found")
     rows = session.execute(
         select(Observation, Filing)
         .join(ExtractionAttempt, Observation.attempt_id == ExtractionAttempt.id)
@@ -282,6 +293,11 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
         raise ValueError("company has no extracted observations")
     selected: dict[tuple[str, str, date | None, date], tuple[Observation, Filing]] = {}
     for observation, filing in rows:
+        if (
+            observation.statement == "balance"
+            and observation.period_end.month != company.fiscal_year_end_month
+        ):
+            continue
         key = (
             observation.statement,
             observation.concept_id,
@@ -320,15 +336,22 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
                 "end": observation.period_end,
             }
             concepts.setdefault(observation.concept_id, []).append((observation, filing))
+
+        def filing_precedence(pair: tuple[Observation, Filing]) -> tuple[int, date]:
+            return (
+                int(pair[1].metadata_json.get("reportYear", 0)),
+                pair[1].published_on or date.min,
+            )
+
         ordered = sorted(
             concepts.items(),
-            key=lambda item: min(
-                int(pair[0].evidence.get("sourceOrder", 999999)) for pair in item[1]
+            key=lambda item: int(
+                max(item[1], key=filing_precedence)[0].evidence.get("sourceOrder", 999999)
             ),
         )
         public_rows = []
         for concept_id, observations in ordered:
-            latest_observation = max(observations, key=lambda pair: pair[0].period_end)[0]
+            latest_observation = max(observations, key=filing_precedence)[0]
             cells = {}
             for observation, filing in observations:
                 evidence = observation.evidence
@@ -375,17 +398,23 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
                 "rows": public_rows,
             }
         )
-    present = {statement["id"] for statement in statements}
-    years = sorted(
-        {period["end"].year for statement in statements for period in statement["periods"]}
-    )
-    gaps = [f"{name} has not been extracted" for name in titles if name not in present]
+    years_by_statement = {
+        statement["id"]: {period["end"].year for period in statement["periods"]}
+        for statement in statements
+    }
+    counts = [len(years_by_statement.get(statement_id, set())) for statement_id in titles]
+    gaps = [
+        f"{titles[statement_id]} covers "
+        f"{len(years_by_statement.get(statement_id, set()))} of 10 periods"
+        for statement_id in titles
+        if len(years_by_statement.get(statement_id, set())) < 10
+    ]
     payload = {
         "schemaVersion": "1",
         "companyId": company_id,
         "kind": "verified",
         "statements": statements,
-        "coverage": {"expectedPeriods": 10, "verifiedPeriods": min(len(years), 10), "gaps": gaps},
+        "coverage": {"expectedPeriods": 10, "verifiedPeriods": min(min(counts), 10), "gaps": gaps},
     }
     public = PublicDataset.model_validate(payload)
     payload = public.model_dump(mode="json")
