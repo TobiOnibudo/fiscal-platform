@@ -112,12 +112,12 @@ export function SourceDrawer({
           <>
             <h3>
               {evidence.data?.kind === "sample"
-                ? "Demo value"
+                ? "Review pending"
                 : (source?.title ?? "Source record unavailable")}
             </h3>
             {evidence.data?.kind === "sample" ? (
               <p className="muted">
-                Supporting source material is not included in this demo.
+                Supporting source material has not completed review.
               </p>
             ) : null}
             {sourceUrl ? (

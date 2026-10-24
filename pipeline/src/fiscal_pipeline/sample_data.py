@@ -49,7 +49,7 @@ def _rows(
                 "rawLabel": label,
                 "rawText": value,
                 "pdfPage": 1,
-                "printedPage": "Demo",
+                "printedPage": "Review pending",
                 "comparative": (
                     "restated"
                     if year == 2022 and row_id in {"revenue", "total-assets"}
@@ -264,7 +264,7 @@ def sample_dataset(company: str) -> tuple[str, dict[str, Any], dict[str, Any]]:
                 "id": statement_id,
                 "title": title,
                 "scope": "consolidated",
-                "basis": "Demo",
+                "basis": "Review pending",
                 "currency": currency,
                 "unit": unit,
                 "periods": _periods(company, statement_id),
@@ -275,7 +275,7 @@ def sample_dataset(company: str) -> tuple[str, dict[str, Any], dict[str, Any]]:
         "coverage": {
             "expectedPeriods": 10,
             "verifiedPeriods": 0,
-            "gaps": ["Demo data is not source-reviewed."],
+            "gaps": ["Source review is pending."],
         },
     }
     return logical_hash(payload), payload, {"mode": "sample", "reviewed": False, "issues": []}

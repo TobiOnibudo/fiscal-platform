@@ -183,7 +183,7 @@ export function Workspace() {
               <span className="status-dot" />
               {data
                 ? isSample
-                  ? "Demo data"
+                  ? "Review pending"
                   : "Published review dataset"
                 : "Awaiting published data"}
             </span>
@@ -276,8 +276,8 @@ export function Workspace() {
                 </div>
                 {isSample ? (
                   <div className="sample-note" role="note">
-                    Demo figures for product evaluation. They are not intended
-                    for financial analysis.
+                    These figures have not completed source review and are not
+                    intended for financial analysis.
                   </div>
                 ) : null}
                 <details className="display-options">

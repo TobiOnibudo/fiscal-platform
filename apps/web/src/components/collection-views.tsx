@@ -194,8 +194,8 @@ export function QualityView({
         <>
           {state.data?.kind === "sample" ? (
             <p className="readable">
-              This is a demo dataset for product evaluation. It is not intended
-              for financial analysis.
+              Source review has not been completed for these figures. They are
+              not intended for financial analysis.
             </p>
           ) : null}
           <h3>
@@ -208,7 +208,7 @@ export function QualityView({
           </ul>
           <p>
             {state.data?.kind === "sample"
-              ? "Dataset status: Demo data"
+              ? "Dataset status: Review pending"
               : `Recorded source review: ${state.data?.validation.reviewed ? "Complete" : "Not recorded as complete"}`}
           </p>
         </>
