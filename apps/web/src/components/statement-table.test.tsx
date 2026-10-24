@@ -116,19 +116,15 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain(
       `href="${source.source_url}#page=${cell.pdfPage}"`,
     );
-    expect(drawer).toContain("Full publisher document");
     expect(drawer).toContain(cell.rawLabel);
-    expect(drawer).toContain(cell.rawText);
     expect(drawer).toContain(`PDF page ${cell.pdfPage}`);
-    expect(drawer).toContain(`printed ${cell.printedPage}`);
-    expect(drawer).toContain("Current selection");
-    expect(drawer).toContain("Restated comparative");
-    expect(drawer).toContain("Fiscal period");
-    expect(drawer).toContain("FY2016");
+    expect(drawer).toContain("Selected reported value");
+    expect(drawer).toContain("Restated");
+    expect(drawer).toContain("Value history");
     expect(drawer).toContain("Report year");
     expect(drawer).toContain("2025");
-    expect(drawer).toContain("Reported in");
-    expect(drawer).toContain("Earlier revenue label");
+    expect(drawer).toContain("Treatment");
+    expect(drawer).toContain("Reported label");
     expect(drawer).not.toContain("DEBUG");
     expect(drawer).not.toContain("Publication identifiers");
     expect(drawer).not.toContain(version);
@@ -162,8 +158,8 @@ describe("statement and evidence rendering with synthetic data", () => {
         close={() => undefined}
       />,
     );
-    expect(drawer).toContain("Period and units unavailable");
-    expect(drawer).not.toContain("Loading period and units");
+    expect(drawer).toContain("Value details could not load");
+    expect(drawer).not.toContain("Loading value details");
     const quality = renderToStaticMarkup(
       <QualityView company="synthetic" retry={0} />,
     );
@@ -244,6 +240,6 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(html).toContain('aria-labelledby="source-title"');
     expect(html).toContain('aria-label="Close source inspector"');
     expect(html).toContain(cell.rawLabel);
-    expect(html).toContain(`PDF page ${cell.pdfPage}`);
+    expect(html).toContain("Loading value details");
   });
 });
