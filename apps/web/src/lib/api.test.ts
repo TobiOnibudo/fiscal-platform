@@ -90,6 +90,14 @@ describe("public API boundary", () => {
     expect(body.filters.limit).toBe(30);
     expect(body.nextCursor).toBeNull();
   });
+  it("defaults filing pages to five records", async () => {
+    vi.mocked(filings).mockResolvedValue({ items: [], nextCursor: null });
+    await call("companies/synthetic/filings");
+    expect(filings).toHaveBeenCalledWith(
+      "synthetic",
+      expect.objectContaining({ limit: 5 }),
+    );
+  });
   it("redacts unexpected database failures", async () => {
     vi.mocked(published).mockRejectedValue(
       new Error("postgres://private:secret@example.invalid"),

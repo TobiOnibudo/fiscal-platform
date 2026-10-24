@@ -107,6 +107,7 @@ export async function filings(
       "classification",
       "published_on",
       "sha256",
+      "metadata",
     ])
     .where("company_id", "=", company);
   if (options.search)
@@ -122,8 +123,18 @@ export async function filings(
     .orderBy("id")
     .limit(options.limit + 1)
     .execute();
+  const items = rows.slice(0, options.limit).map(({ metadata, ...filing }) => ({
+    ...filing,
+    report_year:
+      metadata &&
+      typeof metadata === "object" &&
+      !Array.isArray(metadata) &&
+      typeof metadata.reportYear === "number"
+        ? metadata.reportYear
+        : null,
+  }));
   return {
-    items: rows.slice(0, options.limit),
+    items,
     nextCursor: rows.length > options.limit ? rows[options.limit - 1].id : null,
   };
 }

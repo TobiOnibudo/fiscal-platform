@@ -3,6 +3,9 @@ import { useState } from "react";
 import { FileText, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { safeSource, type Filing } from "@/lib/contracts";
 import { useReview, type StatementResponse } from "./review-client";
+
+const FILINGS_PER_PAGE = 5;
+
 export function FilingsView({
   company,
   retry,
@@ -13,10 +16,16 @@ export function FilingsView({
   const [query, setQuery] = useState("");
   const [classification, setClassification] = useState("");
   const [year, setYear] = useState("");
-  const [cursor, setCursor] = useState("");
+  const [page, setPage] = useState(0);
+  const [pageCursors, setPageCursors] = useState([""]);
+  const cursor = pageCursors[page] ?? "";
+  const resetPagination = () => {
+    setPage(0);
+    setPageCursors([""]);
+  };
   const params = new URLSearchParams({
     q: query,
-    limit: "30",
+    limit: String(FILINGS_PER_PAGE),
     ...(classification ? { classification } : {}),
     ...(year ? { year } : {}),
     ...(cursor ? { cursor } : {}),
@@ -38,7 +47,7 @@ export function FilingsView({
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
-              setCursor("");
+              resetPagination();
             }}
             placeholder="Report title"
           />
@@ -49,7 +58,7 @@ export function FilingsView({
             value={classification}
             onChange={(e) => {
               setClassification(e.target.value);
-              setCursor("");
+              resetPagination();
             }}
           >
             <option value="">All documents</option>
@@ -68,7 +77,7 @@ export function FilingsView({
             value={year}
             onChange={(e) => {
               setYear(e.target.value);
-              setCursor("");
+              resetPagination();
             }}
             placeholder="All years"
           />
@@ -91,7 +100,9 @@ export function FilingsView({
                   <p>
                     {filing.classification.replaceAll("_", " ")} ·{" "}
                     {filing.published_on?.slice(0, 10) ??
-                      "Publication date not established"}
+                      (filing.report_year
+                        ? `FY${filing.report_year}`
+                        : "Date unavailable")}
                   </p>
                 </div>
                 {safeSource(filing.source_url) ? (
@@ -111,15 +122,31 @@ export function FilingsView({
           <div className="pagination">
             <button
               className="button"
-              disabled={!cursor}
-              onClick={() => setCursor("")}
+              disabled={page === 0}
+              onClick={() => setPage(0)}
             >
               First page
             </button>
             <button
               className="button"
+              disabled={page === 0}
+              onClick={() => setPage((current) => current - 1)}
+            >
+              Previous page
+            </button>
+            <span aria-live="polite">Page {page + 1}</span>
+            <button
+              className="button"
               disabled={!state.data.nextCursor}
-              onClick={() => setCursor(state.data?.nextCursor ?? "")}
+              onClick={() => {
+                const nextCursor = state.data?.nextCursor;
+                if (!nextCursor) return;
+                setPageCursors((current) => [
+                  ...current.slice(0, page + 1),
+                  nextCursor,
+                ]);
+                setPage((current) => current + 1);
+              }}
             >
               Next page
             </button>

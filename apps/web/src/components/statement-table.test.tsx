@@ -90,6 +90,7 @@ describe("statement and evidence rendering with synthetic data", () => {
       source_url: "https://example.com/annual-report.pdf",
       classification: "annual_report",
       published_on: "2025-03-31",
+      report_year: 2025,
       sha256: "c".repeat(64),
     };
     vi.mocked(useReview).mockReturnValue({
@@ -254,6 +255,9 @@ describe("statement and evidence rendering with synthetic data", () => {
     );
     expect(filings).toContain(source.title);
     expect(filings).toContain(`href="${source.source_url}"`);
+    expect(filings).toContain("Page 1");
+    expect(filings).toContain("Previous page");
+    expect(filings).not.toContain("Publication date not established");
     expect(filings).not.toContain("Source hash");
     expect(filings).not.toContain(source.sha256);
   });

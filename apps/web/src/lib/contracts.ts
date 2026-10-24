@@ -119,6 +119,7 @@ export type Filing = {
   source_url: string;
   classification: string;
   published_on: string | null;
+  report_year: number | null;
   sha256: string;
 };
 export type Published = { version: string; data: Dataset; validation: unknown };
