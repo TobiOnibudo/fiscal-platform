@@ -9,7 +9,7 @@
     "node": ">=22.14.0"
   },
   "scripts": {
-    "dev": "node --env-file-if-exists=.env node_modules/next/dist/bin/next dev apps/web --hostname 127.0.0.1",
+    "dev": "node --env-file-if-exists=.env node_modules/next/dist/bin/next dev apps/web --hostname 127.0.0.1 --webpack",
     "lint": "npm run lint --workspace=@fiscal/web",
     "typecheck": "npm run typecheck --workspace=@fiscal/web",
     "test": "npm run test --workspace=@fiscal/web",
