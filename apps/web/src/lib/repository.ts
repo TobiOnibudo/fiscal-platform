@@ -137,6 +137,10 @@ export async function publishedHistory(
 ) {
   const period = statement.periods.find((p) => p.id === periodId);
   if (!period) return [];
+  // A report may spell its units or basis differently (for example,
+  // "thousands" versus "EUR thousands"). The source concept, statement,
+  // reporting period, and consolidation scope identify a value history; expose
+  // each filing's own units instead of filtering those valid predecessors out.
   let query = database()
     .selectFrom("observations")
     .innerJoin(
@@ -152,16 +156,15 @@ export async function publishedHistory(
       "observations.raw_text",
       "observations.amount",
       "observations.value_state",
+      "observations.currency",
+      "observations.unit",
       "observations.evidence",
     ])
     .where("observations.company_id", "=", company)
     .where("observations.concept_id", "=", row.id)
     .where("observations.statement", "=", statement.id)
     .where("observations.period_end", "=", period.end)
-    .where("observations.currency", "=", row.currency)
-    .where("observations.unit", "=", row.unit)
     .where("observations.scope", "=", statement.scope)
-    .where("observations.basis", "=", statement.basis)
     .where("extraction_attempts.status", "=", "approved");
   query = period.start
     ? query.where("observations.period_start", "=", period.start)
@@ -191,7 +194,12 @@ export async function publishedHistory(
     if (!parsed.success) return [];
     seenFilings.add(observation.filing_id);
     return [
-      { cell: parsed.data, period, unit: row.unit, currency: row.currency },
+      {
+        cell: parsed.data,
+        period,
+        unit: observation.unit,
+        currency: observation.currency,
+      },
     ];
   });
 }
