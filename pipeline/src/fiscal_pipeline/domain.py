@@ -112,7 +112,8 @@ def display_label(raw_label: str) -> str:
     document but obscure the financial concept in a data table.  The original
     wording remains on each cell as ``raw_label`` and in its evidence.
     """
-    label = re.sub(r"(?:\s*\.){2,}\s*$", "", raw_label).strip()
+    label = re.sub(r"^(?:-|–|—)\s+", "", raw_label).strip()
+    label = re.sub(r"(?:\s*\.){2,}\s*$", "", label).strip()
     return re.sub(
         r";\s*[\d,]+\s+shares\s+(?:authorized|issued)\b.*$",
         "",

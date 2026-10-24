@@ -103,6 +103,7 @@ def test_numeric_grammar() -> None:
 @pytest.mark.parametrize(
     ("raw_label", "expected"),
     [
+        ("– Trade and other payables", "Trade and other payables"),
         ("Treasury stock . . . . . . . . . . . . . . .", "Treasury stock"),
         (
             "Class A Common shares \u2013 $0.01 par value; 1,025,672,252 shares authorized; "

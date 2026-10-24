@@ -17,6 +17,9 @@ describe("statement and evidence rendering with synthetic data", () => {
     vi.mocked(useReview).mockReturnValue({ loading: true });
   });
   it("removes PDF leaders and share-count disclosures from displayed labels", () => {
+    expect(displayRowLabel("– Trade and other payables")).toBe(
+      "Trade and other payables",
+    );
     expect(displayRowLabel("Treasury stock . . . . . .")).toBe(
       "Treasury stock",
     );
