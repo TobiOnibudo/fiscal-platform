@@ -74,14 +74,6 @@ export function FilingsView({
           />
         </label>
       </div>
-      {state.data ? (
-        <a
-          className="button"
-          href={`/api/v1/companies/${company}/filings?${params}&download=manifest`}
-        >
-          Export filing list (JSON)
-        </a>
-      ) : null}
       {state.loading ? (
         <p role="status">Loading filings…</p>
       ) : state.error ? (
