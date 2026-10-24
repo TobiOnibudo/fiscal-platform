@@ -1,15 +1,17 @@
 "use client";
+
 import { useEffect, useRef } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 import {
   displayDecimal,
   safeSource,
   type Cell,
-  type Statement,
   type Filing,
+  type Statement,
 } from "@/lib/contracts";
 import { useReview } from "./review-client";
 import { missingLabel } from "./statement-table";
+
 type Evidence = {
   datasetVersion: string;
   kind: "sample" | "verified";
@@ -38,6 +40,7 @@ function reportingVersion(comparative: Cell["comparative"]) {
 function reportYear(source: Filing | null) {
   return source?.published_on?.slice(0, 4) ?? "Not recorded";
 }
+
 export function SourceDrawer({
   cell,
   company,
@@ -54,6 +57,7 @@ export function SourceDrawer({
     `observations/${encodeURIComponent(cell.observationId)}/history?company=${company}&version=${version}`,
     0,
   );
+
   useEffect(() => {
     const opener = document.activeElement;
     dialog.current?.showModal();
@@ -61,8 +65,10 @@ export function SourceDrawer({
       if (opener instanceof HTMLElement) opener.focus();
     };
   }, []);
+
   const source = evidence.data?.source;
   const sourceUrl = source ? safeSource(source.source_url) : undefined;
+
   return (
     <dialog
       ref={dialog}
@@ -91,10 +97,10 @@ export function SourceDrawer({
         </p>
         <p>
           {evidence.data
-            ? `${evidence.data.units.currency} · ${evidence.data.units.unit} · ${evidence.data.period?.label ?? "Period unavailable"}`
+            ? `${evidence.data.units.currency} \u00b7 ${evidence.data.units.unit} \u00b7 ${evidence.data.period?.label ?? "Period unavailable"}`
             : evidence.error
               ? "Period and units unavailable. Reopen the inspector to retry."
-              : "Loading period and units…"}
+              : "Loading period and units..."}
         </p>
         <dl>
           <dt>Original label</dt>
@@ -105,11 +111,11 @@ export function SourceDrawer({
           <dd>{reportingVersion(cell.comparative)}</dd>
           <dt>Source page</dt>
           <dd>
-            PDF page {cell.pdfPage} · printed {cell.printedPage}
+            PDF page {cell.pdfPage} {"\u00b7"} printed {cell.printedPage}
           </dd>
         </dl>
         {evidence.loading ? (
-          <p role="status">Loading evidence…</p>
+          <p role="status">Loading evidence...</p>
         ) : evidence.error ? (
           <p role="alert">
             Evidence could not load. Close and reopen the inspector to retry.
@@ -147,44 +153,73 @@ export function SourceDrawer({
                 references above if the document opens at the beginning.
               </p>
             ) : null}
-            <details open={Boolean(evidence.data?.previousObservations.length)}>
+            <details
+              className="value-history"
+              open={Boolean(evidence.data?.previousObservations.length)}
+            >
               <summary>Value history</summary>
-              <p>
-                The clean view follows the latest approved statement structure
-                and latest compatible observation for each period.
-              </p>
-              <p className="muted">
-                Current source report year: {reportYear(source ?? null)}
-              </p>
+              <section className="history-current" aria-label="Current value">
+                <span className="history-kicker">Current selection</span>
+                <strong className="history-value">
+                  {cell.value === null
+                    ? missingLabel(cell.state)
+                    : displayDecimal(cell.value)}
+                </strong>
+                <span className="history-context">
+                  {reportingVersion(cell.comparative)} {"\u00b7"} report year{" "}
+                  {reportYear(source ?? null)}
+                </span>
+              </section>
               {evidence.data?.previousObservations.length ? (
-                <ul className="gap-list">
+                <div
+                  className="history-list"
+                  aria-label="Earlier reported values"
+                >
                   {evidence.data.previousObservations.map((previous) => (
-                    <li key={previous.cell.observationId}>
-                      <strong>
-                        {reportingVersion(previous.cell.comparative)}
-                      </strong>
-                      {" · "}
-                      {previous.cell.value === null
-                        ? missingLabel(previous.cell.state)
-                        : displayDecimal(previous.cell.value)}{" "}
-                      {previous.currency} {previous.unit} · original label:{" "}
-                      {previous.cell.rawLabel} · PDF page{" "}
-                      {previous.cell.pdfPage} · printed{" "}
-                      {previous.cell.printedPage}
-                      <br />
-                      Fiscal period: {previous.period.label} · source report:{" "}
-                      {previous.source?.title ?? "Not recorded"} · report year:{" "}
-                      {reportYear(previous.source)}
-                    </li>
+                    <article
+                      className="history-entry"
+                      key={previous.cell.observationId}
+                    >
+                      <div className="history-entry-head">
+                        <span className="history-kicker">
+                          {reportingVersion(previous.cell.comparative)}
+                        </span>
+                        <strong className="history-value">
+                          {previous.cell.value === null
+                            ? missingLabel(previous.cell.state)
+                            : displayDecimal(previous.cell.value)}
+                        </strong>
+                      </div>
+                      <dl className="history-metadata">
+                        <div>
+                          <dt>Fiscal period</dt>
+                          <dd>{previous.period.label}</dd>
+                        </div>
+                        <div>
+                          <dt>Report year</dt>
+                          <dd>{reportYear(previous.source)}</dd>
+                        </div>
+                        <div className="history-source">
+                          <dt>Reported in</dt>
+                          <dd>
+                            {previous.source?.title ??
+                              "Source record unavailable"}
+                          </dd>
+                        </div>
+                      </dl>
+                    </article>
                   ))}
-                </ul>
+                </div>
               ) : (
-                <p>No earlier compatible reported value is available.</p>
+                <p className="muted">
+                  No earlier compatible reported value is available.
+                </p>
               )}
-              <p>
-                Historical aliases:{" "}
-                {evidence.data?.row.aliases.join(", ") || "None recorded"}
-              </p>
+              {evidence.data?.row.aliases.length ? (
+                <p className="history-aliases">
+                  Historical labels: {evidence.data.row.aliases.join(", ")}
+                </p>
+              ) : null}
             </details>
           </>
         )}

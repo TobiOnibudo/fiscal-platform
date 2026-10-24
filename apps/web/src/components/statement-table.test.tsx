@@ -94,6 +94,7 @@ describe("statement and evidence rendering with synthetic data", () => {
               ...cell,
               value: "123.45",
               rawLabel: "Earlier reported label",
+              comparative: "restated",
             },
             period: statement.periods[0],
             currency: "GBP",
@@ -120,11 +121,13 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain(cell.rawText);
     expect(drawer).toContain(`PDF page ${cell.pdfPage}`);
     expect(drawer).toContain(`printed ${cell.printedPage}`);
-    expect(drawer).toContain("123.45 GBP millions");
-    expect(drawer).toContain("Earlier reported label");
-    expect(drawer).toContain("Current source report year: 2025");
-    expect(drawer).toContain("Fiscal period: FY2016");
-    expect(drawer).toContain("report year: 2025");
+    expect(drawer).toContain("Current selection");
+    expect(drawer).toContain("Restated comparative");
+    expect(drawer).toContain("Fiscal period");
+    expect(drawer).toContain("FY2016");
+    expect(drawer).toContain("Report year");
+    expect(drawer).toContain("2025");
+    expect(drawer).toContain("Reported in");
     expect(drawer).toContain("Earlier revenue label");
     expect(drawer).not.toContain("DEBUG");
     expect(drawer).not.toContain("Publication identifiers");
