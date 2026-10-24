@@ -248,7 +248,8 @@ def materialize(company: str) -> None:
     """Publish the current deterministic read model from extracted observations."""
     with Session(create_engine(database_url())) as session, session.begin():
         dataset = materialize_automated_dataset(session, company)
-    typer.echo(json.dumps({"company": company, "datasetId": dataset.id, "status": "published"}))
+        dataset_id = dataset.id
+    typer.echo(json.dumps({"company": company, "datasetId": dataset_id, "status": "published"}))
 
 
 @app.command("validate-attempts")
