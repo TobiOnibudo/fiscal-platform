@@ -2,6 +2,7 @@
 
 import json
 from datetime import date
+from decimal import Decimal
 from hashlib import sha256
 from typing import Any
 
@@ -13,6 +14,7 @@ from fiscal_pipeline.domain import (
     Cell,
     SourceInventory,
     logical_hash,
+    parse_amount,
     select_latest,
     validate,
 )
@@ -39,7 +41,7 @@ COMPANIES = [
         "Adyen N.V.",
         12,
         "https://investors.adyen.com/financials",
-        ["investors.adyen.com", "adyen.com"],
+        ["investors.adyen.com", "adyen.com", "brand.adyen.com", "www.euronext.com"],
     ),
 ]
 
@@ -57,6 +59,10 @@ def seed_companies(session: Session) -> None:
             )
             session.flush()
             session.add(CompanyPublication(company_id=company_id, dataset_id=None, generation=0))
+        else:
+            company = session.get(Company, company_id)
+            if company is not None:
+                company.config = {"entryPoints": [entry], "approvedDomains": domains}
 
 
 def record_filing(
@@ -69,6 +75,7 @@ def record_filing(
     classification: str,
     published_on: date | None,
     storage_metadata: dict[str, Any],
+    report_year: int | None = None,
 ) -> Filing:
     """Create or complete the filing record for one immutable source PDF."""
     filing_id = f"{company_id}-{sha256}"
@@ -80,6 +87,8 @@ def record_filing(
             raise ValueError("filing digest is already registered to another publisher URL")
         metadata = dict(filing.metadata_json)
         metadata["storage"] = storage_metadata
+        if report_year is not None:
+            metadata["reportYear"] = report_year
         filing.metadata_json = metadata
         filing.title = title
         filing.classification = classification
@@ -93,7 +102,10 @@ def record_filing(
         sha256=sha256,
         classification=classification,
         published_on=published_on,
-        metadata_json={"storage": storage_metadata},
+        metadata_json={
+            "storage": storage_metadata,
+            **({"reportYear": report_year} if report_year is not None else {}),
+        },
     )
     session.add(filing)
     return filing
@@ -107,12 +119,9 @@ def record_extraction(
     source_hash: str,
     model: str,
     cells: list[Cell],
+    expected_statement: str | None = None,
 ) -> ExtractionAttempt:
-    """Persist an immutable model transcription as a review-only candidate.
-
-    This deliberately does not promote or rewrite evidence. Human decisions are
-    recorded separately, and publication still requires independent validation.
-    """
+    """Persist an immutable transcription after deterministic data validation."""
     filing = session.get(Filing, filing_id)
     if filing is None or filing.company_id != company_id:
         raise ValueError("filing does not belong to the selected company")
@@ -124,6 +133,39 @@ def record_extraction(
         raise ValueError("model output contains a different filing")
     if any(cell.evidence.source_hash != source_hash for cell in cells):
         raise ValueError("model output evidence does not match the supplied PDF")
+    statements = {cell.statement for cell in cells}
+    if len(statements) != 1 or (expected_statement and statements != {expected_statement}):
+        raise ValueError("model output does not match the expected statement")
+    if len(cells) < 8 or sum(cell.value_state == "reported" for cell in cells) < 6:
+        raise ValueError("statement extraction is too sparse to be usable")
+    if any(cell.scope != "consolidated" for cell in cells):
+        raise ValueError("only consolidated statement cells may be published")
+    if any(not cell.basis.strip() for cell in cells):
+        raise ValueError("statement basis is required for every cell")
+    coordinates = [(cell.evidence.row, cell.evidence.column) for cell in cells]
+    if len(coordinates) != len(set(coordinates)):
+        raise ValueError("statement contains duplicate row and column coordinates")
+    rows = {cell.evidence.row for cell in cells}
+    columns = {cell.evidence.column for cell in cells}
+    if not rows or not columns:
+        raise ValueError("statement extraction must contain rows and annual columns")
+    minimum_rows = {"income": 8, "balance": 10, "cashflow": 15}
+    statement = next(iter(statements))
+    if len(rows) < minimum_rows[statement]:
+        raise ValueError("statement extraction omitted too many source rows")
+    for cell in cells:
+        if cell.evidence.column != cell.period_end.isoformat():
+            raise ValueError("source column must equal the reported period end")
+        if cell.value_state == "reported":
+            if cell.amount is None or parse_amount(cell.raw_text) != Decimal(cell.amount):
+                raise ValueError("canonical amount does not round-trip to the source text")
+        if cell.statement == "balance" and cell.period_start is not None:
+            raise ValueError("balance sheet cells must use instant periods")
+        if cell.statement != "balance" and (
+            cell.period_start is None
+            or not 350 <= (cell.period_end - cell.period_start).days <= 380
+        ):
+            raise ValueError("income and cash-flow cells must use annual periods")
     response_hash = logical_hash([cell.model_dump(mode="json") for cell in cells])
     attempt_id = sha256(f"{filing_id}:{source_hash}:{model}:{response_hash}".encode()).hexdigest()
     existing = session.get(ExtractionAttempt, attempt_id)
@@ -143,7 +185,7 @@ def record_extraction(
     )
     session.add(attempt)
     session.flush()
-    for cell in cells:
+    for source_order, cell in enumerate(cells):
         if session.get(Observation, cell.id) is not None:
             raise ValueError("observation identity already exists")
         session.add(
@@ -166,10 +208,206 @@ def record_extraction(
                 evidence={
                     **cell.evidence.model_dump(mode="json"),
                     "mappingReviewed": cell.mapping_reviewed,
+                    "sourceOrder": source_order,
                 },
             )
         )
     return attempt
+
+
+def validate_automated_attempts(session: Session, company_id: str) -> dict[str, int]:
+    """Approve usable stored grids and quarantine incomplete model output."""
+    attempts = session.scalars(
+        select(ExtractionAttempt)
+        .join(Filing, ExtractionAttempt.filing_id == Filing.id)
+        .where(Filing.company_id == company_id)
+        .where(ExtractionAttempt.status.in_(["approved", "needs_review"]))
+    ).all()
+    for attempt in attempts:
+        observations = session.scalars(
+            select(Observation).where(Observation.attempt_id == attempt.id)
+        ).all()
+        issues: list[str] = []
+        if len(observations) < 8:
+            issues.append("too_few_cells")
+        if sum(item.value_state == "reported" for item in observations) < 6:
+            issues.append("too_few_reported_values")
+        if len({item.statement for item in observations}) != 1:
+            issues.append("mixed_statements")
+        if any(item.scope != "consolidated" for item in observations):
+            issues.append("non_consolidated_scope")
+        if any(not item.basis.strip() for item in observations):
+            issues.append("missing_basis")
+        coordinates = [
+            (str(item.evidence.get("row", "")), str(item.evidence.get("column", "")))
+            for item in observations
+        ]
+        if len(coordinates) != len(set(coordinates)):
+            issues.append("duplicate_coordinates")
+        stored_rows = {row for row, _ in coordinates}
+        stored_columns = {column for _, column in coordinates}
+        if not stored_rows or not stored_columns:
+            issues.append("incomplete_grid")
+        stored_statements = {item.statement for item in observations}
+        if len(stored_statements) == 1:
+            minimum_rows = {"income": 8, "balance": 10, "cashflow": 15}
+            stored_statement = next(iter(stored_statements))
+            if len(stored_rows) < minimum_rows[stored_statement]:
+                issues.append("too_few_statement_rows")
+        if any(
+            str(item.evidence.get("column", "")) != item.period_end.isoformat()
+            for item in observations
+        ):
+            issues.append("period_mismatch")
+        attempt.payload = {**attempt.payload, "automatedValidationIssues": sorted(set(issues))}
+        attempt.status = "validation_failed" if issues else "approved"
+    session.flush()
+    return {
+        "approved": sum(attempt.status == "approved" for attempt in attempts),
+        "validationFailed": sum(attempt.status == "validation_failed" for attempt in attempts),
+    }
+
+
+def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
+    """Build the current read model from typed observations without a manual gate."""
+    validate_automated_attempts(session, company_id)
+    rows = session.execute(
+        select(Observation, Filing)
+        .join(ExtractionAttempt, Observation.attempt_id == ExtractionAttempt.id)
+        .join(Filing, ExtractionAttempt.filing_id == Filing.id)
+        .where(Observation.company_id == company_id)
+        .where(ExtractionAttempt.status == "approved")
+    ).all()
+    if not rows:
+        raise ValueError("company has no extracted observations")
+    selected: dict[tuple[str, str, date | None, date], tuple[Observation, Filing]] = {}
+    for observation, filing in rows:
+        key = (
+            observation.statement,
+            observation.concept_id,
+            observation.period_start,
+            observation.period_end,
+        )
+        current = selected.get(key)
+        current_precedence = (
+            (
+                int(current[1].metadata_json.get("reportYear", 0)),
+                current[1].published_on or date.min,
+            )
+            if current
+            else (0, date.min)
+        )
+        precedence = (
+            int(filing.metadata_json.get("reportYear", 0)),
+            filing.published_on or date.min,
+        )
+        if current is None or precedence > current_precedence:
+            selected[key] = (observation, filing)
+    titles = {"income": "Income statement", "balance": "Balance sheet", "cashflow": "Cash flow"}
+    statements: list[dict[str, Any]] = []
+    for statement_id in ["income", "balance", "cashflow"]:
+        statement_rows = [pair for key, pair in selected.items() if key[0] == statement_id]
+        if not statement_rows:
+            continue
+        periods_by_id: dict[str, dict[str, Any]] = {}
+        concepts: dict[str, list[tuple[Observation, Filing]]] = {}
+        for observation, filing in statement_rows:
+            period_id = observation.period_end.isoformat()
+            periods_by_id[period_id] = {
+                "id": period_id,
+                "label": f"FY{observation.period_end.year}",
+                "start": observation.period_start,
+                "end": observation.period_end,
+            }
+            concepts.setdefault(observation.concept_id, []).append((observation, filing))
+        ordered = sorted(
+            concepts.items(),
+            key=lambda item: min(
+                int(pair[0].evidence.get("sourceOrder", 999999)) for pair in item[1]
+            ),
+        )
+        public_rows = []
+        for concept_id, observations in ordered:
+            latest_observation = max(observations, key=lambda pair: pair[0].period_end)[0]
+            cells = {}
+            for observation, filing in observations:
+                evidence = observation.evidence
+                cells[observation.period_end.isoformat()] = {
+                    "value": str(observation.amount) if observation.amount is not None else None,
+                    "state": observation.value_state,
+                    "observationId": observation.id,
+                    "filingId": filing.id,
+                    "rawLabel": observation.raw_label,
+                    "rawText": observation.raw_text,
+                    "pdfPage": int(evidence["page"]),
+                    "printedPage": str(evidence.get("printed_page", "")),
+                    "comparative": str(evidence.get("comparative", "original")),
+                }
+            public_rows.append(
+                {
+                    "id": concept_id,
+                    "label": latest_observation.raw_label,
+                    "currency": latest_observation.currency,
+                    "unit": latest_observation.unit,
+                    "aliases": sorted(
+                        {
+                            item.raw_label
+                            for item, _ in observations
+                            if item.raw_label != latest_observation.raw_label
+                        }
+                    ),
+                    "depth": 0,
+                    "kind": "item",
+                    "historical": False,
+                    "cells": cells,
+                }
+            )
+        first = statement_rows[0][0]
+        statements.append(
+            {
+                "id": statement_id,
+                "title": titles[statement_id],
+                "scope": "consolidated",
+                "basis": first.basis,
+                "currency": first.currency,
+                "unit": first.unit,
+                "periods": [periods_by_id[key] for key in sorted(periods_by_id)],
+                "rows": public_rows,
+            }
+        )
+    present = {statement["id"] for statement in statements}
+    years = sorted(
+        {period["end"].year for statement in statements for period in statement["periods"]}
+    )
+    gaps = [f"{name} has not been extracted" for name in titles if name not in present]
+    payload = {
+        "schemaVersion": "1",
+        "companyId": company_id,
+        "kind": "verified",
+        "statements": statements,
+        "coverage": {"expectedPeriods": 10, "verifiedPeriods": min(len(years), 10), "gaps": gaps},
+    }
+    public = PublicDataset.model_validate(payload)
+    payload = public.model_dump(mode="json")
+    dataset_id = logical_hash(payload)
+    dataset = session.get(Dataset, dataset_id)
+    if dataset is None:
+        dataset = Dataset(
+            id=dataset_id,
+            company_id=company_id,
+            status="published",
+            payload=payload,
+            validation={"mode": "automated", "reviewed": False, "issues": []},
+        )
+        session.add(dataset)
+    pointer = session.get(CompanyPublication, company_id)
+    if pointer is None:
+        pointer = CompanyPublication(company_id=company_id, dataset_id=dataset_id, generation=1)
+        session.add(pointer)
+    elif pointer.dataset_id != dataset_id:
+        pointer.dataset_id = dataset_id
+        pointer.generation += 1
+    return dataset
 
 
 def publish(session: Session, dataset_id: str, expected_generation: int) -> int:
