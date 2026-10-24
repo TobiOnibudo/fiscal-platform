@@ -174,6 +174,20 @@ def seed_sample() -> None:
             elif pointer.dataset_id != dataset_id:
                 pointer.dataset_id = dataset_id
                 pointer.generation += 1
+        pilot_filing = session.get(Filing, "wise-2020-annual-report")
+        if pilot_filing is None:
+            session.add(
+                Filing(
+                    id="wise-2020-annual-report",
+                    company_id="wise",
+                    title="Wise annual report 2020",
+                    source_url="https://wise.com/imaginary-v2/202fc0ec8b6991c74cb298a6c7b9276c.pdf",
+                    sha256="d0c5a2c85d78bb64342224f9f3de7d91f68825cef3cf31427c83132e1e031c16",
+                    classification="annual_report",
+                    published_on=None,
+                    metadata_json={"status": "unreviewed", "source": "local_pilot"},
+                )
+            )
     typer.echo("Illustrative local sample installed for Wise and Adyen; no values are verified.")
 
 

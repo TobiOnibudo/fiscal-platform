@@ -274,12 +274,6 @@ export function Workspace() {
                     </button>
                   )}
                 </div>
-                {isSample ? (
-                  <div className="sample-note" role="note">
-                    These figures have not completed source review and are not
-                    intended for financial analysis.
-                  </div>
-                ) : null}
                 <details className="display-options">
                   <summary>
                     Fiscal range ·{" "}

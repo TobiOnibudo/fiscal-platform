@@ -79,7 +79,7 @@ export function FilingsView({
           className="button"
           href={`/api/v1/companies/${company}/filings?${params}&download=manifest`}
         >
-          Download source manifest (current page)
+          Export filing list (JSON)
         </a>
       ) : null}
       {state.loading ? (
@@ -104,12 +104,13 @@ export function FilingsView({
                 </div>
                 {safeSource(filing.source_url) ? (
                   <a
+                    className="button"
                     href={safeSource(filing.source_url)}
                     target="_blank"
                     rel="noreferrer"
                     aria-label={`Open ${filing.title}`}
                   >
-                    <ArrowUpRight size={20} />
+                    Open document <ArrowUpRight size={16} />
                   </a>
                 ) : null}
               </article>
