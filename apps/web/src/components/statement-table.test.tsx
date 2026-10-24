@@ -121,7 +121,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain(`PDF page ${cell.pdfPage}`);
     expect(drawer).toContain("Selected reported value");
     expect(drawer).toContain("Restated");
-    expect(drawer).toContain("Restated by the source");
+    expect(drawer).toContain("Changed from the prior compatible filing");
     expect(drawer).toContain("Original");
     expect(drawer).toContain("Reported text");
     expect(drawer).toContain("Value history");
@@ -129,13 +129,26 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain("2025");
     expect(drawer).toContain("Treatment");
     expect(drawer).toContain(
-      "the company explicitly identifies as revised or restated.",
+      "A later filing reports a different value for the same period.",
     );
     expect(drawer).toContain("Reported label");
     expect(drawer).not.toContain("DEBUG");
     expect(drawer).not.toContain("Publication identifiers");
     expect(drawer).not.toContain(version);
     expect(drawer).not.toContain(source.sha256);
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      data: {
+        datasetVersion: version,
+        selected: cell,
+        period: statement.periods[0],
+        row: { label: cell.rawLabel, aliases: [] },
+        units: statement,
+        source,
+        historyStatus: "",
+        previousObservations: [],
+      },
+    });
     const originalDrawer = renderToStaticMarkup(
       <SourceDrawer
         cell={cell}
@@ -146,8 +159,78 @@ describe("statement and evidence rendering with synthetic data", () => {
     );
     expect(originalDrawer).not.toContain("Treatment definitions");
     expect(originalDrawer).not.toContain(
+      "A later filing reports a different value for the same period.",
+    );
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      data: {
+        datasetVersion: version,
+        selected: restatedCell,
+        period: statement.periods[0],
+        row: { label: cell.rawLabel, aliases: [] },
+        units: statement,
+        source,
+        historyStatus: "",
+        previousObservations: [
+          {
+            cell: { ...cell, value: restatedCell.value },
+            period: statement.periods[0],
+            currency: "GBP",
+            unit: "millions",
+            source,
+          },
+        ],
+      },
+    });
+    const unchangedRestatement = renderToStaticMarkup(
+      <SourceDrawer
+        cell={restatedCell}
+        company="synthetic"
+        version={version}
+        close={() => undefined}
+      />,
+    );
+    expect(unchangedRestatement).toContain("Updated comparative");
+    expect(unchangedRestatement).not.toContain("Restated by the source");
+    expect(unchangedRestatement).not.toContain(
       "the company explicitly identifies as revised or restated.",
     );
+    const updatedCell = {
+      ...cell,
+      comparative: "updated" as const,
+      value: "200",
+    };
+    vi.mocked(useReview).mockReturnValue({
+      loading: false,
+      data: {
+        datasetVersion: version,
+        selected: updatedCell,
+        period: statement.periods[0],
+        row: { label: cell.rawLabel, aliases: [] },
+        units: statement,
+        source,
+        historyStatus: "",
+        previousObservations: [
+          {
+            cell: { ...cell, value: "123.45" },
+            period: statement.periods[0],
+            currency: "GBP",
+            unit: "millions",
+            source,
+          },
+        ],
+      },
+    });
+    const changedUpdate = renderToStaticMarkup(
+      <SourceDrawer
+        cell={updatedCell}
+        company="synthetic"
+        version={version}
+        close={() => undefined}
+      />,
+    );
+    expect(changedUpdate).toContain("Changed from the prior compatible filing");
+    expect(changedUpdate).not.toContain("Updated comparative");
     vi.mocked(useReview).mockReturnValue({
       loading: false,
       data: { items: [source], nextCursor: null },
@@ -221,6 +304,16 @@ describe("statement and evidence rendering with synthetic data", () => {
       expect(html.indexOf(`>${statement.rows[index - 1].label}<`)).toBeLessThan(
         html.indexOf(`>${statement.rows[index].label}<`),
       );
+    row.label = "Net revenue . . . . . .";
+    const cleanedLabel = renderToStaticMarkup(
+      <StatementTable
+        statement={statement}
+        rows={[row]}
+        inspect={() => undefined}
+      />,
+    );
+    expect(cleanedLabel).toContain(">Net revenue<");
+    expect(cleanedLabel).not.toContain("Net revenue . . .");
   });
   it("keeps alias matching row structure and historical visibility", () => {
     const statement = datasetSchema.parse(fixture).statements[0];

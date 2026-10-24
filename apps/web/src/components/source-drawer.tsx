@@ -37,17 +37,33 @@ function reportingVersion(comparative: Cell["comparative"]) {
 }
 
 function reportingVersionDetail(comparative: Cell["comparative"]) {
-  if (comparative === "restated") return "Restated by the source";
+  if (comparative === "restated")
+    return "Changed from the prior compatible filing";
   if (comparative === "updated") return "Updated comparative";
   return "As originally reported";
 }
 
 function treatmentDefinition(comparative: Cell["comparative"]) {
   if (comparative === "restated")
-    return "A prior-period amount the company explicitly identifies as revised or restated.";
+    return "A later filing reports a different value for the same period.";
   if (comparative === "updated")
     return "Shown again in a later filing as comparative information; the amount may be unchanged.";
   return null;
+}
+
+function comparableAmount(value: string | null) {
+  if (value === null) return null;
+  const [integer, fractional = ""] = value.split(".");
+  const normalizedFractional = fractional.replace(/0+$/, "");
+  return normalizedFractional ? `${integer}.${normalizedFractional}` : integer;
+}
+
+function visibleTreatment(cell: Cell, previousCells: Cell[]) {
+  const previous = previousCells[0];
+  if (!previous) return "original";
+  return comparableAmount(cell.value) === comparableAmount(previous.value)
+    ? "updated"
+    : "restated";
 }
 
 function reportYear(source: Filing | null) {
@@ -87,12 +103,16 @@ export function SourceDrawer({
   const sourceUrl = source ? safeSource(source.source_url) : undefined;
   const selectedValue =
     cell.value === null ? missingLabel(cell.state) : displayDecimal(cell.value);
-  const treatmentDefinitions = [
-    cell.comparative,
-    ...(evidence.data?.previousObservations.map(
-      (previous) => previous.cell.comparative,
-    ) ?? []),
-  ].filter(
+  const historyCells = [
+    cell,
+    ...(evidence.data?.previousObservations.map((previous) => previous.cell) ??
+      []),
+  ];
+  const historyTreatments = historyCells.map((historyCell, index) =>
+    visibleTreatment(historyCell, historyCells.slice(index + 1)),
+  );
+  const selectedTreatment = historyTreatments[0];
+  const treatmentDefinitions = [...historyTreatments].filter(
     (comparative, index, values) =>
       treatmentDefinition(comparative) !== null &&
       values.indexOf(comparative) === index,
@@ -133,9 +153,9 @@ export function SourceDrawer({
               <div className="selected-value-row">
                 <p className="source-amount">{selectedValue}</p>
                 <span
-                  className={`reporting-status reporting-status-${cell.comparative}`}
+                  className={`reporting-status reporting-status-${selectedTreatment}`}
                 >
-                  {reportingVersion(cell.comparative)}
+                  {reportingVersion(selectedTreatment)}
                 </span>
               </div>
               {evidence.data ? (
@@ -153,7 +173,7 @@ export function SourceDrawer({
                   </div>
                   <div>
                     <dt>Treatment</dt>
-                    <dd>{reportingVersionDetail(cell.comparative)}</dd>
+                    <dd>{reportingVersionDetail(selectedTreatment)}</dd>
                   </div>
                 </dl>
               ) : (
@@ -235,29 +255,31 @@ export function SourceDrawer({
                       <td>{selectedValue}</td>
                       <td>
                         <span
-                          className={`history-status history-status-${cell.comparative}`}
+                          className={`history-status history-status-${selectedTreatment}`}
                         >
-                          {reportingVersion(cell.comparative)}
+                          {reportingVersion(selectedTreatment)}
                         </span>
                       </td>
                     </tr>
-                    {evidence.data?.previousObservations.map((previous) => (
-                      <tr key={previous.cell.observationId}>
-                        <td>{reportYear(previous.source)}</td>
-                        <td>
-                          {previous.cell.value === null
-                            ? missingLabel(previous.cell.state)
-                            : displayDecimal(previous.cell.value)}
-                        </td>
-                        <td>
-                          <span
-                            className={`history-status history-status-${previous.cell.comparative}`}
-                          >
-                            {reportingVersion(previous.cell.comparative)}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {evidence.data?.previousObservations.map(
+                      (previous, index) => (
+                        <tr key={previous.cell.observationId}>
+                          <td>{reportYear(previous.source)}</td>
+                          <td>
+                            {previous.cell.value === null
+                              ? missingLabel(previous.cell.state)
+                              : displayDecimal(previous.cell.value)}
+                          </td>
+                          <td>
+                            <span
+                              className={`history-status history-status-${historyTreatments[index + 1]}`}
+                            >
+                              {reportingVersion(historyTreatments[index + 1])}
+                            </span>
+                          </td>
+                        </tr>
+                      ),
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -13,6 +13,10 @@ export function missingLabel(state: string) {
       : "Missing history";
 }
 
+export function displayRowLabel(label: string) {
+  return label.replace(/(?:\s*\.){2,}\s*$/, "").trimEnd();
+}
+
 export function StatementTable({
   statement,
   rows,
@@ -53,7 +57,7 @@ export function StatementTable({
                   paddingLeft: `calc(var(--space-5) + ${row.depth} * var(--space-4))`,
                 }}
               >
-                {row.label}
+                {displayRowLabel(row.label)}
                 {row.currency !== statement.currency ||
                 row.unit !== statement.unit ? (
                   <small>
@@ -71,7 +75,7 @@ export function StatementTable({
                       <button
                         className="amount"
                         onClick={() => inspect(cell)}
-                        aria-label={`${row.label}, ${period.label}, ${cell.value} ${row.currency} ${row.unit}; inspect source`}
+                        aria-label={`${displayRowLabel(row.label)}, ${period.label}, ${cell.value} ${row.currency} ${row.unit}; inspect source`}
                       >
                         {displayDecimal(cell.value)}
                       </button>
