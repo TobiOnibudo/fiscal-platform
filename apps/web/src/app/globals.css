@@ -11,7 +11,7 @@
   --accent: #b9dbb1;
   --space-4: 16px;
   --space-5: 20px;
-  --topbar-height: 56px;
+  --topbar-height: 48px;
   font-family: "Segoe UI", Arial, sans-serif;
   font-size: 14px;
 }
@@ -244,6 +244,37 @@ main {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.statement-workspace .page-heading {
+  margin-bottom: 8px;
+}
+.statement-workspace .page-heading h1 {
+  font-size: 28px;
+}
+.statement-workspace .page-heading p {
+  margin-top: 2px;
+  font-size: 13px;
+}
+.statement-workspace .statement-tabs {
+  margin-bottom: 8px;
+}
+.statement-workspace .statement-tabs button {
+  padding: 7px 0;
+}
+.statement-workspace .statement-heading {
+  margin-bottom: 8px;
+}
+.statement-workspace .statement-heading p {
+  margin-top: 4px;
+}
+.statement-workspace .sample-note {
+  margin-bottom: 8px;
+  padding-block: 6px;
+}
+.statement-workspace .table-toolbar {
+  margin-bottom: 6px;
 }
 .page-heading {
   display: flex;
