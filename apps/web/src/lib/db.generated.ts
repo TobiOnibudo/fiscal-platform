@@ -80,6 +80,16 @@ export interface Observations {
   value_state: string;
 }
 
+export interface ReviewEvents {
+  attempt_id: string;
+  created_at: ColumnType<Date, string | Date, string | Date>;
+  decision: string;
+  id: string;
+  note: string;
+  observation_id: string | null;
+  reviewer: string;
+}
+
 export interface DB {
   companies: Companies;
   company_publications: CompanyPublications;
@@ -87,4 +97,5 @@ export interface DB {
   extraction_attempts: ExtractionAttempts;
   filings: Filings;
   observations: Observations;
+  review_events: ReviewEvents;
 }

@@ -21,7 +21,7 @@ import {
 } from "./review-client";
 import { SourceDrawer } from "./source-drawer";
 import { StatementTable } from "./statement-table";
-import { FilingsView, QualityView } from "./collection-views";
+import { FilingsView, QualityView, ReviewQueue } from "./collection-views";
 const statementTypes = [
   { id: "income", label: "Income statement" },
   { id: "balance", label: "Balance sheet" },
@@ -141,6 +141,7 @@ export function Workspace() {
           {[
             { id: "statements", name: "Statements", icon: BookOpen },
             { id: "filings", name: "Filings", icon: FileText },
+            { id: "review", name: "Review", icon: ShieldCheck },
             { id: "quality", name: "Data quality", icon: ShieldCheck },
           ].map((item) => (
             <button
@@ -408,6 +409,8 @@ export function Workspace() {
             </>
           ) : view === "filings" ? (
             <FilingsView key={company} company={company} retry={retry} />
+          ) : view === "review" ? (
+            <ReviewQueue company={company} retry={retry} />
           ) : (
             <QualityView
               company={company}

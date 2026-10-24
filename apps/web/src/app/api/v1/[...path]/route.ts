@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { database } from "@/lib/db";
-import { apiFailure, querySchema } from "@/lib/api";
+import { database, reviewDatabase, reviewEnabled } from "@/lib/db";
+import { apiFailure, querySchema, reviewDecisionSchema } from "@/lib/api";
 import {
   companies,
   filings,
@@ -12,6 +12,54 @@ import { statementCsv } from "@/lib/export";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function requireLocalReview() {
+  if (!reviewEnabled())
+    throw new ReviewError("REVIEW_UNAVAILABLE", "Review workspace is unavailable.", 404);
+  return reviewDatabase();
+}
+
+async function reviewAttempt(company: string, attemptId: string) {
+  const db = requireLocalReview();
+  const attempt = await db
+    .selectFrom("extraction_attempts as attempts")
+    .innerJoin("filings", "filings.id", "attempts.filing_id")
+    .select([
+      "attempts.id",
+      "attempts.status",
+      "attempts.response_hash",
+      "attempts.payload",
+      "filings.id as filing_id",
+      "filings.title as filing_title",
+      "filings.source_url",
+      "filings.published_on",
+    ])
+    .where("attempts.id", "=", attemptId)
+    .where("filings.company_id", "=", company)
+    .executeTakeFirst();
+  if (!attempt) throw new ReviewError("ATTEMPT_NOT_FOUND", "Extraction is unavailable.", 404);
+  const [observations, events] = await Promise.all([
+    db.selectFrom("observations")
+      .selectAll()
+      .where("attempt_id", "=", attemptId)
+      .orderBy("statement")
+      .orderBy("raw_label")
+      .orderBy("period_end")
+      .execute(),
+    db.selectFrom("review_events")
+      .selectAll()
+      .where("attempt_id", "=", attemptId)
+      .orderBy("created_at", "desc")
+      .execute(),
+  ]);
+  const latest = new Map<string, (typeof events)[number]>();
+  for (const event of events) if (event.observation_id && !latest.has(event.observation_id)) latest.set(event.observation_id, event);
+  return {
+    ...attempt,
+    observations: observations.map((observation) => ({ ...observation, decision: latest.get(observation.id) ?? null })),
+  };
+}
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ path: string[] }> },
@@ -30,6 +78,28 @@ export async function GET(
         "Query parameters must not repeat.",
       );
     const q = querySchema.parse(Object.fromEntries(url.searchParams));
+    if (path[0] === "companies" && path[2] === "review" && path.length === 3) {
+      const company = path[1];
+      if (!/^[a-z0-9-]{1,100}$/.test(company))
+        throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
+      const db = requireLocalReview();
+      const attempts = await db
+        .selectFrom("extraction_attempts as attempts")
+        .innerJoin("filings", "filings.id", "attempts.filing_id")
+        .select([
+          "attempts.id", "attempts.status", "attempts.payload", "attempts.response_hash",
+          "filings.title as filing_title", "filings.published_on",
+        ])
+        .where("filings.company_id", "=", company)
+        .where("attempts.status", "in", ["needs_review", "validation_failed"])
+        .orderBy("filings.published_on", "desc")
+        .limit(100)
+        .execute();
+      return Response.json({ items: attempts, requestId }, { headers: { "Cache-Control": "no-store" } });
+    }
+    if (path[0] === "companies" && path[2] === "review" && path[3] === "attempts" && path.length === 5) {
+      return Response.json({ ...(await reviewAttempt(path[1], path[4])), requestId }, { headers: { "Cache-Control": "no-store" } });
+    }
     if (path.join("/") === "health") {
       await database().selectFrom("companies").select("id").limit(1).execute();
       return Response.json({ status: "ready", requestId });
@@ -227,6 +297,45 @@ export async function GET(
       },
       { headers: { "Cache-Control": "no-store" } },
     );
+  } catch (error) {
+    return apiFailure(error, requestId);
+  }
+}
+
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ path: string[] }> },
+) {
+  const requestId = randomUUID();
+  try {
+    const { path } = await context.params;
+    if (!(path[0] === "companies" && path[2] === "review" && path[3] === "attempts" && path[5] === "decisions" && path.length === 6))
+      throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
+    const company = path[1];
+    const attemptId = path[4];
+    if (!/^[a-z0-9-]{1,100}$/.test(company) || !/^[a-f0-9]{64}$/.test(attemptId))
+      throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
+    const body = reviewDecisionSchema.parse(await request.json());
+    const result = await reviewAttempt(company, attemptId);
+    const db = requireLocalReview();
+    if (!result.observations.some((item) => item.id === body.observationId))
+      throw new ReviewError("OBSERVATION_NOT_FOUND", "The observation is not part of this extraction.", 404);
+    await db.transaction().execute(async (trx) => {
+      await trx.insertInto("review_events").values({
+        id: randomUUID(), attempt_id: attemptId, observation_id: body.observationId,
+        decision: body.decision, reviewer: body.reviewer, note: body.note, created_at: new Date(),
+      }).execute();
+      const decisions = await trx.selectFrom("review_events")
+        .select(["observation_id", "decision", "created_at"])
+        .where("attempt_id", "=", attemptId).orderBy("created_at", "desc").execute();
+      const current = new Map<string, string>();
+      for (const decision of decisions)
+        if (decision.observation_id && !current.has(decision.observation_id)) current.set(decision.observation_id, decision.decision);
+      const status = result.observations.every((item) => current.get(item.id) === "approved")
+        ? "approved" : body.decision === "rejected" ? "validation_failed" : "needs_review";
+      await trx.updateTable("extraction_attempts").set({ status }).where("id", "=", attemptId).execute();
+    });
+    return Response.json({ ok: true, requestId });
   } catch (error) {
     return apiFailure(error, requestId);
   }
