@@ -4,6 +4,8 @@ Next.js review workspace and a Python ingestion pipeline for source-grounded con
 
 This milestone implements the application shell, exact decimal transformations, independent source validation, comparative selection, migrations, and guarded publication. **No ten-year company dataset has been extracted or verified.** The interface exposes this gap. Committed financial fixtures are synthetic test inputs, never company results. `restore-demo` deliberately exits unsuccessfully until a source-reviewed snapshot exists.
 
+For a local UI walkthrough only, `pipeline seed-sample` installs an explicitly labelled illustrative ten-year dataset for Wise and Adyen. Start the web app with `FISCAL_ALLOW_SAMPLE_DATA=true`; sample values are never eligible for the verified publication workflow and must not be used as company data.
+
 ## Review the current milestone
 
 The local review session uses [the app](http://127.0.0.1:3100/) and a separate [HTML verification report](http://127.0.0.1:3101/verification/). Read the [detailed verification document](docs/verification-report.md) for the requirement matrix, human walkthrough, reproducible commands, and remaining release gates. [Recorded evidence](docs/verification/evidence/results.json) includes logs, test totals, HTTP checks and protected-document hashes. These are local addresses, not a public deployment.

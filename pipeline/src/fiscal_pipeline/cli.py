@@ -13,9 +13,10 @@ from sqlalchemy.orm import Session
 
 from fiscal_pipeline import sources
 from fiscal_pipeline.domain import Cell, SourceInventory, logical_hash, select_latest, validate
-from fiscal_pipeline.models import Company, CompanyPublication
+from fiscal_pipeline.models import Company, CompanyPublication, Dataset, Filing
 from fiscal_pipeline.repository import publish as publish_dataset
 from fiscal_pipeline.repository import seed_companies as seed
+from fiscal_pipeline.sample_data import sample_dataset
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -132,6 +133,48 @@ def seed_companies() -> None:
     with Session(create_engine(database_url())) as session, session.begin():
         seed(session)
     typer.echo("Company configuration seeded; no data has been verified.")
+
+
+@app.command()
+def seed_sample() -> None:
+    """Install local-only illustrative data for a UI walkthrough, never source data."""
+    with Session(create_engine(database_url())) as session, session.begin():
+        seed(session)
+        for company in ["wise", "adyen"]:
+            dataset_id, payload, validation = sample_dataset(company)
+            if session.get(Dataset, dataset_id) is None:
+                session.add(
+                    Dataset(
+                        id=dataset_id,
+                        company_id=company,
+                        status="published",
+                        payload=payload,
+                        validation=validation,
+                    )
+                )
+            filing_id = f"sample-{company}-walkthrough"
+            if session.get(Filing, filing_id) is None:
+                session.add(
+                    Filing(
+                        id=filing_id,
+                        company_id=company,
+                        title="Illustrative local walkthrough data",
+                        source_url="",
+                        sha256="sample",
+                        classification="sample",
+                        published_on=None,
+                        metadata_json={"mode": "sample"},
+                    )
+                )
+            pointer = session.get(CompanyPublication, company)
+            if pointer is None:
+                session.add(
+                    CompanyPublication(company_id=company, dataset_id=dataset_id, generation=1)
+                )
+            elif pointer.dataset_id != dataset_id:
+                pointer.dataset_id = dataset_id
+                pointer.generation += 1
+    typer.echo("Illustrative local sample installed for Wise and Adyen; no values are verified.")
 
 
 @app.command("validate")
