@@ -3,7 +3,9 @@
 import json
 import os
 import re
+from datetime import date
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlsplit
 
 import typer
@@ -15,10 +17,13 @@ from fiscal_pipeline import sources
 from fiscal_pipeline.domain import Cell, SourceInventory, logical_hash, select_latest, validate
 from fiscal_pipeline.models import Company, CompanyPublication, Dataset, Filing
 from fiscal_pipeline.repository import publish as publish_dataset
+from fiscal_pipeline.repository import record_filing as persist_filing
 from fiscal_pipeline.repository import seed_companies as seed
 from fiscal_pipeline.sample_data import sample_dataset
+from fiscal_pipeline.storage import R2Config, create_client, store_pdf
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
+PUBLISHED_ON_OPTION = typer.Option(None, "--published-on")
 
 
 @app.command()
@@ -113,11 +118,59 @@ def discover(company: str) -> None:
 
 
 @app.command()
-def download(company: str, url: str) -> None:
-    """Download one explicit publisher PDF, bounded to 50 MB; classification awaits review."""
+def download(
+    company: str,
+    url: str,
+    store_r2: bool = typer.Option(False, "--store-r2"),
+    record_filing: bool = typer.Option(False, "--record-filing"),
+    title: str | None = typer.Option(None, "--title"),
+    classification: str = typer.Option("unreviewed", "--classification"),
+    published_on: str | None = PUBLISHED_ON_OPTION,
+) -> None:
+    """Archive one official PDF; R2/database writes require explicit operator flags."""
+    if record_filing and not store_r2:
+        raise typer.BadParameter("--record-filing requires --store-r2")
+    if record_filing and not title:
+        raise typer.BadParameter("--record-filing requires --title")
+    try:
+        publication_date = date.fromisoformat(published_on) if published_on else None
+    except ValueError as exc:
+        raise typer.BadParameter("--published-on must use YYYY-MM-DD") from exc
     _, domains = company_config(company)
     archive = Path(os.getenv("ARCHIVE_DIR", "archive"))
-    typer.echo(json.dumps(sources.download(url, domains, archive), indent=2))
+    result: dict[str, Any] = sources.download(url, domains, archive)
+    stored = None
+    if store_r2:
+        config = R2Config.from_environment()
+        stored = store_pdf(
+            create_client(config),
+            config,
+            company,
+            Path(str(result["path"])).read_bytes(),
+            str(result["sha256"]),
+        )
+        result["storage"] = {
+            "provider": "cloudflare-r2",
+            "bucket": config.bucket,
+            "key": stored.key,
+            "sha256": stored.sha256,
+            "size": stored.size,
+            "created": stored.created,
+        }
+    if record_filing and stored is not None and title is not None:
+        with Session(create_engine(database_url())) as session, session.begin():
+            filing = persist_filing(
+                session,
+                company_id=company,
+                title=title,
+                source_url=str(result["sourceUrl"]),
+                sha256=str(result["sha256"]),
+                classification=classification,
+                published_on=publication_date,
+                storage_metadata=dict(result["storage"]),
+            )
+            result["filingId"] = filing.id
+    typer.echo(json.dumps(result, indent=2))
 
 
 def database_url() -> str:

@@ -1,6 +1,7 @@
 """Short transactions only. External requests happen before entering these functions."""
 
 import json
+from datetime import date
 from typing import Any
 
 from sqlalchemy import select
@@ -14,7 +15,7 @@ from fiscal_pipeline.domain import (
     select_latest,
     validate,
 )
-from fiscal_pipeline.models import Company, CompanyPublication, Dataset
+from fiscal_pipeline.models import Company, CompanyPublication, Dataset, Filing
 from fiscal_pipeline.public_contract import PublicDataset
 
 COMPANIES = [
@@ -48,6 +49,46 @@ def seed_companies(session: Session) -> None:
             )
             session.flush()
             session.add(CompanyPublication(company_id=company_id, dataset_id=None, generation=0))
+
+
+def record_filing(
+    session: Session,
+    *,
+    company_id: str,
+    title: str,
+    source_url: str,
+    sha256: str,
+    classification: str,
+    published_on: date | None,
+    storage_metadata: dict[str, Any],
+) -> Filing:
+    """Create or complete the filing record for one immutable source PDF."""
+    filing_id = f"{company_id}-{sha256}"
+    filing = session.get(Filing, filing_id)
+    if filing is not None:
+        if filing.company_id != company_id or filing.sha256 != sha256:
+            raise ValueError("filing identity conflicts with immutable source content")
+        if filing.source_url != source_url:
+            raise ValueError("filing digest is already registered to another publisher URL")
+        metadata = dict(filing.metadata_json)
+        metadata["storage"] = storage_metadata
+        filing.metadata_json = metadata
+        filing.title = title
+        filing.classification = classification
+        filing.published_on = published_on
+        return filing
+    filing = Filing(
+        id=filing_id,
+        company_id=company_id,
+        title=title,
+        source_url=source_url,
+        sha256=sha256,
+        classification=classification,
+        published_on=published_on,
+        metadata_json={"storage": storage_metadata},
+    )
+    session.add(filing)
+    return filing
 
 
 def publish(session: Session, dataset_id: str, expected_generation: int) -> int:

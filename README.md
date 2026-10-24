@@ -49,6 +49,8 @@ uv run --project pipeline pipeline --help
 uv run --project pipeline pipeline add-company example "Example plc" https://example.com/reports example.com --fiscal-month 12
 uv run --project pipeline pipeline discover example
 uv run --project pipeline pipeline download example https://example.com/annual.pdf
+uv sync --project pipeline --extra storage
+uv run --project pipeline pipeline download wise https://publisher.example/annual.pdf --store-r2 --record-filing --title "Wise annual report 2024" --classification annual_report --published-on 2025-03-27
 uv run --project pipeline pipeline locate archive/pdf/REPORT_HASH.pdf
 uv run --project pipeline pipeline validate candidate.json independent-inventory.json
 uv run --project pipeline pipeline replay contracts/fixtures/synthetic-replay.v1.json --offline
