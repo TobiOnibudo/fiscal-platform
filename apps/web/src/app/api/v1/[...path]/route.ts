@@ -64,6 +64,34 @@ export async function GET(
                 .where("id", "=", cell.filingId)
                 .where("company_id", "=", q.company)
                 .executeTakeFirst();
+              const history = await publishedHistory(
+                q.company,
+                statement,
+                row,
+                periodId,
+                cell,
+              );
+              const historyFilingIds = [
+                ...new Set(history.map((item) => item.cell.filingId)),
+              ];
+              const historySources = historyFilingIds.length
+                ? await database()
+                    .selectFrom("filings")
+                    .select([
+                      "id",
+                      "title",
+                      "source_url",
+                      "published_on",
+                      "classification",
+                      "sha256",
+                    ])
+                    .where("company_id", "=", q.company)
+                    .where("id", "in", historyFilingIds)
+                    .execute()
+                : [];
+              const historySourcesById = new Map(
+                historySources.map((item) => [item.id, item]),
+              );
               return Response.json({
                 datasetVersion: snapshot.version,
                 kind: snapshot.data.kind,
@@ -77,13 +105,10 @@ export async function GET(
                   scope: statement.scope,
                 },
                 source: source ?? null,
-                previousObservations: await publishedHistory(
-                  q.company,
-                  statement,
-                  row,
-                  periodId,
-                  cell,
-                ),
+                previousObservations: history.map((item) => ({
+                  ...item,
+                  source: historySourcesById.get(item.cell.filingId) ?? null,
+                })),
                 historyStatus:
                   "Alternative compatible observations are drawn from up to 100 published datasets. Candidate extractions are private. Dataset hashes do not indicate publication order.",
                 requestId,

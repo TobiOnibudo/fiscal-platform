@@ -22,10 +22,22 @@ type Evidence = {
   previousObservations: {
     datasetVersion: string;
     cell: Cell;
+    period: Statement["periods"][number];
     unit: string;
     currency: string;
+    source: Filing | null;
   }[];
 };
+
+function reportingVersion(comparative: Cell["comparative"]) {
+  if (comparative === "restated") return "Restated comparative";
+  if (comparative === "updated") return "Updated comparative";
+  return "Original report";
+}
+
+function reportYear(source: Filing | null) {
+  return source?.published_on?.slice(0, 4) ?? "Not recorded";
+}
 export function SourceDrawer({
   cell,
   company,
@@ -90,13 +102,7 @@ export function SourceDrawer({
           <dt>Original value text</dt>
           <dd className="mono">{cell.rawText || "Blank in source"}</dd>
           <dt>Reporting version</dt>
-          <dd>
-            {cell.comparative === "original"
-              ? "Original observation"
-              : cell.comparative === "restated"
-                ? "Restated by source"
-                : "Updated comparative"}
-          </dd>
+          <dd>{reportingVersion(cell.comparative)}</dd>
           <dt>Source page</dt>
           <dd>
             PDF page {cell.pdfPage} · printed {cell.printedPage}
@@ -141,21 +147,23 @@ export function SourceDrawer({
                 references above if the document opens at the beginning.
               </p>
             ) : null}
-            <details>
-              <summary>Selection and label history</summary>
+            <details open={Boolean(evidence.data?.previousObservations.length)}>
+              <summary>Value history</summary>
               <p>
                 The clean view follows the latest approved statement structure
                 and latest compatible observation for each period.
               </p>
-              <p>
-                {evidence.data?.previousObservations.length
-                  ? "Previously reported values are shown below."
-                  : "No previously reported values are available."}
+              <p className="muted">
+                Current source report year: {reportYear(source ?? null)}
               </p>
               {evidence.data?.previousObservations.length ? (
                 <ul className="gap-list">
                   {evidence.data.previousObservations.map((previous) => (
                     <li key={previous.cell.observationId}>
+                      <strong>
+                        {reportingVersion(previous.cell.comparative)}
+                      </strong>
+                      {" · "}
                       {previous.cell.value === null
                         ? missingLabel(previous.cell.state)
                         : displayDecimal(previous.cell.value)}{" "}
@@ -163,10 +171,16 @@ export function SourceDrawer({
                       {previous.cell.rawLabel} · PDF page{" "}
                       {previous.cell.pdfPage} · printed{" "}
                       {previous.cell.printedPage}
+                      <br />
+                      Fiscal period: {previous.period.label} · source report:{" "}
+                      {previous.source?.title ?? "Not recorded"} · report year:{" "}
+                      {reportYear(previous.source)}
                     </li>
                   ))}
                 </ul>
-              ) : null}
+              ) : (
+                <p>No earlier compatible reported value is available.</p>
+              )}
               <p>
                 Historical aliases:{" "}
                 {evidence.data?.row.aliases.join(", ") || "None recorded"}
