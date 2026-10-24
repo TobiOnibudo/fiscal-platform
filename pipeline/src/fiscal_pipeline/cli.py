@@ -158,7 +158,7 @@ def seed_sample() -> None:
                     Filing(
                         id=filing_id,
                         company_id=company,
-                        title="Illustrative local walkthrough data",
+                        title="Demo dataset",
                         source_url="",
                         sha256="sample",
                         classification="sample",

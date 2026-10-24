@@ -194,13 +194,13 @@ export function QualityView({
         <>
           {state.data?.kind === "sample" ? (
             <p className="readable">
-              This local walkthrough uses illustrative figures. It has no
-              source-review status and must not be used for analysis.
+              This is a demo dataset for product evaluation. It is not intended
+              for financial analysis.
             </p>
           ) : null}
           <h3>
             {state.data?.kind === "sample"
-              ? `${state.data.coverage.expectedPeriods} illustrative periods shown`
+              ? `${state.data.coverage.expectedPeriods} periods available`
               : `${state.data?.coverage.verifiedPeriods} of ${state.data?.coverage.expectedPeriods} target periods verified`}
           </h3>
           <ul className="gap-list">
@@ -208,7 +208,7 @@ export function QualityView({
           </ul>
           <p>
             {state.data?.kind === "sample"
-              ? "Source review: not applicable to illustrative data"
+              ? "Dataset status: Demo data"
               : `Recorded source review: ${state.data?.validation.reviewed ? "Complete" : "Not recorded as complete"}`}
           </p>
         </>

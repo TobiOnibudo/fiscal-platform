@@ -112,13 +112,12 @@ export function SourceDrawer({
           <>
             <h3>
               {evidence.data?.kind === "sample"
-                ? "Illustrative value"
+                ? "Demo value"
                 : (source?.title ?? "Source record unavailable")}
             </h3>
             {evidence.data?.kind === "sample" ? (
               <p className="muted">
-                This is mock data for the local walkthrough and has no
-                supporting filing.
+                Supporting source material is not included in this demo.
               </p>
             ) : null}
             {sourceUrl ? (

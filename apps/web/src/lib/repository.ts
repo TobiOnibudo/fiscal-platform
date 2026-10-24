@@ -69,6 +69,12 @@ export async function published(
     );
   const data = parsed.data;
   const localSampleAllowed = process.env.FISCAL_ALLOW_SAMPLE_DATA === "true";
+  if (data.kind === "sample" && !localSampleAllowed)
+    throw new ReviewError(
+      "NO_PUBLISHED_DATASET",
+      "No reviewed dataset has been published for this company.",
+      404,
+    );
   if (
     data.companyId !== company ||
     (data.kind !== "verified" &&
