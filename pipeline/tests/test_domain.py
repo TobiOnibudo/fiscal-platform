@@ -99,6 +99,16 @@ def test_numeric_grammar() -> None:
             parse_amount(invalid)
 
 
+def test_reported_amount_contract_rejects_formatted_number(
+    candidate: tuple[list[Cell], SourceInventory],
+) -> None:
+    cells, _ = candidate
+    data = cells[0].model_dump()
+    data["amount"] = "1,234.50"
+    with pytest.raises(ValueError, match="String should match pattern"):
+        Cell.model_validate(data)
+
+
 @pytest.mark.parametrize(
     ("mutation", "check"),
     [

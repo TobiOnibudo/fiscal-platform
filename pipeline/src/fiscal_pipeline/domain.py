@@ -41,7 +41,7 @@ class Cell(StrictModel):
     raw_label: str
     raw_text: str
     value_state: Literal["reported", "not_reported", "unreadable"]
-    amount: str | None
+    amount: str | None = Field(default=None, pattern=r"^-?\d+(?:\.\d+)?$")
     unit: str
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     scope: Literal["consolidated", "parent"]
