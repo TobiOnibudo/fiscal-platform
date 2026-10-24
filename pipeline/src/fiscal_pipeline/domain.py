@@ -105,6 +105,22 @@ def parse_amount(raw: str, *, decimal_separator: str = ".") -> Decimal | None:
     return result.copy_negate() if negative else result
 
 
+def display_label(raw_label: str) -> str:
+    """Return a concise published label without altering source evidence.
+
+    PDF table leaders and share-count disclosures are useful in the source
+    document but obscure the financial concept in a data table.  The original
+    wording remains on each cell as ``raw_label`` and in its evidence.
+    """
+    label = re.sub(r"(?:\s*\.){2,}\s*$", "", raw_label).strip()
+    return re.sub(
+        r";\s*[\d,]+\s+shares\s+(?:authorized|issued)\b.*$",
+        "",
+        label,
+        flags=re.IGNORECASE,
+    ).strip()
+
+
 def validate(cells: list[Cell], source: SourceInventory) -> list[Issue]:
     issues: list[Issue] = []
 

@@ -5,16 +5,14 @@ import {
   type Row,
   type Cell,
 } from "@/lib/contracts";
+export { displayRowLabel } from "@/lib/display-label";
+import { displayRowLabel } from "@/lib/display-label";
 export function missingLabel(state: string) {
   return state === "not_reported"
     ? "Not reported"
     : state === "unreadable"
       ? "Unreadable"
       : "Missing history";
-}
-
-export function displayRowLabel(label: string) {
-  return label.replace(/(?:\s*\.){2,}\s*$/, "").trimEnd();
 }
 
 export function StatementTable({

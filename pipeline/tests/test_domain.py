@@ -9,6 +9,7 @@ from fiscal_pipeline.domain import (
     Cell,
     Evidence,
     SourceInventory,
+    display_label,
     logical_hash,
     parse_amount,
     select_latest,
@@ -97,6 +98,22 @@ def test_numeric_grammar() -> None:
     for invalid in ["1,23", "NaN", "1e4", "123*", "(-12)", "12%"]:
         with pytest.raises(ValueError):
             parse_amount(invalid)
+
+
+@pytest.mark.parametrize(
+    ("raw_label", "expected"),
+    [
+        ("Treasury stock . . . . . . . . . . . . . . .", "Treasury stock"),
+        (
+            "Class A Common shares \u2013 $0.01 par value; 1,025,672,252 shares authorized; "
+            "1,025,672,252 shares issued and outstanding as of March 31, 2026",
+            "Class A Common shares \u2013 $0.01 par value",
+        ),
+        ("Property, plant and equipment, net", "Property, plant and equipment, net"),
+    ],
+)
+def test_display_label_removes_pdf_artifacts(raw_label: str, expected: str) -> None:
+    assert display_label(raw_label) == expected
 
 
 def test_reported_amount_contract_rejects_formatted_number(

@@ -9,6 +9,7 @@ import {
   type Filing,
   type Statement,
 } from "@/lib/contracts";
+import { displayRowLabel } from "@/lib/display-label";
 import { useReview } from "./review-client";
 import { missingLabel } from "./statement-table";
 
@@ -128,7 +129,7 @@ export function SourceDrawer({
       <header className="drawer-head">
         <div>
           <h2 id="source-title">Value details</h2>
-          <p>{evidence.data?.row.label ?? cell.rawLabel}</p>
+          <p>{displayRowLabel(evidence.data?.row.label ?? cell.rawLabel)}</p>
         </div>
         <button
           className="icon-button"
@@ -189,7 +190,7 @@ export function SourceDrawer({
               <dl className="source-fields">
                 <div>
                   <dt>Reported label</dt>
-                  <dd>{cell.rawLabel}</dd>
+                  <dd>{displayRowLabel(cell.rawLabel)}</dd>
                 </div>
                 <div>
                   <dt>Reported text</dt>

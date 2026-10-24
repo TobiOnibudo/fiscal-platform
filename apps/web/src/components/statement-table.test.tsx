@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { datasetSchema, searchRows } from "@/lib/contracts";
 import fixture from "../../../../contracts/fixtures/synthetic-dataset.v1.json";
-import { StatementTable } from "./statement-table";
+import { displayRowLabel, StatementTable } from "./statement-table";
 import { SourceDrawer } from "./source-drawer";
 import { FilingsView, QualityView } from "./collection-views";
 import { Workspace } from "./workspace";
@@ -15,6 +15,17 @@ describe("statement and evidence rendering with synthetic data", () => {
   beforeEach(() => {
     vi.mocked(useReview).mockReset();
     vi.mocked(useReview).mockReturnValue({ loading: true });
+  });
+  it("removes PDF leaders and share-count disclosures from displayed labels", () => {
+    expect(displayRowLabel("Treasury stock . . . . . .")).toBe(
+      "Treasury stock",
+    );
+    expect(
+      displayRowLabel(
+        "Class A Common shares – $0.01 par value; 1,025,672,252 shares authorized; " +
+          "1,025,672,252 shares issued and outstanding",
+      ),
+    ).toBe("Class A Common shares – $0.01 par value");
   });
   it.each([
     ["NO_PUBLISHED_DATASET", "No statements available"],

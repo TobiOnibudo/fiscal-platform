@@ -13,6 +13,7 @@ from fiscal_pipeline.domain import (
     RULE_VERSION,
     Cell,
     SourceInventory,
+    display_label,
     logical_hash,
     parse_amount,
     select_latest,
@@ -352,6 +353,7 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
         public_rows = []
         for concept_id, observations in ordered:
             latest_observation = max(observations, key=filing_precedence)[0]
+            label = display_label(latest_observation.raw_label)
             cells = {}
             for observation, filing in observations:
                 evidence = observation.evidence
@@ -369,14 +371,14 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
             public_rows.append(
                 {
                     "id": concept_id,
-                    "label": latest_observation.raw_label,
+                    "label": label,
                     "currency": latest_observation.currency,
                     "unit": latest_observation.unit,
                     "aliases": sorted(
                         {
-                            item.raw_label
+                            item_label
                             for item, _ in observations
-                            if item.raw_label != latest_observation.raw_label
+                            if (item_label := display_label(item.raw_label)) != label
                         }
                     ),
                     "depth": 0,
