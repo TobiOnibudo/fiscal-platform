@@ -22,7 +22,6 @@ type Evidence = {
   source: Filing | null;
   historyStatus: string;
   previousObservations: {
-    datasetVersion: string;
     cell: Cell;
     period: Statement["periods"][number];
     unit: string;
@@ -44,7 +43,11 @@ function reportingVersionDetail(comparative: Cell["comparative"]) {
 }
 
 function reportYear(source: Filing | null) {
-  return source?.published_on?.slice(0, 4) ?? "—";
+  return (
+    source?.published_on?.slice(0, 4) ??
+    source?.title.match(/\b(?:19|20)\d{2}\b/)?.[0] ??
+    "—"
+  );
 }
 
 export function SourceDrawer({

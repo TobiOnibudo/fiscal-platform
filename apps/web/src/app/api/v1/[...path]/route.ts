@@ -111,7 +111,7 @@ export async function GET(
                   source: historySourcesById.get(item.cell.filingId) ?? null,
                 })),
                 historyStatus:
-                  "Alternative compatible observations are drawn from up to 100 published datasets. Candidate extractions are private. Dataset hashes do not indicate publication order.",
+                  "Compatible approved observations are drawn from the source filings stored for this company.",
                 requestId,
               });
             }

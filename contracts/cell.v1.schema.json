@@ -72,12 +72,14 @@
     "amount": {
       "anyOf": [
         {
+          "pattern": "^-?\\d+(?:\\.\\d+)?$",
           "type": "string"
         },
         {
           "type": "null"
         }
       ],
+      "default": null,
       "title": "Amount"
     },
     "basis": {
@@ -193,7 +195,6 @@
     "raw_label",
     "raw_text",
     "value_state",
-    "amount",
     "unit",
     "currency",
     "scope",

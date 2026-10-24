@@ -15,7 +15,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from fiscal_pipeline import sources
-from fiscal_pipeline.domain import Cell, SourceInventory, logical_hash, select_latest, validate
+from fiscal_pipeline.domain import (
+    Cell,
+    SourceInventory,
+    logical_hash,
+    select_latest,
+    validate,
+)
 from fiscal_pipeline.models import Company, CompanyPublication, Dataset, Filing
 from fiscal_pipeline.repository import (
     materialize_automated_dataset,
@@ -145,9 +151,9 @@ def ingest_extraction(
     for row_index, (base, occurrence) in enumerate(ordered_keys):
         concept_id = base if occurrence == 1 else f"{base}-{occurrence}"
         for period in periods:
-            cell = indexed[period].get((base, occurrence))
-            if cell is not None:
-                normalized.append((row_index, concept_id, cell))
+            candidate = indexed[period].get((base, occurrence))
+            if candidate is not None:
+                normalized.append((row_index, concept_id, candidate))
     latest_period = periods[0]
     for index, (row_index, concept_id, cell) in enumerate(normalized):
         if cell.statement == "balance":

@@ -1,5 +1,6 @@
 import { database } from "./db";
 import {
+  cellSchema,
   datasetSchema,
   type Published,
   type Statement,
@@ -136,53 +137,61 @@ export async function publishedHistory(
 ) {
   const period = statement.periods.find((p) => p.id === periodId);
   if (!period) return [];
-  const versions = await database()
-    .selectFrom("datasets")
-    .select(["id", "payload"])
-    .where("company_id", "=", company)
-    .where("status", "=", "published")
-    .orderBy("id")
+  let query = database()
+    .selectFrom("observations")
+    .innerJoin(
+      "extraction_attempts",
+      "extraction_attempts.id",
+      "observations.attempt_id",
+    )
+    .innerJoin("filings", "filings.id", "extraction_attempts.filing_id")
+    .select([
+      "observations.id",
+      "filings.id as filing_id",
+      "observations.raw_label",
+      "observations.raw_text",
+      "observations.amount",
+      "observations.value_state",
+      "observations.evidence",
+    ])
+    .where("observations.company_id", "=", company)
+    .where("observations.concept_id", "=", row.id)
+    .where("observations.statement", "=", statement.id)
+    .where("observations.period_end", "=", period.end)
+    .where("observations.currency", "=", row.currency)
+    .where("observations.unit", "=", row.unit)
+    .where("observations.scope", "=", statement.scope)
+    .where("observations.basis", "=", statement.basis)
+    .where("extraction_attempts.status", "=", "approved");
+  query = period.start
+    ? query.where("observations.period_start", "=", period.start)
+    : query.where("observations.period_start", "is", null);
+  const observations = await query
+    .orderBy("filings.published_on", "desc")
+    .orderBy("observations.id")
     .limit(100)
     .execute();
-  const seen = new Set([selected.observationId]);
-  const history: {
-    datasetVersion: string;
-    cell: Cell;
-    period: typeof period;
-    unit: string;
-    currency: string;
-  }[] = [];
-  for (const version of versions) {
-    const parsed = datasetSchema.safeParse(version.payload);
-    if (
-      !parsed.success ||
-      parsed.data.companyId !== company ||
-      parsed.data.kind !== "verified"
-    )
-      continue;
-    const previousStatement = parsed.data.statements.find(
-      (s) =>
-        s.id === statement.id &&
-        s.scope === statement.scope &&
-        s.basis === statement.basis,
-    );
-    const previousPeriod = previousStatement?.periods.find(
-      (p) => p.start === period.start && p.end === period.end,
-    );
-    const previousRow = previousStatement?.rows.find(
-      (r) =>
-        r.id === row.id && r.currency === row.currency && r.unit === row.unit,
-    );
-    const cell = previousPeriod && previousRow?.cells[previousPeriod.id];
-    if (!cell || seen.has(cell.observationId)) continue;
-    seen.add(cell.observationId);
-    history.push({
-      datasetVersion: version.id,
-      cell,
-      period: previousPeriod,
-      unit: row.unit,
-      currency: row.currency,
+  const seenFilings = new Set([selected.filingId]);
+  return observations.flatMap((observation) => {
+    if (seenFilings.has(observation.filing_id)) return [];
+    const evidence = observation.evidence;
+    if (!evidence || typeof evidence !== "object" || Array.isArray(evidence))
+      return [];
+    const parsed = cellSchema.safeParse({
+      value: observation.amount,
+      state: observation.value_state,
+      observationId: observation.id,
+      filingId: observation.filing_id,
+      rawLabel: observation.raw_label,
+      rawText: observation.raw_text,
+      pdfPage: evidence.page,
+      printedPage: evidence.printed_page ?? "",
+      comparative: evidence.comparative ?? "original",
     });
-  }
-  return history;
+    if (!parsed.success) return [];
+    seenFilings.add(observation.filing_id);
+    return [
+      { cell: parsed.data, period, unit: row.unit, currency: row.currency },
+    ];
+  });
 }

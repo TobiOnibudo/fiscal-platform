@@ -68,6 +68,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     const cell = Object.values(
       statement.rows.find((row) => Object.keys(row.cells).length)!.cells,
     )[0];
+    const restatedCell = { ...cell, comparative: "restated" as const };
     const version = "b".repeat(64);
     const source = {
       id: cell.filingId,
@@ -81,7 +82,7 @@ describe("statement and evidence rendering with synthetic data", () => {
       loading: false,
       data: {
         datasetVersion: version,
-        selected: cell,
+        selected: restatedCell,
         period: statement.periods[0],
         row: { label: cell.rawLabel, aliases: ["Earlier revenue label"] },
         units: statement,
@@ -94,7 +95,7 @@ describe("statement and evidence rendering with synthetic data", () => {
               ...cell,
               value: "123.45",
               rawLabel: "Earlier reported label",
-              comparative: "restated",
+              comparative: "original",
             },
             period: statement.periods[0],
             currency: "GBP",
@@ -106,7 +107,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     });
     const drawer = renderToStaticMarkup(
       <SourceDrawer
-        cell={cell}
+        cell={restatedCell}
         company="synthetic"
         version={version}
         close={() => undefined}
@@ -120,7 +121,8 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain(`PDF page ${cell.pdfPage}`);
     expect(drawer).toContain("Selected reported value");
     expect(drawer).toContain("Restated");
-    expect(drawer).toContain("As originally reported");
+    expect(drawer).toContain("Restated by the source");
+    expect(drawer).toContain("Original");
     expect(drawer).toContain("Reported text");
     expect(drawer).toContain("Value history");
     expect(drawer).toContain("Filing year");

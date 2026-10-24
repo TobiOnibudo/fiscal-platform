@@ -4,7 +4,17 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import BigInteger, CheckConstraint, Date, ForeignKey, Integer, Numeric, Text
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    Numeric,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -87,14 +97,16 @@ class ReviewEvent(Base):
     __tablename__ = "review_events"
     __table_args__ = (
         CheckConstraint("decision IN ('approved','rejected')", name="review_event_decision"),
+        Index("review_events_attempt_created", "attempt_id", "created_at"),
+        Index("review_events_observation_created", "observation_id", "created_at"),
     )
     id: Mapped[str] = mapped_column(Text, primary_key=True)
-    attempt_id: Mapped[str] = mapped_column(ForeignKey("extraction_attempts.id"), index=True)
-    observation_id: Mapped[str | None] = mapped_column(ForeignKey("observations.id"), index=True)
+    attempt_id: Mapped[str] = mapped_column(ForeignKey("extraction_attempts.id"))
+    observation_id: Mapped[str | None] = mapped_column(ForeignKey("observations.id"))
     decision: Mapped[str] = mapped_column(Text)
     reviewer: Mapped[str] = mapped_column(Text)
     note: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class Dataset(Base):

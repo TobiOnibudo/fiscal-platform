@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install uv==0.13.5
-      - run: uv sync --project pipeline --frozen --extra dev --extra extraction
+      - run: uv sync --project pipeline --frozen --extra dev --extra extraction --extra storage
       - working-directory: pipeline
         run: |
           uv run --no-sync ruff check .
