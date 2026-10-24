@@ -15,14 +15,13 @@ export function database() {
         max: 5,
         connectionTimeoutMillis: 4000,
         idleTimeoutMillis: 10000,
+        query_timeout: 5000,
         types: {
           getTypeParser: (oid, format) =>
             oid === 1082 || oid === 1700
               ? (value: string) => value
               : types.getTypeParser(oid, format),
         },
-        options:
-          "-c default_transaction_read_only=on -c statement_timeout=5000",
       }),
     }),
   }));

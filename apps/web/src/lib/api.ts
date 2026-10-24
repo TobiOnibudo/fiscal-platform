@@ -61,6 +61,7 @@ export function apiFailure(error: unknown, requestId: string) {
       },
       { status: 400 },
     );
+  console.error(`[api:${requestId}] Unexpected API error`, error);
   return Response.json(
     {
       error: {
