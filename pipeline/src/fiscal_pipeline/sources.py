@@ -41,7 +41,16 @@ def fetch(url: str, approved_domains: list[str], *, max_bytes: int) -> tuple[byt
     with httpx.Client(timeout=30, follow_redirects=False, trust_env=False) as client:
         for _ in range(5):
             validate_url(url, approved_domains)
-            with client.stream("GET", url, headers={"User-Agent": "FiscalReview/0.1"}) as response:
+            headers = {
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/131.0 Safari/537.36"
+                ),
+                "Accept": "application/pdf,text/html;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+            }
+            with client.stream("GET", url, headers=headers) as response:
                 if response.is_redirect:
                     url = urljoin(url, response.headers["location"])
                     continue
@@ -71,7 +80,7 @@ def discover(entry: str, domains: list[str]) -> list[str]:
 
 
 def download(url: str, domains: list[str], archive: Path) -> dict[str, str]:
-    data, resolved = fetch(url, domains, max_bytes=50_000_000)
+    data, resolved = fetch(url, domains, max_bytes=150_000_000)
     if not data.startswith(b"%PDF-"):
         raise ValueError("source does not contain a PDF signature")
     digest = hashlib.sha256(data).hexdigest()

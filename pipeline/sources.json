@@ -1,0 +1,22 @@
+{
+  "wise": [
+    {"year": 2020, "title": "Wise annual report 2020", "url": "https://wise.com/imaginary/202fc0ec8b6991c74cb298a6c7b9276c.pdf"},
+    {"year": 2021, "title": "Wise full financial year results 2021", "url": "https://owners.wise.com/static-files/b0676711-0ae9-4c01-b640-fd1d896469e0"},
+    {"year": 2022, "title": "Wise full financial year results 2022", "url": "https://owners.wise.com/static-files/2e0235eb-4d10-4e79-8697-58bd53e4abc8"},
+    {"year": 2023, "title": "Wise full financial year results 2023", "url": "https://owners.wise.com/static-files/b18fcce9-e441-4a2b-9ee1-21a7c149190e"},
+    {"year": 2024, "title": "Wise full financial year results 2024", "url": "https://owners.wise.com/static-files/3839881a-60fb-4671-86a6-e9ec2bcd7ebd"},
+    {"year": 2025, "title": "Wise full financial year results 2025", "url": "https://owners.wise.com/static-files/fc630a9e-c907-4946-aa5e-16f4246a4ba6"},
+    {"year": 2026, "title": "Wise full financial year results 2026", "url": "https://owners.wise.com/static-files/8a520d4d-373b-4058-b288-1757bf067c04"}
+  ],
+  "adyen": [
+    {"year": 2018, "title": "Adyen annual report 2018", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjE4ODA0LCJ0aW1lc3RhbXAiOjE3MjgzMTU2NTcsInZlcnNpb24iOjE3MTM5ODExMTh9:adyen:aypJG0YrPE_Fi6KDraKpDFHWulpCi1EtlcwZElYyvgI/download"},
+    {"year": 2019, "title": "Adyen annual report 2019", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjE4NzQ3LCJ0aW1lc3RhbXAiOjE3MjgzMTU2MjEsInZlcnNpb24iOjE3MTM5ODA3OTJ9:adyen:Et2R5kYTN8oc6Mnb20IRDAQc9SUJYB8pn9orINM1u-Y/download"},
+    {"year": 2020, "title": "Adyen annual report 2020", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjE4NzQ1LCJ0aW1lc3RhbXAiOjE3MjgzMTU2MTksInZlcnNpb24iOjE3MTM5ODA3NjZ9:adyen:CaeQnBBFMwQfowjLI2-_2Vn7sTOaC7QJ-dsDjo8bYVk/download"},
+    {"year": 2021, "title": "Adyen annual report 2021", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjE4NzQ2LCJ0aW1lc3RhbXAiOjE3MjgzMTU2MjcsInZlcnNpb24iOjE3MTM5ODA3ODB9:adyen:t72GL-V-Zl2CjKC0bAhdpxZTULn0jyUpTyCAvp77-Vo/download"},
+    {"year": 2022, "title": "Adyen annual report 2022", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjE4ODA1LCJ0aW1lc3RhbXAiOjE3MjgzMTU3NzIsInZlcnNpb24iOjE3MTM5ODExMjF9:adyen:okYOoQUgUn9OzZGFdgg8hIJK5x0BeFN5Q4SEobTIFwU/download"},
+    {"year": 2023, "title": "Adyen annual report 2023", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjMyNTE0LCJ0aW1lc3RhbXAiOjE3MjgzMTU3MjEsInZlcnNpb24iOjE3MjY4NDgzMTR9:adyen:iwEwC1TNrJjtNC9dUM3PO_Eb8oo5A--EY40HaATJOtY/download"},
+    {"year": 2024, "title": "Adyen annual report 2024", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjU2NjkxLCJ0aW1lc3RhbXAiOjE3NDEzNDgzNDEsInZlcnNpb24iOjE3NDEzNDgyMDV9:adyen:kj44Bpqibw5DHCvRHFCwtnzOuM88_WWzAKJ1odHfCfY/download"},
+    {"year": 2025, "title": "Adyen annual report 2025", "url": "https://brand.adyen.com/api/asset/eyJjbGllbnRJZCI6bnVsbCwiaWQiOjEyMjMwOCwidGltZXN0YW1wIjoxNzc1NTY0MjQ0LCJ2ZXJzaW9uIjoxNzcyNjkwMjA3fQ:adyen:DEcCEo4XPo3eDfzj-fjMZ366g2pQkuoZMPARCHC5BoE/download"},
+    {"year": 2017, "title": "Adyen IPO prospectus", "classification": "prospectus", "url": "https://www.euronext.com/sites/default/files/3.3.22.32.5.2_nash_-_afm_final_approval_version_prospectus.pdf"}
+  ]
+}
