@@ -42,6 +42,14 @@ function reportingVersionDetail(comparative: Cell["comparative"]) {
   return "As originally reported";
 }
 
+function treatmentDefinition(comparative: Cell["comparative"]) {
+  if (comparative === "restated")
+    return "A prior-period amount the company explicitly identifies as revised or restated.";
+  if (comparative === "updated")
+    return "Shown again in a later filing as comparative information; the amount may be unchanged.";
+  return null;
+}
+
 function reportYear(source: Filing | null) {
   return (
     source?.published_on?.slice(0, 4) ??
@@ -79,6 +87,16 @@ export function SourceDrawer({
   const sourceUrl = source ? safeSource(source.source_url) : undefined;
   const selectedValue =
     cell.value === null ? missingLabel(cell.state) : displayDecimal(cell.value);
+  const treatmentDefinitions = [
+    cell.comparative,
+    ...(evidence.data?.previousObservations.map(
+      (previous) => previous.cell.comparative,
+    ) ?? []),
+  ].filter(
+    (comparative, index, values) =>
+      treatmentDefinition(comparative) !== null &&
+      values.indexOf(comparative) === index,
+  );
 
   return (
     <dialog
@@ -243,25 +261,19 @@ export function SourceDrawer({
                   </tbody>
                 </table>
               </div>
-              <dl
-                className="history-definitions"
-                aria-label="Treatment definitions"
-              >
-                <div>
-                  <dt>Updated</dt>
-                  <dd>
-                    Shown again in a later filing as comparative information;
-                    the amount may be unchanged.
-                  </dd>
-                </div>
-                <div>
-                  <dt>Restated</dt>
-                  <dd>
-                    A prior-period amount the company explicitly identifies as
-                    revised or restated.
-                  </dd>
-                </div>
-              </dl>
+              {treatmentDefinitions.length ? (
+                <dl
+                  className="history-definitions"
+                  aria-label="Treatment definitions"
+                >
+                  {treatmentDefinitions.map((comparative) => (
+                    <div key={comparative}>
+                      <dt>{reportingVersion(comparative)}</dt>
+                      <dd>{treatmentDefinition(comparative)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : null}
               {!evidence.data?.previousObservations.length ? (
                 <p className="history-empty">
                   This is the earliest compatible filing available for this

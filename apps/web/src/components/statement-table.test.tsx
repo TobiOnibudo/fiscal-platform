@@ -129,9 +129,6 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain("2025");
     expect(drawer).toContain("Treatment");
     expect(drawer).toContain(
-      "Shown again in a later filing as comparative information;",
-    );
-    expect(drawer).toContain(
       "the company explicitly identifies as revised or restated.",
     );
     expect(drawer).toContain("Reported label");
@@ -139,6 +136,18 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).not.toContain("Publication identifiers");
     expect(drawer).not.toContain(version);
     expect(drawer).not.toContain(source.sha256);
+    const originalDrawer = renderToStaticMarkup(
+      <SourceDrawer
+        cell={cell}
+        company="synthetic"
+        version={version}
+        close={() => undefined}
+      />,
+    );
+    expect(originalDrawer).not.toContain("Treatment definitions");
+    expect(originalDrawer).not.toContain(
+      "the company explicitly identifies as revised or restated.",
+    );
     vi.mocked(useReview).mockReturnValue({
       loading: false,
       data: { items: [source], nextCursor: null },
