@@ -170,7 +170,10 @@ export function Workspace() {
             <Database size={15} /> Retry data
           </button>
         </header>
-        <main id="review">
+        <main
+          id="review"
+          className={view === "statements" ? "statement-workspace" : undefined}
+        >
           <div className="page-heading">
             <div>
               <h1>{selectedCompany.name}</h1>
@@ -180,7 +183,7 @@ export function Workspace() {
               <span className="status-dot" />
               {data
                 ? isSample
-                  ? "Illustrative sample"
+                  ? "Demo data"
                   : "Published review dataset"
                 : "Awaiting published data"}
             </span>
@@ -273,8 +276,8 @@ export function Workspace() {
                 </div>
                 {isSample ? (
                   <div className="sample-note" role="note">
-                    Illustrative mock data for reviewing the experience. It is
-                    not company-reported or source-verified.
+                    Demo figures for product evaluation. They are not intended
+                    for financial analysis.
                   </div>
                 ) : null}
                 <details className="display-options">
@@ -388,9 +391,9 @@ export function Workspace() {
                   <>
                     <div className="coverage-note">
                       {isSample
-                        ? `${data.coverage.expectedPeriods} illustrative periods shown`
+                        ? `${data.coverage.expectedPeriods} periods available`
                         : `${data.coverage.verifiedPeriods} / ${data.coverage.expectedPeriods} target periods verified`}
-                      {data.coverage.gaps.length
+                      {!isSample && data.coverage.gaps.length
                         ? ` · ${data.coverage.gaps.length} coverage gaps`
                         : ""}
                       <button
@@ -405,16 +408,6 @@ export function Workspace() {
                       rows={rows}
                       inspect={setSelected}
                     />
-                    <div className="table-foot">
-                      <span>
-                        Latest compatible reported values · source order
-                        preserved
-                      </span>
-                      <span>
-                        U Updated comparative · R Restated · — Missing history ·
-                        n/r Not reported
-                      </span>
-                    </div>
                   </>
                 ) : null}
               </section>
