@@ -1,6 +1,6 @@
 """Persistence metadata; Alembic alone changes deployed schemas."""
 
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -81,6 +81,20 @@ class Observation(Base):
     scope: Mapped[str] = mapped_column(Text)
     basis: Mapped[str] = mapped_column(Text)
     evidence: Mapped[dict[str, Any]] = mapped_column(JSONB)
+
+
+class ReviewEvent(Base):
+    __tablename__ = "review_events"
+    __table_args__ = (
+        CheckConstraint("decision IN ('approved','rejected')", name="review_event_decision"),
+    )
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    attempt_id: Mapped[str] = mapped_column(ForeignKey("extraction_attempts.id"), index=True)
+    observation_id: Mapped[str | None] = mapped_column(ForeignKey("observations.id"), index=True)
+    decision: Mapped[str] = mapped_column(Text)
+    reviewer: Mapped[str] = mapped_column(Text)
+    note: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column()
 
 
 class Dataset(Base):

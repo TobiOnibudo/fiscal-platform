@@ -41,6 +41,8 @@ def extract_pilot(
     offline: bool,
     allow_paid: bool,
     max_output_tokens: int = 12000,
+    company_id: str | None = None,
+    filing_id: str | None = None,
 ) -> list[Cell]:
     if not 1 <= max_output_tokens <= 16000:
         raise ValueError("output token bound must be between 1 and 16000")
@@ -50,12 +52,16 @@ def extract_pilot(
     if len(content) > 5_000_000 or not content.startswith(b"%PDF-"):
         raise ValueError("pilot requires a PDF page group no larger than 5 MB")
     source_hash = hashlib.sha256(content).hexdigest()
+    if (company_id is None) != (filing_id is None):
+        raise ValueError("company and filing identifiers must be supplied together")
     configuration = {
         "sourceHash": source_hash,
         "model": model,
         "promptVersion": PROMPT_VERSION,
         "schemaHash": logical_hash(ExtractionEnvelope.model_json_schema()),
         "maxOutputTokens": max_output_tokens,
+        "companyId": company_id,
+        "filingId": filing_id,
     }
     cache_key = logical_hash(configuration)
     directory = archive / "attempts" / cache_key
@@ -97,7 +103,13 @@ def extract_pilot(
                             "type": "input_text",
                             "text": "Transcribe this complete consolidated statement "
                             f"page group. Source SHA256: {source_hash}. "
-                            "Source pages are one-based.",
+                            + (
+                                "Use company_id exactly "
+                                f"{company_id!r} and filing_id exactly {filing_id!r}. "
+                                if company_id and filing_id
+                                else ""
+                            )
+                            + "Source pages are one-based.",
                         },
                     ],
                 }

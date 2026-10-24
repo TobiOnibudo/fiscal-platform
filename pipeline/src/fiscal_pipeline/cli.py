@@ -17,6 +17,7 @@ from fiscal_pipeline import sources
 from fiscal_pipeline.domain import Cell, SourceInventory, logical_hash, select_latest, validate
 from fiscal_pipeline.models import Company, CompanyPublication, Dataset, Filing
 from fiscal_pipeline.repository import publish as publish_dataset
+from fiscal_pipeline.repository import record_extraction
 from fiscal_pipeline.repository import record_filing as persist_filing
 from fiscal_pipeline.repository import seed_companies as seed
 from fiscal_pipeline.sample_data import sample_dataset
@@ -55,6 +56,46 @@ def extract(
         max_output_tokens=max_output_tokens,
     )
     typer.echo(json.dumps([c.model_dump(mode="json") for c in cells], indent=2))
+
+
+@app.command("ingest-extraction")
+def ingest_extraction(
+    company: str,
+    filing_id: str,
+    pdf: Path,
+    model: str,
+    offline: bool = False,
+    allow_paid: bool = False,
+    max_output_tokens: int = typer.Option(12000, min=1, max=16000),
+) -> None:
+    """Extract one reviewed page group and persist it as a review-only candidate."""
+    from hashlib import sha256
+
+    from fiscal_pipeline.live_extraction import extract_pilot
+
+    load_dotenv()
+    content = pdf.read_bytes()
+    source_hash = sha256(content).hexdigest()
+    cells = extract_pilot(
+        pdf,
+        Path(os.getenv("ARCHIVE_DIR", "archive")),
+        model,
+        offline=offline,
+        allow_paid=allow_paid,
+        max_output_tokens=max_output_tokens,
+        company_id=company,
+        filing_id=filing_id,
+    )
+    with Session(create_engine(database_url())) as session, session.begin():
+        attempt = record_extraction(
+            session,
+            company_id=company,
+            filing_id=filing_id,
+            source_hash=source_hash,
+            model=model,
+            cells=cells,
+        )
+    typer.echo(json.dumps({"attemptId": attempt.id, "status": attempt.status, "cells": len(cells)}))
 
 
 def company_config(company: str) -> tuple[str, list[str]]:

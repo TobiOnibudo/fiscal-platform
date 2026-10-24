@@ -2,6 +2,7 @@
 
 import json
 from datetime import date
+from hashlib import sha256
 from typing import Any
 
 from sqlalchemy import select
@@ -15,7 +16,14 @@ from fiscal_pipeline.domain import (
     select_latest,
     validate,
 )
-from fiscal_pipeline.models import Company, CompanyPublication, Dataset, Filing
+from fiscal_pipeline.models import (
+    Company,
+    CompanyPublication,
+    Dataset,
+    ExtractionAttempt,
+    Filing,
+    Observation,
+)
 from fiscal_pipeline.public_contract import PublicDataset
 
 COMPANIES = [
@@ -89,6 +97,79 @@ def record_filing(
     )
     session.add(filing)
     return filing
+
+
+def record_extraction(
+    session: Session,
+    *,
+    company_id: str,
+    filing_id: str,
+    source_hash: str,
+    model: str,
+    cells: list[Cell],
+) -> ExtractionAttempt:
+    """Persist an immutable model transcription as a review-only candidate.
+
+    This deliberately does not promote or rewrite evidence. Human decisions are
+    recorded separately, and publication still requires independent validation.
+    """
+    filing = session.get(Filing, filing_id)
+    if filing is None or filing.company_id != company_id:
+        raise ValueError("filing does not belong to the selected company")
+    if not cells:
+        raise ValueError("extraction returned no cells")
+    if any(cell.company_id != company_id for cell in cells):
+        raise ValueError("model output contains a different company")
+    if any(cell.filing_id != filing_id for cell in cells):
+        raise ValueError("model output contains a different filing")
+    if any(cell.evidence.source_hash != source_hash for cell in cells):
+        raise ValueError("model output evidence does not match the supplied PDF")
+    response_hash = logical_hash([cell.model_dump(mode="json") for cell in cells])
+    attempt_id = sha256(f"{filing_id}:{source_hash}:{model}:{response_hash}".encode()).hexdigest()
+    existing = session.get(ExtractionAttempt, attempt_id)
+    if existing is not None:
+        return existing
+    attempt = ExtractionAttempt(
+        id=attempt_id,
+        filing_id=filing_id,
+        response_hash=response_hash,
+        status="needs_review",
+        payload={
+            "schemaVersion": 1,
+            "sourceHash": source_hash,
+            "model": model,
+            "cellCount": len(cells),
+        },
+    )
+    session.add(attempt)
+    session.flush()
+    for cell in cells:
+        if session.get(Observation, cell.id) is not None:
+            raise ValueError("observation identity already exists")
+        session.add(
+            Observation(
+                id=cell.id,
+                attempt_id=attempt.id,
+                company_id=cell.company_id,
+                concept_id=cell.concept_id,
+                period_start=cell.period_start,
+                period_end=cell.period_end,
+                statement=cell.statement,
+                raw_label=cell.raw_label,
+                raw_text=cell.raw_text,
+                amount=cell.amount,
+                value_state=cell.value_state,
+                unit=cell.unit,
+                currency=cell.currency,
+                scope=cell.scope,
+                basis=cell.basis,
+                evidence={
+                    **cell.evidence.model_dump(mode="json"),
+                    "mappingReviewed": cell.mapping_reviewed,
+                },
+            )
+        )
+    return attempt
 
 
 def publish(session: Session, dataset_id: str, expected_generation: int) -> int:

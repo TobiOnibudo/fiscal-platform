@@ -6,6 +6,8 @@ from sqlalchemy import create_engine
 from fiscal_pipeline.models import Base
 
 url = os.environ["MIGRATION_DATABASE_URL"]
+if url.startswith("postgresql://"):
+    url = "postgresql+psycopg://" + url.removeprefix("postgresql://")
 engine = create_engine(url)
 with engine.connect() as connection:
     context.configure(connection=connection, target_metadata=Base.metadata, compare_type=True)
