@@ -4,6 +4,7 @@ import type { Statement } from "@/lib/contracts";
 export type Failure = { code: string; message: string; requestId?: string };
 export type StatementResponse = {
   datasetVersion: string;
+  kind: "sample" | "verified";
   statement: Statement;
   coverage: {
     expectedPeriods: number;

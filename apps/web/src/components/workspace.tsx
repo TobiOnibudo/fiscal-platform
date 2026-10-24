@@ -76,6 +76,7 @@ export function Workspace() {
     retry,
   );
   const data = response.data;
+  const isSample = data?.kind === "sample";
   const years = Array.from(
     new Set(data?.statement.periods.map((p) => p.end.slice(0, 4)) ?? []),
   ).sort();
@@ -155,15 +156,6 @@ export function Workspace() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-foot">
-          <span className="status-dot" />
-          <span>Read-only workspace</span>
-          <p>
-            Reported figures.
-            <br />
-            Traceable to their source.
-          </p>
-        </div>
       </aside>
       <div className="main-shell">
         <header className="topbar">
@@ -186,7 +178,11 @@ export function Workspace() {
             </div>
             <span className={`publication-badge ${data ? "available" : ""}`}>
               <span className="status-dot" />
-              {data ? "Published review dataset" : "Awaiting published data"}
+              {data
+                ? isSample
+                  ? "Illustrative sample"
+                  : "Published review dataset"
+                : "Awaiting published data"}
             </span>
           </div>
           {view === "statements" ? (
@@ -275,6 +271,12 @@ export function Workspace() {
                     </button>
                   )}
                 </div>
+                {isSample ? (
+                  <div className="sample-note" role="note">
+                    Illustrative mock data for reviewing the experience. It is
+                    not company-reported or source-verified.
+                  </div>
+                ) : null}
                 <details className="display-options">
                   <summary>
                     Fiscal range ·{" "}
@@ -385,8 +387,9 @@ export function Workspace() {
                 ) : data ? (
                   <>
                     <div className="coverage-note">
-                      {data.coverage.verifiedPeriods} /{" "}
-                      {data.coverage.expectedPeriods} target periods verified
+                      {isSample
+                        ? `${data.coverage.expectedPeriods} illustrative periods shown`
+                        : `${data.coverage.verifiedPeriods} / ${data.coverage.expectedPeriods} target periods verified`}
                       {data.coverage.gaps.length
                         ? ` · ${data.coverage.gaps.length} coverage gaps`
                         : ""}
@@ -412,23 +415,6 @@ export function Workspace() {
                         n/r Not reported
                       </span>
                     </div>
-                    <details className="view-explanation">
-                      <summary>How this view is assembled</summary>
-                      <p>
-                        The latest approved statement supplies the labels and
-                        row order. Each amount uses the latest compatible
-                        observation for its period. Different scope, accounting
-                        basis, currency, units or period boundaries are never
-                        silently combined. Select a value to see its original
-                        label and source.
-                      </p>
-                      <p>
-                        Historical items are{" "}
-                        {historical ? "included" : "excluded"} in this view and
-                        export. Search filters also apply to export. An
-                        original-report view has not yet been published.
-                      </p>
-                    </details>
                   </>
                 ) : null}
               </section>
@@ -442,14 +428,6 @@ export function Workspace() {
               retry={retry}
             />
           )}
-          <footer className="workspace-footer">
-            <span>Source evidence before certainty.</span>
-            <span>
-              {data
-                ? "Financial statements available"
-                : "No financial values published"}
-            </span>
-          </footer>
         </main>
       </div>
       {selected && data ? (

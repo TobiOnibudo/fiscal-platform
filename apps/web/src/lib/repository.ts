@@ -68,7 +68,12 @@ export async function published(
       503,
     );
   const data = parsed.data;
-  if (data.kind !== "verified" || data.companyId !== company)
+  const localSampleAllowed = process.env.FISCAL_ALLOW_SAMPLE_DATA === "true";
+  if (
+    data.companyId !== company ||
+    (data.kind !== "verified" &&
+      !(localSampleAllowed && data.kind === "sample"))
+  )
     throw new ReviewError(
       "DATASET_INVALID",
       "The published dataset does not meet the review contract.",

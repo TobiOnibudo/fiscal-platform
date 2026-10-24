@@ -12,6 +12,7 @@ import { useReview } from "./review-client";
 import { missingLabel } from "./statement-table";
 type Evidence = {
   datasetVersion: string;
+  kind: "sample" | "verified";
   selected: Cell;
   period: Statement["periods"][number];
   row: { label: string; aliases: string[] };
@@ -109,7 +110,17 @@ export function SourceDrawer({
           </p>
         ) : (
           <>
-            <h3>{source?.title ?? "Source record unavailable"}</h3>
+            <h3>
+              {evidence.data?.kind === "sample"
+                ? "Illustrative value"
+                : (source?.title ?? "Source record unavailable")}
+            </h3>
+            {evidence.data?.kind === "sample" ? (
+              <p className="muted">
+                This is mock data for the local walkthrough and has no
+                supporting filing.
+              </p>
+            ) : null}
             {sourceUrl ? (
               <div className="source-links">
                 <a
@@ -125,10 +136,12 @@ export function SourceDrawer({
                 </a>
               </div>
             ) : null}
-            <p className="muted">
-              PDF viewers may handle page links differently. Use the page
-              references above if the document opens at the beginning.
-            </p>
+            {evidence.data?.kind !== "sample" ? (
+              <p className="muted">
+                PDF viewers may handle page links differently. Use the page
+                references above if the document opens at the beginning.
+              </p>
+            ) : null}
             <details>
               <summary>Selection and label history</summary>
               <p>

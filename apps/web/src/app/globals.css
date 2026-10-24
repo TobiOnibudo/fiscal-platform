@@ -297,6 +297,15 @@ main {
   color: var(--muted);
   font-size: 12px;
 }
+.sample-note {
+  margin: -8px 0 20px;
+  padding: 10px 12px;
+  border: 1px solid #725d35;
+  border-radius: 6px;
+  background: #2a251a;
+  color: #e6ce9d;
+  font-size: 12px;
+}
 .button {
   border: 1px solid #3b4646;
   background: var(--raised);

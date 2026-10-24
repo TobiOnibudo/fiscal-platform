@@ -154,6 +154,7 @@ export function QualityView({
 }) {
   const state = useReview<{
     datasetVersion: string;
+    kind: "sample" | "verified";
     coverage: StatementResponse["coverage"];
     validation: { reviewed?: boolean; issues?: unknown[] };
   }>(
@@ -191,18 +192,24 @@ export function QualityView({
         </div>
       ) : (
         <>
+          {state.data?.kind === "sample" ? (
+            <p className="readable">
+              This local walkthrough uses illustrative figures. It has no
+              source-review status and must not be used for analysis.
+            </p>
+          ) : null}
           <h3>
-            {state.data?.coverage.verifiedPeriods} of{" "}
-            {state.data?.coverage.expectedPeriods} target periods verified
+            {state.data?.kind === "sample"
+              ? `${state.data.coverage.expectedPeriods} illustrative periods shown`
+              : `${state.data?.coverage.verifiedPeriods} of ${state.data?.coverage.expectedPeriods} target periods verified`}
           </h3>
           <ul className="gap-list">
             {state.data?.coverage.gaps.map((gap) => <li key={gap}>{gap}</li>)}
           </ul>
           <p>
-            Recorded source review:{" "}
-            {state.data?.validation.reviewed
-              ? "Complete"
-              : "Not recorded as complete"}
+            {state.data?.kind === "sample"
+              ? "Source review: not applicable to illustrative data"
+              : `Recorded source review: ${state.data?.validation.reviewed ? "Complete" : "Not recorded as complete"}`}
           </p>
         </>
       )}

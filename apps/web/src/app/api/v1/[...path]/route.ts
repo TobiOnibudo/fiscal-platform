@@ -66,6 +66,7 @@ export async function GET(
                 .executeTakeFirst();
               return Response.json({
                 datasetVersion: snapshot.version,
+                kind: snapshot.data.kind,
                 selected: cell,
                 period: statement.periods.find((p) => p.id === periodId),
                 row: { label: row.label, aliases: row.aliases },
@@ -145,6 +146,7 @@ export async function GET(
     if (path[2] === "quality")
       return Response.json({
         datasetVersion: snapshot.version,
+        kind: snapshot.data.kind,
         coverage: snapshot.data.coverage,
         validation: snapshot.validation,
         requestId,
@@ -193,6 +195,7 @@ export async function GET(
     return Response.json(
       {
         datasetVersion: snapshot.version,
+        kind: snapshot.data.kind,
         statement,
         coverage: snapshot.data.coverage,
         requestId,
