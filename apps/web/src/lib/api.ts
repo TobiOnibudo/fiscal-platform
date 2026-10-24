@@ -36,14 +36,6 @@ export const querySchema = z
     "The beginning year must precede the ending year",
   );
 
-export const reviewDecisionSchema = z
-  .object({
-    observationId: z.string().min(1).max(200),
-    decision: z.enum(["approved", "rejected"]),
-    reviewer: z.string().trim().min(1).max(120),
-    note: z.string().trim().max(2000).default(""),
-  })
-  .strict();
 export function apiFailure(error: unknown, requestId: string) {
   if (error instanceof ReviewError)
     return Response.json(

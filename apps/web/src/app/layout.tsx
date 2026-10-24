@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "Fiscal | Financial review",
+  title: "Fiscal | Financial statements",
   description:
-    "Review reported financial statements and their source evidence.",
+    "Explore published financial statements and their source evidence.",
 };
 export default function RootLayout({
   children,

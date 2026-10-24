@@ -36,7 +36,7 @@ describe("statement and evidence rendering with synthetic data", () => {
       /local setup|Postgres|migrations|pipeline|demonstration snapshot|ten-year coverage|Request /i,
     );
   });
-  it("shows review status and coverage without raw validation details", () => {
+  it("shows publication status and coverage without raw validation details", () => {
     vi.mocked(useReview).mockReturnValue({
       loading: false,
       data: {
@@ -47,7 +47,7 @@ describe("statement and evidence rendering with synthetic data", () => {
           gaps: ["FY2017 income statement"],
         },
         validation: {
-          reviewed: true,
+          reviewed: false,
           issues: [{ debug: "private-validation-detail" }],
         },
       },
@@ -57,7 +57,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     );
     expect(html).toContain("8 of 10 target periods verified");
     expect(html).toContain("FY2017 income statement");
-    expect(html).toContain("Recorded source review:");
+    expect(html).toContain("Automatic publication checks:");
     expect(html).toContain("Complete");
     expect(html).not.toContain("<pre");
     expect(html).not.toContain("private-validation-detail");

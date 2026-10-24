@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
     <main className="boot" role="status">
-      Opening the review workspace…
+      Opening the financial statements workspace…
     </main>
   );
 }

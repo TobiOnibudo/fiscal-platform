@@ -13,9 +13,11 @@ export default function ErrorPage({ reset }: { reset: () => void }) {
           <AlertTriangle size={22} />
         </div>
         <p className="boot-eyebrow">Workspace unavailable</p>
-        <h1 id="workspace-error-title">We couldn&apos;t load this review.</h1>
+        <h1 id="workspace-error-title">
+          We couldn&apos;t load this workspace.
+        </h1>
         <p className="boot-copy">
-          Try again to reconnect to the financial review workspace.
+          Try again to reconnect to the financial statements workspace.
         </p>
         <div className="boot-actions">
           <button className="button boot-primary" onClick={reset} autoFocus>

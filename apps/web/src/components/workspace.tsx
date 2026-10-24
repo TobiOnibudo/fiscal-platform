@@ -21,7 +21,7 @@ import {
 } from "./review-client";
 import { SourceDrawer } from "./source-drawer";
 import { StatementTable } from "./statement-table";
-import { FilingsView, QualityView, ReviewQueue } from "./collection-views";
+import { FilingsView, QualityView } from "./collection-views";
 const statementTypes = [
   { id: "income", label: "Income statement" },
   { id: "balance", label: "Balance sheet" },
@@ -112,8 +112,8 @@ export function Workspace() {
   }
   return (
     <div className="app-shell">
-      <a href="#review" className="skip-link">
-        Skip to financial review
+      <a href="#workspace" className="skip-link">
+        Skip to financial statements
       </a>
       <aside className="sidebar">
         <Link className="brand" href="/" aria-label="Fiscal home">
@@ -137,11 +137,10 @@ export function Workspace() {
             ))}
           </select>
         </div>
-        <nav aria-label="Review navigation">
+        <nav aria-label="Workspace navigation">
           {[
             { id: "statements", name: "Statements", icon: BookOpen },
             { id: "filings", name: "Filings", icon: FileText },
-            { id: "review", name: "Review", icon: ShieldCheck },
             { id: "quality", name: "Data quality", icon: ShieldCheck },
           ].map((item) => (
             <button
@@ -161,7 +160,7 @@ export function Workspace() {
       <div className="main-shell">
         <header className="topbar">
           <span>
-            Financial review <ChevronRight size={14} />
+            Financial statements <ChevronRight size={14} />
             <strong>{selectedCompany.name}</strong>
           </span>
           <button
@@ -172,7 +171,7 @@ export function Workspace() {
           </button>
         </header>
         <main
-          id="review"
+          id="workspace"
           className={view === "statements" ? "statement-workspace" : undefined}
         >
           <div className="page-heading">
@@ -184,8 +183,8 @@ export function Workspace() {
               <span className="status-dot" />
               {data
                 ? isSample
-                  ? "Review pending"
-                  : "Published review dataset"
+                  ? "Automatically published sample"
+                  : "Automatically published dataset"
                 : "Awaiting published data"}
             </span>
           </div>
@@ -253,7 +252,7 @@ export function Workspace() {
                     <p>
                       {data
                         ? `${data.statement.currency} · ${data.statement.unit} · ${data.statement.basis} · ${data.statement.scope}`
-                        : `Fiscal year end: ${selectedCompany.fiscal_year_end_month === 3 ? "31 March" : "31 December"} · Currency and units pending source review`}
+                        : `Fiscal year end: ${selectedCompany.fiscal_year_end_month === 3 ? "31 March" : "31 December"} · Currency and units available after publication`}
                     </p>
                   </div>
                   {data ? (
@@ -395,7 +394,7 @@ export function Workspace() {
                         className="text-button"
                         onClick={() => setView("quality")}
                       >
-                        Review coverage <ArrowUpRight size={14} />
+                        View coverage <ArrowUpRight size={14} />
                       </button>
                     </div>
                     <StatementTable
@@ -409,8 +408,6 @@ export function Workspace() {
             </>
           ) : view === "filings" ? (
             <FilingsView key={company} company={company} retry={retry} />
-          ) : view === "review" ? (
-            <ReviewQueue company={company} retry={retry} />
           ) : (
             <QualityView
               company={company}

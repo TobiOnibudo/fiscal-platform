@@ -690,24 +690,6 @@ tr:hover th {
   gap: 12px;
   margin-top: 24px;
 }
-.review-toolbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 24px 0 14px;
-}
-.review-table-wrap { overflow: auto; border: 1px solid var(--border); }
-.review-table { width: 100%; min-width: 880px; border-collapse: collapse; font-size: 12px; }
-.review-table th, .review-table td { padding: 13px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
-.review-table th { color: var(--muted); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
-.review-table small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
-.review-actions { display: inline-flex; gap: 6px; }
-.review-actions button { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--border); background: transparent; color: var(--foreground); border-radius: 5px; }
-.review-actions button:first-child:hover { border-color: #3c90f5; color: #78b5ff; }
-.review-actions button:last-child:hover { border-color: #c75d72; color: #ff8fa0; }
-.review-decision { text-transform: capitalize; font-size: 11px; }
-.review-decision.approved { color: #78b5ff; }
-.review-decision.rejected { color: #ff8fa0; }
 .quiet-empty {
   padding: 64px 0;
   max-width: 72ch;
