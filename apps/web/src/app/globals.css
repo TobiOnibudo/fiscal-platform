@@ -964,6 +964,27 @@ pre {
   background: #122a44;
   font-weight: 600;
 }
+.history-definitions {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+.history-definitions > div {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+}
+.history-definitions dt {
+  color: #d9e3ef;
+  font-size: 11px;
+  font-weight: 600;
+}
+.history-definitions dd {
+  margin: 0;
+  color: #9eafc3;
+  font-size: 11px;
+  line-height: 1.45;
+}
 .history-empty {
   margin-top: 12px;
   color: #9eafc3;

@@ -128,6 +128,12 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain("Filing year");
     expect(drawer).toContain("2025");
     expect(drawer).toContain("Treatment");
+    expect(drawer).toContain(
+      "Shown again in a later filing as comparative information;",
+    );
+    expect(drawer).toContain(
+      "the company explicitly identifies as revised or restated.",
+    );
     expect(drawer).toContain("Reported label");
     expect(drawer).not.toContain("DEBUG");
     expect(drawer).not.toContain("Publication identifiers");

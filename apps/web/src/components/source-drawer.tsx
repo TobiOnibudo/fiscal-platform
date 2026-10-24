@@ -243,6 +243,25 @@ export function SourceDrawer({
                   </tbody>
                 </table>
               </div>
+              <dl
+                className="history-definitions"
+                aria-label="Treatment definitions"
+              >
+                <div>
+                  <dt>Updated</dt>
+                  <dd>
+                    Shown again in a later filing as comparative information;
+                    the amount may be unchanged.
+                  </dd>
+                </div>
+                <div>
+                  <dt>Restated</dt>
+                  <dd>
+                    A prior-period amount the company explicitly identifies as
+                    revised or restated.
+                  </dd>
+                </div>
+              </dl>
               {!evidence.data?.previousObservations.length ? (
                 <p className="history-empty">
                   This is the earliest compatible filing available for this
