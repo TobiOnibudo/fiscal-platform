@@ -13,6 +13,10 @@ export function missingLabel(state: string) {
       : "Missing history";
 }
 
+function comparativeLabel(comparative: Cell["comparative"]) {
+  return comparative === "restated" ? "Restated" : "Updated";
+}
+
 export function StatementTable({
   statement,
   rows,
@@ -71,19 +75,16 @@ export function StatementTable({
                       <button
                         className="amount"
                         onClick={() => inspect(cell)}
-                        aria-label={`${row.label}, ${period.label}, ${cell.value} ${row.currency} ${row.unit}; inspect source`}
+                        aria-label={`${row.label}, ${period.label}, ${cell.value} ${row.currency} ${row.unit}; ${cell.comparative === "original" ? "as originally reported" : comparativeLabel(cell.comparative)}; inspect source`}
                       >
-                        {displayDecimal(cell.value)}
+                        <span className="amount-value">
+                          {displayDecimal(cell.value)}
+                        </span>
                         {cell.comparative !== "original" ? (
                           <span
-                            className="comparative"
-                            title={
-                              cell.comparative === "restated"
-                                ? "Restated"
-                                : "Updated comparative"
-                            }
+                            className={`comparative comparative-${cell.comparative}`}
                           >
-                            {cell.comparative === "restated" ? "R" : "U"}
+                            {comparativeLabel(cell.comparative)}
                           </span>
                         ) : null}
                       </button>

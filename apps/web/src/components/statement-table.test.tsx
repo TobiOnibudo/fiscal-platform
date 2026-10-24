@@ -120,8 +120,10 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain(`PDF page ${cell.pdfPage}`);
     expect(drawer).toContain("Selected reported value");
     expect(drawer).toContain("Restated");
+    expect(drawer).toContain("As originally reported");
+    expect(drawer).toContain("Reported text");
     expect(drawer).toContain("Value history");
-    expect(drawer).toContain("Report year");
+    expect(drawer).toContain("Filing year");
     expect(drawer).toContain("2025");
     expect(drawer).toContain("Treatment");
     expect(drawer).toContain("Reported label");
@@ -182,6 +184,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     row.currency = "XXX";
     row.unit = "per share";
     row.cells[period.id].value = "9007199254740993.123456789";
+    row.cells[period.id].comparative = "restated";
     const html = renderToStaticMarkup(
       <StatementTable
         statement={statement}
@@ -192,8 +195,10 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(html).toContain("9,007,199,254,740,993.123456789");
     expect(html).toContain("XXX · per share");
     expect(html).toContain(
-      "9007199254740993.123456789 XXX per share; inspect source",
+      "9007199254740993.123456789 XXX per share; Restated; inspect source",
     );
+    expect(html).toContain(">Restated<");
+    expect(html).not.toMatch(/>R<|>U</);
     expect(html).toContain('<th scope="col">Line item</th>');
     for (let index = 1; index < statement.rows.length; index++)
       expect(html.indexOf(`>${statement.rows[index - 1].label}<`)).toBeLessThan(
