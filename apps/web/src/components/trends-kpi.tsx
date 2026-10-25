@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BarChart3, CalendarDays, Check, Info, TrendingUp } from "lucide-react";
 import { useReview } from "./review-client";
 
@@ -354,11 +354,24 @@ function CashFlowChart({
 
 export function TrendsKpi({ company }: { company: string }) {
   const trends = useReview<TrendResponse>(`companies/${company}/trends`, 0);
+  const rangeFilter = useRef<HTMLDetailsElement>(null);
   const [chart, setChart] = useState<"performance" | "cashflow">("performance");
   const [panel, setPanel] = useState<"trends" | "kpis">("trends");
   const [range, setRange] = useState<{ start: number; end: number } | null>(
     null,
   );
+  useEffect(() => {
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (
+        rangeFilter.current?.open &&
+        !rangeFilter.current.contains(event.target as Node)
+      )
+        rangeFilter.current.open = false;
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsidePress);
+  }, []);
   if (trends.loading)
     return (
       <section className="trends-view">
@@ -514,7 +527,7 @@ export function TrendsKpi({ company }: { company: string }) {
           </p>
         </div>
         <div className="trend-controls">
-          <details className="range-filter">
+          <details className="range-filter" ref={rangeFilter}>
             <summary className="range-button">
               <CalendarDays size={15} />
               {periodRange}
@@ -549,16 +562,6 @@ export function TrendsKpi({ company }: { company: string }) {
                   ))}
                 </select>
               </label>
-              <button
-                type="button"
-                onClick={(event) =>
-                  event.currentTarget
-                    .closest("details")
-                    ?.removeAttribute("open")
-                }
-              >
-                Done
-              </button>
             </div>
           </details>
         </div>
