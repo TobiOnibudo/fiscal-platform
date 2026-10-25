@@ -317,7 +317,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     );
     expect(html).not.toContain(">Restated<");
     expect(html).not.toMatch(/>R<|>U</);
-    expect(html).toContain('<th scope="col">Line item</th>');
+    expect(html).toContain('<th scope="col">Line item<small');
     for (let index = 1; index < statement.rows.length; index++)
       expect(html.indexOf(`>${statement.rows[index - 1].label}<`)).toBeLessThan(
         html.indexOf(`>${statement.rows[index].label}<`),
@@ -355,6 +355,15 @@ describe("statement and evidence rendering with synthetic data", () => {
         (r) => r.id === row.id,
       ),
     ).toBe(true);
+    const aliasHtml = renderToStaticMarkup(
+      <StatementTable
+        statement={statement}
+        rows={[row]}
+        inspect={() => undefined}
+      />,
+    );
+    expect(aliasHtml).toContain("Earlier reporting names");
+    expect(aliasHtml).toContain("Synthetic old label");
   });
   it("uses a named native dialog and visible close control for evidence", () => {
     const statement = datasetSchema.parse(fixture).statements[0];
