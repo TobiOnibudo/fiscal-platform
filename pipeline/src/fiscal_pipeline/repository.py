@@ -64,6 +64,9 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         "profit-loss-for-the-year": "profit-loss-for-year",
         "loss-for-the-year": "profit-loss-for-year",
         "net-profit-for-the-year": "profit-loss-for-year",
+        # The 2026 results PDF extracts this identical USD net-income line
+        # twice from the same source page under two internal concept IDs.
+        "net-income": "net-income",
         "interest-expense": "interest-expense",
         "interest-expenses": "interest-expense",
         "income-tax-credit": "income-tax-credit-expense",
@@ -79,6 +82,7 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         "income1": "income-total",
         "income": "income-total",
         "interest-income-from-corporate-investments": "net-interest-income-corporate-investments",
+        "net-interest-income-from-operating-assets": ("net-interest-income-corporate-investments"),
         "net-interest-income-from-corporate-investments": (
             "net-interest-income-corporate-investments"
         ),
@@ -94,6 +98,17 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         "total-comprehensive-loss-for-the-year": "total-comprehensive-income-loss-for-year",
     },
     ("adyen", "income"): {
+        "net-income-for-the-period": "net-income-attributable-to-adyen-owners",
+        "net-income-for-the-year": "net-income-attributable-to-adyen-owners",
+        "net-income-attributable-to-owners-of-adyen-n-v": "net-income-attributable-to-adyen-owners",
+        "revenue": "non-interest-revenue",
+        "non-interest-revenue": "non-interest-revenue",
+        "cost-of-inventory": "cost-of-goods-sold",
+        "costs-of-goods-sold": "cost-of-goods-sold",
+        "amortization-and-depreciation-of-tangible-and-intangible-fixed-assets": (
+            "amortization-and-depreciation"
+        ),
+        "amortization-and-depreciation": "amortization-and-depreciation",
         "income-before-net-finance-expense-and-income-taxes": (
             "income-before-net-finance-result-and-income-taxes"
         ),
@@ -102,6 +117,38 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         ),
         "income-before-net-finance-income-and-income-taxes": (
             "income-before-net-finance-result-and-income-taxes"
+        ),
+        "other-comprehensive-income-for-the-year": "other-comprehensive-income",
+        "other-comprehensive-income-for-the-period": "other-comprehensive-income",
+        "other-comprehensive-income-expense-for-the-year": "other-comprehensive-income",
+        "other-comprehensive-income-expense-for-the-period": "other-comprehensive-income",
+        "net-finance-income-expense": "net-finance-income-expense",
+        "net-finance-expense": "net-finance-income-expense",
+        "net-finance-income": "net-finance-income-expense",
+        "other-income": "other-income-expense",
+        "other-expenses": "other-income-expense",
+        "other-income-expense": "other-income-expense",
+        "other-income-expenses": "other-income-expense",
+        "currency-translation-adjustments-subsidiaries": "currency-translation-adjustments",
+        "other-currency-translation-adjustments": "currency-translation-adjustments",
+        "currency-translation-adjustments-foreign-operations": "currency-translation-adjustments",
+        "gains-on-re-measuring-of-available-for-sale-financial-assets": (
+            "gains-on-remeasuring-fair-value-oci-assets"
+        ),
+        "gains-on-re-measuring-of-fair-value-through-other-comprehensive-income-financial-assets": (
+            "gains-on-remeasuring-fair-value-oci-assets"
+        ),
+        "total-comprehensive-income-for-the-year-attributable-to-owners-of-adyen-n-v": (
+            "total-comprehensive-income-attributable-to-adyen-owners"
+        ),
+        "total-comprehensive-income-for-the-period-attributable-to-owners-of-adyen-n-v": (
+            "total-comprehensive-income-attributable-to-adyen-owners"
+        ),
+        "total-comprehensive-income-for-the-year-attributable-to-owners-of-adyen-b-v": (
+            "total-comprehensive-income-attributable-to-adyen-owners"
+        ),
+        "total-comprehensive-income-for-the-period-attributable-to-owners-of-adyen-b-v": (
+            "total-comprehensive-income-attributable-to-adyen-owners"
         ),
     },
     ("adyen", "balance"): {
@@ -117,6 +164,10 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         "payables-to-merchants-and-financial-institutions": (
             "payables-to-merchants-and-financial-institutions"
         ),
+        "receivables-from-merchants-and-financial-institutions": (
+            "receivables-from-financial-institutions"
+        ),
+        "receivables-from-financial-institutions": "receivables-from-financial-institutions",
     },
     ("adyen", "cashflow"): {
         "net-cash-flows-from-financing-activities": (
@@ -127,6 +178,48 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         ),
         "net-cash-flows-from-used-in-financing-activities": (
             "net-cash-flows-from-used-in-financing-activities"
+        ),
+        "cash-cash-equivalents-and-bank-overdrafts-at-end-of-the-year": (
+            "cash-and-bank-overdrafts-ending"
+        ),
+        "cash-cash-equivalents-and-bank-overdrafts-at-end-of-the-period": (
+            "cash-and-bank-overdrafts-ending"
+        ),
+        "cash-and-cash-equivalents-at-end-of-the-year": "cash-and-bank-overdrafts-ending",
+        "cash-cash-equivalents-and-bank-overdrafts-at-beginning-of-the-year": (
+            "cash-and-bank-overdrafts-beginning"
+        ),
+        "cash-and-cash-equivalents-at-beginning-of-the-year": "cash-and-bank-overdrafts-beginning",
+        "share-premium-paid-by-shareholders": "share-premium-paid",
+        "share-premium-paid-by-the-shareholders": "share-premium-paid",
+        "exchange-losses-on-cash-cash-equivalents-and-bank-overdrafts": "cash-exchange-effect",
+        "exchange-gains-losses-on-cash-cash-equivalents-and-bank-overdrafts": (
+            "cash-exchange-effect"
+        ),
+        "exchange-gains-on-cash-cash-equivalents-and-bank-overdrafts": "cash-exchange-effect",
+        "exchange-gains-losses-on-cash-and-cash-equivalents": "cash-exchange-effect",
+        "redemption-of-other-financial-assets-at-fvpl": "fvpl-financial-assets-redemption",
+        "redemption-of-financial-assets-at-fvpl": "fvpl-financial-assets-redemption",
+        "finance-expense": "finance-expense",
+        "finance-expenses": "finance-expense",
+        "lease-payments": "lease-payments",
+        "lease-payment": "lease-payments",
+        "lease-payments-excluding-interest": "lease-payments",
+        "amortization-of-contract-assets": "contract-assets-amortization",
+        "amortization-and-additions-of-contract-assets": "contract-assets-amortization",
+        "receivables-from-merchants-and-financial-institutions": (
+            "receivables-from-financial-institutions"
+        ),
+        "receivables-from-financial-institutions": "receivables-from-financial-institutions",
+        "net-increase-in-cash-cash-equivalents-and-bank-overdrafts": "net-cash-change",
+        "net-increase-in-cash-and-cash-equivalents": "net-cash-change",
+        "finance-income-received": "interest-received",
+        "interest-received": "interest-received",
+        "other-movements-resulting-from-depositary-receipts-treasury-shares": (
+            "depositary-receipts-treasury-shares-movements"
+        ),
+        "sale-of-depositary-receipts-treasury-shares": (
+            "depositary-receipts-treasury-shares-movements"
         ),
     },
     ("wise", "cashflow"): {
@@ -154,6 +247,23 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         "net-cash-used-in-generated-from-financing-activities": "net-cash-financing-activities",
         "net-cash-generated-from-used-in-financing-activities": "net-cash-financing-activities",
         "net-cash-generated-used-in-financing-activities": "net-cash-financing-activities",
+        "cash-used-in-operating-activities": "net-cash-operating-activities",
+        "net-cash-used-in-operating-activities": "net-cash-operating-activities",
+        "proceeds-from-issue-of-shares": "share-issue-proceeds",
+        "proceeds-from-issues-of-shares-and-other-equity": "share-issue-proceeds",
+        "payments-for-intangible-assets": "intangible-asset-development-payments",
+        "payments-for-intangible-assets-development-costs": "intangible-asset-development-payments",
+        "purchases-of-intangible-assets": "intangible-asset-development-payments",
+        "increase-decrease-in-overdraft-balances": "overdraft-balance-change",
+        "change-in-overdraft-balance": "overdraft-balance-change",
+    },
+    ("wise", "balance"): {
+        "share-based-payment-reserves": "share-based-payment-reserve",
+        "share-based-payment-reserve": "share-based-payment-reserve",
+        "deferred-tax-assets": "deferred-tax-asset",
+        "deferred-tax-asset": "deferred-tax-asset",
+        "currency-translation-differences": "currency-translation-reserve",
+        "currency-translation-reserve": "currency-translation-reserve",
     },
 }
 
@@ -169,6 +279,9 @@ def _unit_scale(unit: str, currency: str) -> tuple[str, Decimal]:
     normalized = unit.casefold().replace("_", " ").replace("’", "'").replace("−", "-")
     normalized = normalized.replace(currency.casefold(), "")
     normalized = normalized.replace("£", "").replace("€", "").replace("$", "")
+    # Some PDFs arrive with an undecodable currency glyph (U+FFFD); strip all
+    # remaining symbols before detecting scales such as m and 000.
+    normalized = re.sub(r"[^a-z0-9' _-]+", " ", normalized)
     scale = Decimal(1)
     if re.search(r"\b(billions?|bn)\b|(?:^|\s)b$", normalized):
         scale = Decimal(1_000_000_000)
@@ -176,9 +289,9 @@ def _unit_scale(unit: str, currency: str) -> tuple[str, Decimal]:
     elif re.search(r"\b(millions?|mn)\b|(?:^|\s)m$|_m\b", normalized):
         scale = Decimal(1_000_000)
         normalized = re.sub(r"\b(millions?|mn)\b|(?:^|\s)m$|_m\b", " ", normalized)
-    elif re.search(r"\b(thousands?|k)\b|['_]000\b", normalized):
+    elif re.search(r"\b(thousands?|k)\b|['_]?000\b", normalized):
         scale = Decimal(1_000)
-        normalized = re.sub(r"\b(thousands?|k)\b|['_]000\b", " ", normalized)
+        normalized = re.sub(r"\b(thousands?|k)\b|['_]?000\b", " ", normalized)
     dimension = re.sub(r"[^a-z0-9]+", "", normalized)
     return dimension, scale
 

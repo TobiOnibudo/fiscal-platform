@@ -15,6 +15,8 @@ from fiscal_pipeline.repository import _row_alias_key, _unit_scale, publish, see
 
 def test_unit_scale_recognizes_company_report_notations() -> None:
     assert _unit_scale("GBP'000", "GBP")[1] == Decimal("1000")
+    assert _unit_scale("GBP · £000", "GBP") == ("", Decimal("1000"))
+    assert _unit_scale("GBP · £m", "GBP") == ("", Decimal("1000000"))
     assert _unit_scale("£m", "GBP")[1] == Decimal("1000000")
     assert _unit_scale("EUR_thousands", "EUR")[1] == Decimal("1000")
     assert _unit_scale("EUR per share", "EUR")[0] == "pershare"
@@ -30,6 +32,9 @@ def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
     assert _row_alias_key("wise", "income", "Interest expenses", "plural") == _row_alias_key(
         "wise", "income", "Interest expense", "singular"
     )
+    assert _row_alias_key("wise", "income", "Net income", "net-income") == _row_alias_key(
+        "wise", "income", "Net income", "net-income-duplicate"
+    )
     assert _row_alias_key(
         "wise", "income", "Total other comprehensive loss", "old"
     ) == _row_alias_key("wise", "income", "Total other comprehensive income/(loss)", "new")
@@ -38,6 +43,20 @@ def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
     ) != _row_alias_key(
         "wise", "income", "Total comprehensive income for the year", "comprehensive"
     )
+    assert _row_alias_key(
+        "adyen", "income", "Net income for the period", "older-net-income"
+    ) == _row_alias_key(
+        "adyen", "income", "Net income attributable to owners of Adyen N.V.", "newer-net-income"
+    )
+    assert _row_alias_key("adyen", "income", "Revenue", "gross-revenue") == _row_alias_key(
+        "adyen", "income", "Non-interest revenue", "renamed-gross-revenue"
+    )
+    assert _row_alias_key("adyen", "income", "Net revenue", "net-revenue") != _row_alias_key(
+        "adyen", "income", "Non-interest revenue", "gross-revenue"
+    )
+    assert _row_alias_key(
+        "adyen", "income", "Cost of inventory", "older-cost-label"
+    ) == _row_alias_key("adyen", "income", "Costs of goods sold", "newer-cost-label")
     assert _row_alias_key(
         "wise", "cashflow", "Cash generated from operating activities", "old-id"
     ) == _row_alias_key("wise", "cashflow", "Cash generated from operations", "new-id")
@@ -60,6 +79,17 @@ def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
     ) == _row_alias_key(
         "adyen", "balance", "Payables to merchants and financial institutions", "new-id"
     )
+    assert _row_alias_key("adyen", "cashflow", "Lease payments", "old-id") == _row_alias_key(
+        "adyen", "cashflow", "Lease payments, excluding interest", "new-id"
+    )
+    assert _row_alias_key(
+        "adyen", "cashflow", "Amortization of contract assets", "old-id"
+    ) == _row_alias_key(
+        "adyen", "cashflow", "Amortization and additions of contract assets", "new-id"
+    )
+    assert _row_alias_key(
+        "wise", "cashflow", "Purchases of intangible assets", "old-id"
+    ) == _row_alias_key("wise", "cashflow", "Payments for intangible assets", "new-id")
 
 
 def synthetic_release() -> tuple[dict, dict]:  # type: ignore[type-arg]
