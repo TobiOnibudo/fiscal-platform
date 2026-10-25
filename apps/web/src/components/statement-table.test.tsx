@@ -140,6 +140,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(drawer).toContain("Value history");
     expect(drawer).toContain("Filing year");
     expect(drawer).toContain("2025");
+    expect(drawer).toContain(`123.45 GBP`);
     expect(drawer).toContain("Treatment");
     expect(drawer).toContain(
       "A later filing reports a different value for the same period.",

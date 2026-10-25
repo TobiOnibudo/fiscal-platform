@@ -59,6 +59,16 @@ function comparableAmount(value: string | null) {
   return normalizedFractional ? `${integer}.${normalizedFractional}` : integer;
 }
 
+function historyValue(
+  value: string | null,
+  state: Cell["state"],
+  currency: string,
+) {
+  return value === null
+    ? missingLabel(state)
+    : `${displayDecimal(value)} ${currency}`;
+}
+
 function visibleTreatment(cell: Cell, previousCells: Cell[]) {
   const previous = previousCells[0];
   if (!previous) return "original";
@@ -253,7 +263,13 @@ export function SourceDrawer({
                   <tbody>
                     <tr className="history-current-row">
                       <td>{reportYear(source ?? null)}</td>
-                      <td>{selectedValue}</td>
+                      <td>
+                        {historyValue(
+                          cell.value,
+                          cell.state,
+                          evidence.data?.units.currency ?? "",
+                        )}
+                      </td>
                       <td>
                         <span
                           className={`history-status history-status-${selectedTreatment}`}
@@ -267,9 +283,11 @@ export function SourceDrawer({
                         <tr key={previous.cell.observationId}>
                           <td>{reportYear(previous.source)}</td>
                           <td>
-                            {previous.cell.value === null
-                              ? missingLabel(previous.cell.state)
-                              : displayDecimal(previous.cell.value)}
+                            {historyValue(
+                              previous.cell.value,
+                              previous.cell.state,
+                              previous.currency,
+                            )}
                           </td>
                           <td>
                             <span
