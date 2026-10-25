@@ -199,8 +199,8 @@ export function QualityView({
       <h2>Data quality and coverage</h2>
       <p className="readable">
         Verified means the source transcription, reporting scope, label mapping,
-        and selected comparative passed review.
-        Passing arithmetic checks alone does not establish accuracy.
+        and selected comparative passed review. Passing arithmetic checks alone
+        does not establish accuracy.
       </p>
       {state.loading ? (
         <p role="status">Loading coverage…</p>
