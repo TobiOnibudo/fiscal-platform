@@ -10,7 +10,13 @@ from sqlalchemy.orm import Session
 
 from fiscal_pipeline.domain import logical_hash
 from fiscal_pipeline.models import Dataset
-from fiscal_pipeline.repository import _row_alias_key, _unit_scale, publish, seed_companies
+from fiscal_pipeline.repository import (
+    _row_alias_key,
+    _row_display_label,
+    _unit_scale,
+    publish,
+    seed_companies,
+)
 
 
 def test_unit_scale_recognizes_company_report_notations() -> None:
@@ -90,6 +96,21 @@ def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
     assert _row_alias_key(
         "wise", "cashflow", "Purchases of intangible assets", "old-id"
     ) == _row_alias_key("wise", "cashflow", "Payments for intangible assets", "new-id")
+
+
+def test_same_printed_balance_labels_remain_distinct_when_the_pdf_has_two_measures() -> None:
+    assert _row_display_label("wise", "balance", "borrowings", "Borrowings") == (
+        "Borrowings — non-current"
+    )
+    assert _row_display_label("wise", "balance", "borrowings-2", "Borrowings") == (
+        "Borrowings — current"
+    )
+    assert _row_display_label("adyen", "balance", "lease-liability", "Lease liability") == (
+        "Lease liability — non-current"
+    )
+    assert _row_display_label("adyen", "balance", "lease-liability-2", "Lease liability") == (
+        "Lease liability — current"
+    )
 
 
 def synthetic_release() -> tuple[dict, dict]:  # type: ignore[type-arg]

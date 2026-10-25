@@ -267,11 +267,45 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
     },
 }
 
+# Some balance-sheet PDFs repeat the same printed label under the current and
+# non-current headings. These are distinct measures reported for the same
+# period, not historical aliases, so preserve both values with unambiguous
+# clean-view labels. Keys are canonical concept IDs after aliasing.
+ROW_LABEL_DISAMBIGUATIONS: dict[tuple[str, str, str], str] = {
+    ("adyen", "balance", "financial-asset-at-amortized-cost"): (
+        "Financial asset at amortized cost — non-current"
+    ),
+    ("adyen", "balance", "financial-asset-at-amortized-cost-2"): (
+        "Financial asset at amortized cost — current"
+    ),
+    ("adyen", "balance", "lease-liability"): "Lease liability — non-current",
+    ("adyen", "balance", "lease-liability-2"): "Lease liability — current",
+    ("wise", "balance", "trade-and-other-receivables"): (
+        "Trade and other receivables — non-current"
+    ),
+    ("wise", "balance", "trade-and-other-receivables-2"): ("Trade and other receivables — current"),
+    ("wise", "balance", "trade-and-other-payables"): ("Trade and other payables — non-current"),
+    ("wise", "balance", "trade-and-other-payables-2"): ("Trade and other payables — current"),
+    ("wise", "balance", "borrowings"): "Borrowings — non-current",
+    ("wise", "balance", "borrowings-2"): "Borrowings — current",
+    ("wise", "balance", "lease-liabilities"): "Lease liabilities — non-current",
+    ("wise", "balance", "lease-liabilities-2"): "Lease liabilities — current",
+    ("wise", "balance", "provisions"): "Provisions — non-current",
+    ("wise", "balance", "provisions-2"): "Provisions — current",
+}
+
 
 def _row_alias_key(company_id: str, statement: str, raw_label: str, concept_id: str) -> str:
     """Return a source-validated display grouping key without changing evidence."""
     label_key = re.sub(r"[^a-z0-9]+", "-", raw_label.casefold()).strip("-")
     return ROW_LABEL_ALIASES.get((company_id, statement), {}).get(label_key, concept_id)
+
+
+def _row_display_label(company_id: str, statement: str, concept_id: str, raw_label: str) -> str:
+    """Use an explicit qualifier where a source has duplicate printed labels."""
+    return ROW_LABEL_DISAMBIGUATIONS.get(
+        (company_id, statement, concept_id), display_label(raw_label)
+    )
 
 
 def _unit_scale(unit: str, currency: str) -> tuple[str, Decimal]:
@@ -611,7 +645,9 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
         public_rows = []
         for (concept_id, currency), observations in ordered:
             latest_observation = max(observations, key=filing_precedence)[0]
-            label = display_label(latest_observation.raw_label)
+            label = _row_display_label(
+                company_id, statement_id, concept_id, latest_observation.raw_label
+            )
             target_dimension, target_scale = _unit_scale(
                 latest_observation.unit, latest_observation.currency
             )
@@ -662,6 +698,22 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
                     "historical": False,
                     "cells": cells,
                 }
+            )
+        duplicate_labels = {
+            (row["label"], row["currency"])
+            for row in public_rows
+            if sum(
+                1
+                for candidate in public_rows
+                if (candidate["label"], candidate["currency"]) == (row["label"], row["currency"])
+            )
+            > 1
+        }
+        if duplicate_labels:
+            formatted = ", ".join(f"{label} ({currency})" for label, currency in duplicate_labels)
+            raise ValueError(
+                f"Clean view contains unresolved duplicate labels for {company_id} {statement_id}: "
+                f"{formatted}"
             )
         first = statement_rows[0][0]
         statements.append(
