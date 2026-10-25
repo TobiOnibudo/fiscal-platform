@@ -1,6 +1,5 @@
 "use client";
 
-import { Fragment } from "react";
 import {
   displayDecimal,
   type Cell,
@@ -42,18 +41,65 @@ function groupRows(rows: Row[]) {
   return [...groups.entries()].map(([label, rows]) => ({ label, rows }));
 }
 
+type DisplayRow = {
+  row: Row;
+  alternateUnits: Record<string, string>;
+  hasMixedUnits: boolean;
+};
+
+function consolidateRows(
+  rows: Row[],
+  primaryUnit: string | undefined,
+): DisplayRow[] {
+  return groupRows(rows).map((group) => {
+    const ordered = [...group.rows].sort(
+      (left, right) =>
+        Number(unitKey(right) === primaryUnit) -
+        Number(unitKey(left) === primaryUnit),
+    );
+    const anchor = ordered[0];
+    const selected = new Map<string, Row>();
+
+    for (const row of ordered) {
+      for (const [periodId, cell] of Object.entries(row.cells)) {
+        const current = selected.get(periodId);
+        if (
+          !current ||
+          (current.cells[periodId].value === null && cell.value !== null)
+        )
+          selected.set(periodId, row);
+      }
+    }
+
+    const alternateUnits: Record<string, string> = {};
+    const cells = Object.fromEntries(
+      [...selected.entries()].map(([periodId, sourceRow]) => {
+        if (unitKey(sourceRow) !== unitKey(anchor))
+          alternateUnits[periodId] = unitLabel(sourceRow);
+        return [periodId, sourceRow.cells[periodId]];
+      }),
+    );
+
+    return {
+      row: { ...anchor, cells },
+      alternateUnits,
+      hasMixedUnits: new Set(group.rows.map(unitKey)).size > 1,
+    };
+  });
+}
+
 function StatementRow({
   row,
   statement,
   inspect,
-  primaryUnit,
-  showUnitAsLabel,
+  alternateUnits,
+  hasMixedUnits,
 }: {
   row: Row;
   statement: Statement;
   inspect: (cell: Cell) => void;
-  primaryUnit: string | undefined;
-  showUnitAsLabel: boolean;
+  alternateUnits: Record<string, string>;
+  hasMixedUnits: boolean;
 }) {
   return (
     <tr className={row.kind}>
@@ -61,14 +107,17 @@ function StatementRow({
         <div
           className="line-item"
           style={{
-            paddingLeft: `calc(var(--space-5) + ${row.depth + Number(showUnitAsLabel)} * var(--space-4))`,
+            paddingLeft: `calc(var(--space-5) + ${row.depth} * var(--space-4))`,
           }}
         >
-          <span className="line-item-label">
-            {showUnitAsLabel ? unitLabel(row) : displayRowLabel(row.label)}
-          </span>
-          {!showUnitAsLabel && unitKey(row) !== primaryUnit ? (
-            <small className="line-item-unit">{unitLabel(row)}</small>
+          <span className="line-item-label">{displayRowLabel(row.label)}</span>
+          {hasMixedUnits ? (
+            <span
+              title="Values retain the unit reported for each year."
+              style={{ marginLeft: 6, color: "var(--muted)", fontSize: 10 }}
+            >
+              Mixed reporting units
+            </span>
           ) : null}
           {row.aliases.length ? (
             <details style={{ marginTop: 3, border: 0, padding: 0 }}>
@@ -87,17 +136,25 @@ function StatementRow({
       </th>
       {statement.periods.map((period) => {
         const cell = row.cells[period.id];
+        const alternateUnit = alternateUnits[period.id];
         return (
           <td key={period.id}>
             {row.kind === "section" ? null : cell?.value !== null &&
               cell?.value !== undefined ? (
-              <button
-                className="amount"
-                onClick={() => inspect(cell)}
-                aria-label={`${displayRowLabel(row.label)}, ${period.label}, ${cell.value} ${row.currency} ${row.unit}; inspect source`}
-              >
-                {displayDecimal(cell.value)}
-              </button>
+              <>
+                <button
+                  className="amount"
+                  onClick={() => inspect(cell)}
+                  aria-label={`${displayRowLabel(row.label)}, ${period.label}, ${cell.value} ${alternateUnit ?? `${row.currency} ${row.unit}`}; inspect source`}
+                >
+                  {displayDecimal(cell.value)}
+                </button>
+                {alternateUnit ? (
+                  <small style={{ display: "block", color: "var(--muted)" }}>
+                    {alternateUnit}
+                  </small>
+                ) : null}
+              </>
             ) : (
               <span
                 className="missing"
@@ -130,7 +187,7 @@ export function StatementTable({
   const primaryUnit = primaryUnitKey(rows);
   const primaryRow = rows.find((row) => unitKey(row) === primaryUnit);
   const mixedUnits = new Set(rows.map(unitKey)).size > 1;
-  const groupedRows = groupRows(rows);
+  const displayRows = consolidateRows(rows, primaryUnit);
   return (
     <div
       className="table-scroll"
@@ -163,40 +220,16 @@ export function StatementTable({
           </tr>
         </thead>
         <tbody>
-          {groupedRows.map((group) => {
-            const hasVariants = group.rows.length > 1;
-            return (
-              <Fragment key={group.label}>
-                {hasVariants ? (
-                  <tr className="section row-group">
-                    <th scope="rowgroup">
-                      <div className="line-item">
-                        <span className="line-item-label">
-                          {displayRowLabel(group.label)}
-                        </span>
-                        <small>
-                          Reported in more than one currency or unit
-                        </small>
-                      </div>
-                    </th>
-                    <td colSpan={statement.periods.length}>
-                      Amounts remain in the reporting currency shown below.
-                    </td>
-                  </tr>
-                ) : null}
-                {group.rows.map((row) => (
-                  <StatementRow
-                    key={row.id}
-                    row={row}
-                    statement={statement}
-                    inspect={inspect}
-                    primaryUnit={primaryUnit}
-                    showUnitAsLabel={hasVariants}
-                  />
-                ))}
-              </Fragment>
-            );
-          })}
+          {displayRows.map(({ row, alternateUnits, hasMixedUnits }) => (
+            <StatementRow
+              key={row.id}
+              row={row}
+              statement={statement}
+              inspect={inspect}
+              alternateUnits={alternateUnits}
+              hasMixedUnits={hasMixedUnits}
+            />
+          ))}
         </tbody>
       </table>
       {rows.length === 0 ? (

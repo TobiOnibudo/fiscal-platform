@@ -365,6 +365,36 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(aliasHtml).toContain("Earlier reporting names");
     expect(aliasHtml).toContain("Synthetic old label");
   });
+  it("consolidates a metric reported in different units into one finance-table row", () => {
+    const statement = datasetSchema.parse(fixture).statements[0];
+    const source = statement.rows.find((row) => row.kind !== "section")!;
+    const [firstPeriod, secondPeriod] = statement.periods;
+    const gbpRow = {
+      ...structuredClone(source),
+      id: "metric-gbp",
+      currency: "GBP",
+      unit: "millions",
+      cells: { [firstPeriod.id]: source.cells[firstPeriod.id] },
+    };
+    const usdRow = {
+      ...structuredClone(source),
+      id: "metric-usd",
+      currency: "USD",
+      unit: "millions",
+      cells: { [secondPeriod.id]: source.cells[secondPeriod.id] },
+    };
+    const html = renderToStaticMarkup(
+      <StatementTable
+        statement={statement}
+        rows={[gbpRow, usdRow]}
+        inspect={() => undefined}
+      />,
+    );
+    expect(html.match(/<tr class="item">/g)).toHaveLength(1);
+    expect(html).toContain("Mixed reporting units");
+    expect(html).toContain("USD \u00b7 millions");
+    expect(html).not.toContain("Reported in more than one currency or unit");
+  });
   it("uses a named native dialog and visible close control for evidence", () => {
     const statement = datasetSchema.parse(fixture).statements[0];
     const cell = Object.values(
