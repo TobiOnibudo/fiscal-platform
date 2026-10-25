@@ -81,6 +81,19 @@ ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
         "fair-value-gain-loss-on-investments-net": "fair-value-investment-gain-loss",
         "income1": "income-total",
         "income": "income-total",
+        # KPI headings were abbreviated in the later investor reports.  The
+        # overlapping FY2024 values confirm these are historical renames, not
+        # separate measures.
+        "underlying-profit-before-tax3": "underlying-profit-before-tax",
+        "underlying-pbt3": "underlying-profit-before-tax",
+        "adjusted-operating-profit-loss-ebitda-non-gaap": "adjusted-ebitda",
+        "adjusted-ebitda2": "adjusted-ebitda",
+        # Early accounts omit the "in pence" suffix from EPS headings.  Later
+        # filings provide the same basic/diluted EPS measures explicitly.
+        "basic": "basic-earnings-per-share",
+        "basic-in-pence": "basic-earnings-per-share",
+        "diluted": "diluted-earnings-per-share",
+        "diluted-in-pence": "diluted-earnings-per-share",
         "interest-income-from-corporate-investments": "net-interest-income-corporate-investments",
         "net-interest-income-from-operating-assets": ("net-interest-income-corporate-investments"),
         "net-interest-income-from-corporate-investments": (
@@ -294,6 +307,15 @@ ROW_LABEL_DISAMBIGUATIONS: dict[tuple[str, str, str], str] = {
     ("wise", "balance", "provisions-2"): "Provisions — current",
 }
 
+# Preserve the issuer's terminology while dropping PDF footnote markers and
+# abbreviations once historical rows have been reconciled into one measure.
+ROW_LABEL_CLEAN_NAMES: dict[tuple[str, str, str], str] = {
+    ("wise", "income", "income-total"): "Income",
+    ("wise", "income", "underlying-income"): "Underlying income",
+    ("wise", "income", "underlying-profit-before-tax"): "Underlying profit before tax",
+    ("wise", "income", "adjusted-ebitda"): "Adjusted EBITDA",
+}
+
 
 def _row_alias_key(company_id: str, statement: str, raw_label: str, concept_id: str) -> str:
     """Return a source-validated display grouping key without changing evidence."""
@@ -304,7 +326,8 @@ def _row_alias_key(company_id: str, statement: str, raw_label: str, concept_id: 
 def _row_display_label(company_id: str, statement: str, concept_id: str, raw_label: str) -> str:
     """Use an explicit qualifier where a source has duplicate printed labels."""
     return ROW_LABEL_DISAMBIGUATIONS.get(
-        (company_id, statement, concept_id), display_label(raw_label)
+        (company_id, statement, concept_id),
+        ROW_LABEL_CLEAN_NAMES.get((company_id, statement, concept_id), display_label(raw_label)),
     )
 
 

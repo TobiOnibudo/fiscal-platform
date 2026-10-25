@@ -43,6 +43,19 @@ def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
         "wise", "income", "Net income", "net-income-duplicate"
     )
     assert _row_alias_key(
+        "wise", "income", "Underlying profit before tax3", "older-underlying-pbt"
+    ) == _row_alias_key("wise", "income", "Underlying PBT3", "newer-underlying-pbt")
+    assert _row_alias_key(
+        "wise", "income", "Adjusted operating profit/(loss) (EBITDA, non-GAAP)", "older-ebitda"
+    ) == _row_alias_key("wise", "income", "Adjusted EBITDA2", "newer-ebitda")
+    assert _row_alias_key("wise", "income", "Diluted", "older-diluted-eps") == _row_alias_key(
+        "wise", "income", "Diluted, in pence", "newer-diluted-eps"
+    )
+    assert (
+        _row_display_label("wise", "income", "underlying-profit-before-tax", "Underlying PBT3")
+        == "Underlying profit before tax"
+    )
+    assert _row_alias_key(
         "wise", "income", "Total other comprehensive loss", "old"
     ) == _row_alias_key("wise", "income", "Total other comprehensive income/(loss)", "new")
     assert _row_alias_key(
