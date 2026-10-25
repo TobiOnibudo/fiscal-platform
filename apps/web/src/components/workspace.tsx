@@ -292,14 +292,16 @@ export function Workspace() {
                     <label>
                       From
                       <input
-                        type="date"
+                        type="number"
                         aria-label="From fiscal year"
-                        value={selectedFrom ? `${selectedFrom}-01-01` : ""}
-                        min={years.length ? `${years[0]}-01-01` : undefined}
-                        max={selectedTo ? `${selectedTo}-12-31` : undefined}
+                        inputMode="numeric"
+                        step="1"
+                        value={selectedFrom}
+                        min={years[0]}
+                        max={selectedTo}
                         disabled={!data}
                         onChange={(event) => {
-                          setFrom(event.target.value.slice(0, 4));
+                          setFrom(event.target.value);
                           setSelected(null);
                         }}
                       />
@@ -307,14 +309,16 @@ export function Workspace() {
                     <label>
                       To
                       <input
-                        type="date"
+                        type="number"
                         aria-label="To fiscal year"
-                        value={selectedTo ? `${selectedTo}-12-31` : ""}
-                        min={selectedFrom ? `${selectedFrom}-01-01` : undefined}
-                        max={years.length ? `${years.at(-1)}-12-31` : undefined}
+                        inputMode="numeric"
+                        step="1"
+                        value={selectedTo}
+                        min={selectedFrom}
+                        max={years.at(-1)}
                         disabled={!data}
                         onChange={(event) => {
-                          setTo(event.target.value.slice(0, 4));
+                          setTo(event.target.value);
                           setSelected(null);
                         }}
                       />

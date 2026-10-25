@@ -567,7 +567,7 @@ details p {
   gap: 8px;
 }
 .fiscal-range-picker label { display: flex; align-items: center; gap: 6px; color: #9fb4cb; font-size: 11px; white-space: nowrap; }
-.fiscal-range-picker input { min-height: 34px; max-width: 142px; padding: 5px 8px; border-color: #29455f; background-color: #091829; color: #e3f2ff; font: inherit; }
+.fiscal-range-picker input { width: 78px; min-height: 34px; padding: 5px 8px; border-color: #29455f; background-color: #091829; color: #e3f2ff; font: inherit; }
 .range-popover label { display: grid; gap: 5px; color: #9fb4cb; font-size: 11px; }
 .range-popover select { min-width: 78px; min-height: 34px; padding: 5px 28px 5px 9px; border-color: #29455f; background-color: #091829; color: #e3f2ff; font-size: 12px; }
 .range-separator {
