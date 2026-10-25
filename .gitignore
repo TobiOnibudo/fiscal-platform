@@ -19,3 +19,6 @@ archive/
 *.swp
 *.tsbuildinfo
 .vercel/
+.run/
+tmp/
+r2tmp/
