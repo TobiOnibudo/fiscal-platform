@@ -51,6 +51,48 @@ COMPANIES = [
 # periods in the source filings. Keep the aliases scoped to issuer and
 # statement: similarly named rows are not necessarily the same measure.
 ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
+    ("wise", "income"): {
+        # Wise's earlier statutory accounts use loss/profit-specific labels;
+        # later consolidated reports use a single signed profit/(loss) row.
+        "operating-loss": "operating-profit-loss",
+        "operating-profit-loss": "operating-profit-loss",
+        "operating-profit": "operating-profit-loss",
+        "profit-loss-before-tax": "profit-loss-before-tax",
+        "loss-before-tax": "profit-loss-before-tax",
+        "profit-before-tax": "profit-loss-before-tax",
+        "profit-for-the-year": "profit-loss-for-year",
+        "profit-loss-for-the-year": "profit-loss-for-year",
+        "loss-for-the-year": "profit-loss-for-year",
+        "net-profit-for-the-year": "profit-loss-for-year",
+        "interest-expense": "interest-expense",
+        "interest-expenses": "interest-expense",
+        "income-tax-credit": "income-tax-credit-expense",
+        "income-tax-expense": "income-tax-credit-expense",
+        "income-tax-credit-expense": "income-tax-credit-expense",
+        "other-operating-income": "other-operating-income",
+        "other-operating-income-net": "other-operating-income",
+        "fair-value-gain-on-investments": "fair-value-investment-gain-loss",
+        "fair-value-gain-on-investments-net": "fair-value-investment-gain-loss",
+        "fair-value-loss-on-investments-net": "fair-value-investment-gain-loss",
+        "fair-value-loss-gain-on-investments": "fair-value-investment-gain-loss",
+        "fair-value-gain-loss-on-investments-net": "fair-value-investment-gain-loss",
+        "income1": "income-total",
+        "income": "income-total",
+        "interest-income-from-corporate-investments": "net-interest-income-corporate-investments",
+        "net-interest-income-from-corporate-investments": (
+            "net-interest-income-corporate-investments"
+        ),
+        "total-other-comprehensive-income": "total-other-comprehensive-income-loss",
+        "total-other-comprehensive-income-loss": "total-other-comprehensive-income-loss",
+        "total-other-comprehensive-loss-income": "total-other-comprehensive-income-loss",
+        "total-other-comprehensive-income-expense": "total-other-comprehensive-income-loss",
+        "total-other-comprehensive-loss": "total-other-comprehensive-income-loss",
+        "total-comprehensive-income-expense-for-the-year": (
+            "total-comprehensive-income-loss-for-year"
+        ),
+        "total-comprehensive-income-for-the-year": "total-comprehensive-income-loss-for-year",
+        "total-comprehensive-loss-for-the-year": "total-comprehensive-income-loss-for-year",
+    },
     ("adyen", "income"): {
         "income-before-net-finance-expense-and-income-taxes": (
             "income-before-net-finance-result-and-income-taxes"

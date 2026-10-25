@@ -22,6 +22,23 @@ def test_unit_scale_recognizes_company_report_notations() -> None:
 
 def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
     assert _row_alias_key(
+        "wise", "income", "Operating loss", "old-operating-loss"
+    ) == _row_alias_key("wise", "income", "Operating profit/(loss)", "new-operating-profit")
+    assert _row_alias_key(
+        "wise", "income", "Loss before tax", "old-loss-before-tax"
+    ) == _row_alias_key("wise", "income", "Profit before tax", "new-profit-before-tax")
+    assert _row_alias_key("wise", "income", "Interest expenses", "plural") == _row_alias_key(
+        "wise", "income", "Interest expense", "singular"
+    )
+    assert _row_alias_key(
+        "wise", "income", "Total other comprehensive loss", "old"
+    ) == _row_alias_key("wise", "income", "Total other comprehensive income/(loss)", "new")
+    assert _row_alias_key(
+        "wise", "income", "Total other comprehensive income", "other-comprehensive"
+    ) != _row_alias_key(
+        "wise", "income", "Total comprehensive income for the year", "comprehensive"
+    )
+    assert _row_alias_key(
         "wise", "cashflow", "Cash generated from operating activities", "old-id"
     ) == _row_alias_key("wise", "cashflow", "Cash generated from operations", "new-id")
     assert _row_alias_key(
