@@ -1,6 +1,7 @@
 """Short transactions only. External requests happen before entering these functions."""
 
 import json
+import re
 from datetime import date
 from decimal import Decimal
 from hashlib import sha256
@@ -45,6 +46,99 @@ COMPANIES = [
         ["investors.adyen.com", "adyen.com", "brand.adyen.com", "www.euronext.com"],
     ),
 ]
+
+# These are presentation-only aliases verified against overlapping comparative
+# periods in the source filings. Keep the aliases scoped to issuer and
+# statement: similarly named rows are not necessarily the same measure.
+ROW_LABEL_ALIASES: dict[tuple[str, str], dict[str, str]] = {
+    ("adyen", "income"): {
+        "income-before-net-finance-expense-and-income-taxes": (
+            "income-before-net-finance-result-and-income-taxes"
+        ),
+        "income-before-net-finance-income-expense-and-income-taxes": (
+            "income-before-net-finance-result-and-income-taxes"
+        ),
+        "income-before-net-finance-income-and-income-taxes": (
+            "income-before-net-finance-result-and-income-taxes"
+        ),
+    },
+    ("adyen", "balance"): {
+        "total-equity-attributable-to-owners-of-adyen-b-v": (
+            "total-equity-attributable-to-owners-of-adyen"
+        ),
+        "total-equity-attributable-to-owners-of-adyen-n-v": (
+            "total-equity-attributable-to-owners-of-adyen"
+        ),
+        "payable-to-merchants-and-financial-institutions": (
+            "payables-to-merchants-and-financial-institutions"
+        ),
+        "payables-to-merchants-and-financial-institutions": (
+            "payables-to-merchants-and-financial-institutions"
+        ),
+    },
+    ("adyen", "cashflow"): {
+        "net-cash-flows-from-financing-activities": (
+            "net-cash-flows-from-used-in-financing-activities"
+        ),
+        "net-cash-flows-used-in-financing-activities": (
+            "net-cash-flows-from-used-in-financing-activities"
+        ),
+        "net-cash-flows-from-used-in-financing-activities": (
+            "net-cash-flows-from-used-in-financing-activities"
+        ),
+    },
+    ("wise", "cashflow"): {
+        "cash-generated-from-operating-activities": "cash-generated-from-operations",
+        "cash-generated-from-operations": "cash-generated-from-operations",
+        "cash-and-cash-equivalents-at-beginning-of-year": "cash-and-cash-equivalents-beginning",
+        "cash-and-cash-equivalents-at-beginning-of-the-year": "cash-and-cash-equivalents-beginning",
+        "cash-and-cash-equivalents-at-end-of-year": "cash-and-cash-equivalents-ending",
+        "cash-and-cash-equivalents-at-end-of-the-year": "cash-and-cash-equivalents-ending",
+        "income-tax-paid": "corporate-income-tax-paid",
+        "corporate-income-tax-paid": "corporate-income-tax-paid",
+        "interest-paid": "interest-expense-paid",
+        "interest-expense-paid": "interest-expense-paid",
+        "purchases-of-property-plant-and-equipment": "property-plant-and-equipment-purchases",
+        "purchase-of-property-plant-and-equipment": "property-plant-and-equipment-purchases",
+        "payments-for-property-plant-and-equipment": "property-plant-and-equipment-purchases",
+        "exchange-gains-losses-on-cash-and-cash-equivalents": "cash-exchange-effect",
+        "exchange-losses-gains-on-cash-and-cash-equivalents": "cash-exchange-effect",
+        "exchange-gains-on-cash-and-cash-equivalents": "cash-exchange-effect",
+        "effects-of-exchange-rate-changes-on-cash-and-cash-equivalents": "cash-exchange-effect",
+        "effect-of-exchange-rate-fluctuations-on-cash-and-cash-equivalent": "cash-exchange-effect",
+        "net-increase-in-cash-and-cash-equivalents": "net-change-in-cash-and-cash-equivalents",
+        "net-change-in-cash-and-cash-equivalents": "net-change-in-cash-and-cash-equivalents",
+        "net-cash-generated-from-financing-activities": "net-cash-financing-activities",
+        "net-cash-used-in-generated-from-financing-activities": "net-cash-financing-activities",
+        "net-cash-generated-from-used-in-financing-activities": "net-cash-financing-activities",
+        "net-cash-generated-used-in-financing-activities": "net-cash-financing-activities",
+    },
+}
+
+
+def _row_alias_key(company_id: str, statement: str, raw_label: str, concept_id: str) -> str:
+    """Return a source-validated display grouping key without changing evidence."""
+    label_key = re.sub(r"[^a-z0-9]+", "-", raw_label.casefold()).strip("-")
+    return ROW_LABEL_ALIASES.get((company_id, statement), {}).get(label_key, concept_id)
+
+
+def _unit_scale(unit: str, currency: str) -> tuple[str, Decimal]:
+    """Return a unit dimension and base-unit multiplier for safe display conversion."""
+    normalized = unit.casefold().replace("_", " ").replace("’", "'").replace("−", "-")
+    normalized = normalized.replace(currency.casefold(), "")
+    normalized = normalized.replace("£", "").replace("€", "").replace("$", "")
+    scale = Decimal(1)
+    if re.search(r"\b(billions?|bn)\b|(?:^|\s)b$", normalized):
+        scale = Decimal(1_000_000_000)
+        normalized = re.sub(r"\b(billions?|bn)\b|(?:^|\s)b$", " ", normalized)
+    elif re.search(r"\b(millions?|mn)\b|(?:^|\s)m$|_m\b", normalized):
+        scale = Decimal(1_000_000)
+        normalized = re.sub(r"\b(millions?|mn)\b|(?:^|\s)m$|_m\b", " ", normalized)
+    elif re.search(r"\b(thousands?|k)\b|['_]000\b", normalized):
+        scale = Decimal(1_000)
+        normalized = re.sub(r"\b(thousands?|k)\b|['_]000\b", " ", normalized)
+    dimension = re.sub(r"[^a-z0-9]+", "", normalized)
+    return dimension, scale
 
 
 def seed_companies(session: Session) -> None:
@@ -154,7 +248,9 @@ def record_extraction(
         raise ValueError("statement extraction must contain rows and annual columns")
     if len(columns) < 2:
         raise ValueError("annual report extraction must include its comparative column")
-    minimum_rows = {"income": 8, "balance": 10, "cashflow": 15}
+    # Older cash-flow statements can be materially shorter than later reports;
+    # still require a useful grid, but do not reject a complete compact statement.
+    minimum_rows = {"income": 8, "balance": 10, "cashflow": 10}
     statement = next(iter(statements))
     if len(rows) < minimum_rows[statement]:
         raise ValueError("statement extraction omitted too many source rows")
@@ -259,7 +355,7 @@ def validate_automated_attempts(session: Session, company_id: str) -> dict[str, 
             issues.append("too_few_annual_columns")
         stored_statements = {item.statement for item in observations}
         if len(stored_statements) == 1:
-            minimum_rows = {"income": 8, "balance": 10, "cashflow": 15}
+            minimum_rows = {"income": 8, "balance": 10, "cashflow": 10}
             stored_statement = next(iter(stored_statements))
             if len(stored_rows) < minimum_rows[stored_statement]:
                 issues.append("too_few_statement_rows")
@@ -327,7 +423,7 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
         if not statement_rows:
             continue
         periods_by_id: dict[str, dict[str, Any]] = {}
-        concepts: dict[str, list[tuple[Observation, Filing]]] = {}
+        concepts: dict[tuple[str, str], list[tuple[Observation, Filing]]] = {}
         for observation, filing in statement_rows:
             period_id = observation.period_end.isoformat()
             periods_by_id[period_id] = {
@@ -336,7 +432,14 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
                 "start": observation.period_start,
                 "end": observation.period_end,
             }
-            concepts.setdefault(observation.concept_id, []).append((observation, filing))
+            canonical_id = _row_alias_key(
+                company_id, statement_id, observation.raw_label, observation.concept_id
+            )
+            # A clean row must never combine amounts reported in different
+            # currencies. Historical currency changes stay as separate rows.
+            concepts.setdefault((canonical_id, observation.currency), []).append(
+                (observation, filing)
+            )
 
         def filing_precedence(pair: tuple[Observation, Filing]) -> tuple[int, date]:
             return (
@@ -351,14 +454,32 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
             ),
         )
         public_rows = []
-        for concept_id, observations in ordered:
+        for (concept_id, currency), observations in ordered:
             latest_observation = max(observations, key=filing_precedence)[0]
             label = display_label(latest_observation.raw_label)
+            target_dimension, target_scale = _unit_scale(
+                latest_observation.unit, latest_observation.currency
+            )
             cells = {}
-            for observation, filing in observations:
+            by_period: dict[date, list[tuple[Observation, Filing]]] = {}
+            for pair in observations:
+                by_period.setdefault(pair[0].period_end, []).append(pair)
+            for period_end, period_observations in by_period.items():
+                # A newer filing can restate or round a comparative. Choose its
+                # value for the clean view while retaining every source record.
+                observation, filing = max(period_observations, key=filing_precedence)
                 evidence = observation.evidence
-                cells[observation.period_end.isoformat()] = {
-                    "value": str(observation.amount) if observation.amount is not None else None,
+                value = str(observation.amount) if observation.amount is not None else None
+                source_dimension, source_scale = _unit_scale(observation.unit, observation.currency)
+                if (
+                    value is not None
+                    and observation.currency == latest_observation.currency
+                    and source_dimension == target_dimension
+                ):
+                    normalized = Decimal(value) * source_scale / target_scale
+                    value = format(normalized.normalize(), "f")
+                cells[period_end.isoformat()] = {
+                    "value": value,
                     "state": observation.value_state,
                     "observationId": observation.id,
                     "filingId": filing.id,
@@ -370,9 +491,9 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
                 }
             public_rows.append(
                 {
-                    "id": concept_id,
+                    "id": f"{concept_id}-{currency.casefold()}",
                     "label": label,
-                    "currency": latest_observation.currency,
+                    "currency": currency,
                     "unit": latest_observation.unit,
                     "aliases": sorted(
                         {

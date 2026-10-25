@@ -115,9 +115,21 @@ export async function filings(
   if (options.classification)
     query = query.where("classification", "=", options.classification);
   if (options.year)
-    query = query
-      .where("published_on", ">=", `${options.year}-01-01`)
-      .where("published_on", "<=", `${options.year}-12-31`);
+    query = query.where((eb) =>
+      eb.or([
+        eb.and([
+          eb("published_on", ">=", `${options.year}-01-01`),
+          eb("published_on", "<=", `${options.year}-12-31`),
+        ]),
+        // Older filings were imported with a report year before publication
+        // dates were captured. Keep the year filter useful for those records.
+        eb(
+          "metadata",
+          "@>",
+          JSON.stringify({ reportYear: Number(options.year) }),
+        ),
+      ]),
+    );
   if (options.cursor) query = query.where("id", ">", options.cursor);
   const rows = await query
     .orderBy("id")
@@ -148,6 +160,13 @@ export async function publishedHistory(
 ) {
   const period = statement.periods.find((p) => p.id === periodId);
   if (!period) return [];
+  const sourceLabels = Array.from(
+    new Set([
+      row.label,
+      ...row.aliases,
+      ...Object.values(row.cells).map((cell) => cell.rawLabel),
+    ]),
+  );
   // A report may spell its units or basis differently (for example,
   // "thousands" versus "EUR thousands"). The source concept, statement,
   // reporting period, and consolidation scope identify a value history; expose
@@ -172,7 +191,7 @@ export async function publishedHistory(
       "observations.evidence",
     ])
     .where("observations.company_id", "=", company)
-    .where("observations.concept_id", "=", row.id)
+    .where("observations.raw_label", "in", sourceLabels)
     .where("observations.statement", "=", statement.id)
     .where("observations.period_end", "=", period.end)
     .where("observations.scope", "=", statement.scope)

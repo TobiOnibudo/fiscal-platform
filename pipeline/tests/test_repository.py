@@ -10,7 +10,39 @@ from sqlalchemy.orm import Session
 
 from fiscal_pipeline.domain import logical_hash
 from fiscal_pipeline.models import Dataset
-from fiscal_pipeline.repository import publish, seed_companies
+from fiscal_pipeline.repository import _row_alias_key, _unit_scale, publish, seed_companies
+
+
+def test_unit_scale_recognizes_company_report_notations() -> None:
+    assert _unit_scale("GBP'000", "GBP")[1] == Decimal("1000")
+    assert _unit_scale("£m", "GBP")[1] == Decimal("1000000")
+    assert _unit_scale("EUR_thousands", "EUR")[1] == Decimal("1000")
+    assert _unit_scale("EUR per share", "EUR")[0] == "pershare"
+
+
+def test_source_validated_aliases_are_issuer_and_statement_scoped() -> None:
+    assert _row_alias_key(
+        "wise", "cashflow", "Cash generated from operating activities", "old-id"
+    ) == _row_alias_key("wise", "cashflow", "Cash generated from operations", "new-id")
+    assert _row_alias_key(
+        "adyen", "income", "Income before net finance expense and income taxes", "old-id"
+    ) == _row_alias_key(
+        "adyen", "income", "Income before net finance income/(expense) and income taxes", "new-id"
+    )
+    assert (
+        _row_alias_key(
+            "wise", "income", "Income before net finance expense and income taxes", "old-id"
+        )
+        == "old-id"
+    )
+    assert _row_alias_key("wise", "cashflow", "Interest paid", "old-id") == _row_alias_key(
+        "wise", "cashflow", "Interest expense paid", "new-id"
+    )
+    assert _row_alias_key(
+        "adyen", "balance", "Payable to merchants and financial institutions", "old-id"
+    ) == _row_alias_key(
+        "adyen", "balance", "Payables to merchants and financial institutions", "new-id"
+    )
 
 
 def synthetic_release() -> tuple[dict, dict]:  # type: ignore[type-arg]

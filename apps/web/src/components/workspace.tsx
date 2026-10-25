@@ -80,7 +80,7 @@ export function Workspace() {
   const years = Array.from(
     new Set(data?.statement.periods.map((p) => p.end.slice(0, 4)) ?? []),
   ).sort();
-  const selectedFrom = from || years[Math.max(0, years.length - 10)] || "";
+  const selectedFrom = from || years[0] || "";
   const selectedTo = to || years.at(-1) || "";
   const visibleStatement = data
     ? {
@@ -93,6 +93,15 @@ export function Workspace() {
       }
     : undefined;
   const rows = data ? searchRows(data.statement.rows, query, historical) : [];
+  const statementUnits = new Set(
+    data?.statement.rows.map((row) => `${row.currency} · ${row.unit}`) ?? [],
+  );
+  const unitSummary =
+    statementUnits.size > 1
+      ? "Multiple currencies / units · shown per line item"
+      : data
+        ? `${data.statement.currency} · ${data.statement.unit}`
+        : "Currency and units available after publication";
   const historicalCount =
     data?.statement.rows.filter((r) => r.historical).length ?? 0;
   const exportParams = new URLSearchParams({
@@ -251,8 +260,8 @@ export function Workspace() {
                     </h2>
                     <p>
                       {data
-                        ? `${data.statement.currency} · ${data.statement.unit} · ${data.statement.basis} · ${data.statement.scope}`
-                        : `Fiscal year end: ${selectedCompany.fiscal_year_end_month === 3 ? "31 March" : "31 December"} · Currency and units available after publication`}
+                        ? `${unitSummary} · ${data.statement.basis} · ${data.statement.scope}`
+                        : `Fiscal year end: ${selectedCompany.fiscal_year_end_month === 3 ? "31 March" : "31 December"} · ${unitSummary}`}
                     </p>
                   </div>
                   {data ? (
@@ -336,7 +345,7 @@ export function Workspace() {
                         setTo("");
                       }}
                     >
-                      Latest ten published periods
+                      All published periods
                     </button>
                   </div>
                 </details>

@@ -97,6 +97,13 @@ def parse_amount(raw: str, *, decimal_separator: str = ".") -> Decimal | None:
     negative = value.startswith("(") and value.endswith(")")
     if negative:
         value = value[1:-1]
+    # Some Companies House scans group thousands with ordinary or Unicode
+    # spaces. Accept only standard three-digit groups.
+    value = re.sub(r"[\u00a0\u202f]", " ", value)
+    if " " in value:
+        if not re.fullmatch(r"-?\d{1,3}(?: \d{3})+(?:[.,]\d+)?", value):
+            raise ValueError(f"ambiguous financial number: {raw!r}")
+        value = value.replace(" ", "")
     grammar = rf"-?(?:\d+|\d{{1,3}}(?:{re.escape(thousands)}\d{{3}})+)"
     grammar += rf"(?:{re.escape(decimal_separator)}\d+)?"
     if not re.fullmatch(grammar, value) or (negative and value.startswith("-")):

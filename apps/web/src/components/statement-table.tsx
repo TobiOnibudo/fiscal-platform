@@ -24,6 +24,10 @@ export function StatementTable({
   rows: Row[];
   inspect: (cell: Cell) => void;
 }) {
+  const unitLabels = new Set(
+    rows.map((row) => `${row.currency} · ${row.unit}`),
+  );
+  const mixedUnits = unitLabels.size > 1;
   return (
     <div
       className="table-scroll"
@@ -32,8 +36,11 @@ export function StatementTable({
     >
       <table>
         <caption className="sr-only">
-          {statement.title}. {statement.currency}, {statement.unit}. Select an
-          amount to inspect its source.
+          {statement.title}.{" "}
+          {mixedUnits
+            ? "Currency and unit are shown per line item."
+            : `${statement.currency}, ${statement.unit}.`}{" "}
+          Select an amount to inspect its source.
         </caption>
         <thead>
           <tr>
@@ -56,7 +63,8 @@ export function StatementTable({
                 }}
               >
                 {displayRowLabel(row.label)}
-                {row.currency !== statement.currency ||
+                {mixedUnits ||
+                row.currency !== statement.currency ||
                 row.unit !== statement.unit ? (
                   <small>
                     {row.currency} · {row.unit}
