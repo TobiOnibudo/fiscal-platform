@@ -656,8 +656,22 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
     ).all()
     if not rows:
         raise ValueError("company has no extracted observations")
+    reporting_years = sorted(
+        {
+            observation.period_end.year
+            for observation, _ in rows
+            if observation.statement != "balance"
+            or observation.period_end.month == company.fiscal_year_end_month
+        }
+    )
+    # The public dataset is a rolling ten-year view. Keep the latest ten
+    # distinct fiscal-year ends so older comparative columns do not turn the
+    # view into an eleven-plus-year history.
+    retained_years = set(reporting_years[-10:])
     selected: dict[tuple[str, str, date | None, date], tuple[Observation, Filing]] = {}
     for observation, filing in rows:
+        if observation.period_end.year not in retained_years:
+            continue
         if (
             observation.statement == "balance"
             and observation.period_end.month != company.fiscal_year_end_month
