@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BarChart3, CalendarDays, Check, Info, TrendingUp } from "lucide-react";
+import { useReview } from "./review-client";
 
 const annualPeriods = ["FY20", "FY21", "FY22", "FY23", "FY24"];
 const quarterlyPeriods = ["Q1 24", "Q2 24", "Q3 24", "Q4 24", "Q1 25"];
@@ -18,6 +19,7 @@ const quarterlyData = {
   cashFlow: [78.4, 91.2, 105.8, 147.7, 161.9],
   conversion: [28.5, 31.2, 33.4, 44.4, 44.9],
 };
+type TrendResponse = typeof annualData & { periods: string[]; currency: string; unit: string };
 
 function points(
   values: number[],
@@ -77,18 +79,22 @@ function RevenueChart({
   quarterly,
   start,
   end,
+  data,
+  labels,
 }: {
   quarterly: boolean;
   start: number;
   end: number;
+  data?: typeof annualData;
+  labels?: string[];
 }) {
-  const data = quarterly ? quarterlyData : annualData;
-  const periods = (quarterly ? quarterlyPeriods : annualPeriods).slice(
+  const series = data ?? (quarterly ? quarterlyData : annualData);
+  const periods = (labels ?? (quarterly ? quarterlyPeriods : annualPeriods)).slice(
     start,
     end + 1,
   );
-  const revenue = data.revenue.slice(start, end + 1);
-  const margin = data.margin.slice(start, end + 1);
+  const revenue = series.revenue.slice(start, end + 1);
+  const margin = series.margin.slice(start, end + 1);
   const revenueMax = quarterly ? 400 : 1400;
   const marginPoints = points(margin, 700, 270, 35).split(" ");
   const x = (i: number) => 55 + (i * 575) / Math.max(periods.length - 1, 1);
@@ -178,18 +184,22 @@ function CashFlowChart({
   quarterly,
   start,
   end,
+  data,
+  labels,
 }: {
   quarterly: boolean;
   start: number;
   end: number;
+  data?: typeof annualData;
+  labels?: string[];
 }) {
-  const data = quarterly ? quarterlyData : annualData;
-  const periods = (quarterly ? quarterlyPeriods : annualPeriods).slice(
+  const series = data ?? (quarterly ? quarterlyData : annualData);
+  const periods = (labels ?? (quarterly ? quarterlyPeriods : annualPeriods)).slice(
     start,
     end + 1,
   );
-  const cashFlow = data.cashFlow.slice(start, end + 1);
-  const conversionData = data.conversion.slice(start, end + 1);
+  const cashFlow = series.cashFlow.slice(start, end + 1);
+  const conversionData = series.conversion.slice(start, end + 1);
   const max = quarterly ? 180 : 500;
   const conversion = points(conversionData, 600, 230, 28).split(" ");
   const x = (i: number) => 48 + (i * 490) / Math.max(periods.length - 1, 1);
@@ -258,22 +268,38 @@ function CashFlowChart({
 }
 
 export function TrendsKpi({ company }: { company: string }) {
-  const [period, setPeriod] = useState<"annual" | "quarterly">("annual");
+  const trends = useReview<TrendResponse>(`companies/${company}/trends`, 0);
   const [chart, setChart] = useState<"performance" | "cashflow">("performance");
   const [panel, setPanel] = useState<"trends" | "kpis">("trends");
   const [range, setRange] = useState({ start: 0, end: 4 });
-  const quarterly = period === "quarterly";
-  const periods = quarterly ? quarterlyPeriods : annualPeriods;
-  const periodRange = `${periods[range.start]} to ${periods[range.end]}`;
-  const setCadence = (next: "annual" | "quarterly") => {
-    setPeriod(next);
-    setRange({ start: 0, end: 4 });
-  };
+  if (trends.loading) return <section className="trends-view"><div className="table-loading" role="status"><span />Loading published trend data…</div></section>;
+  if (trends.error || !trends.data) return <section className="trends-view"><div className="empty-state"><h2>Trend data unavailable</h2><p>Published income and cash-flow data are required to calculate this view.</p></div></section>;
+  const quarterly = false;
+  const source = trends.data;
+  const periods = source.periods;
+  const rangeStart = Math.min(range.start, periods.length - 1);
+  const rangeEnd = Math.min(range.end, periods.length - 1);
+  const periodRange = `${periods[rangeStart]} to ${periods[rangeEnd]}`;
   const updateStart = (start: number) =>
     setRange((current) => ({ start, end: Math.max(start, current.end) }));
   const updateEnd = (end: number) =>
     setRange((current) => ({ start: Math.min(current.start, end), end }));
   const title = company === "adyen" ? "Adyen" : "Wise";
+  const last = source.revenue.length - 1;
+  const prior = Math.max(0, last - 1);
+  const growth = ((source.revenue[last] / source.revenue[prior]) - 1) * 100;
+  const symbol = source.currency === "EUR" ? "€" : source.currency === "GBP" ? "£" : `${source.currency} `;
+  const displayMetrics = [
+    ["Revenue", `${symbol}${source.revenue[last].toFixed(1)} ${source.unit}`, `${growth >= 0 ? "+" : ""}${growth.toFixed(1)}%`, "vs. prior period"],
+    ["Revenue growth", `${growth.toFixed(1)}%`, "Calculated from published revenue", "vs. prior period"],
+    ["Operating margin", `${source.margin[last].toFixed(1)}%`, `${(source.margin[last] - source.margin[prior]).toFixed(1)}pp`, "vs. prior period"],
+    ["Operating cash flow", `${symbol}${source.cashFlow[last].toFixed(1)} ${source.unit}`, `${(source.conversion[last] - source.conversion[prior]).toFixed(1)}pp`, "cash conversion vs. prior period"],
+  ];
+  const displayRows = [
+    ["Revenue growth", source.revenue.map((value, index) => index ? ((value / source.revenue[index - 1]) - 1) * 100 : 0), "pp", false],
+    ["Operating margin", source.margin, "pp", false],
+    ["Operating cash conversion", source.conversion, "pp", false],
+  ] as const;
   const metrics = [
     [
       "Revenue",
@@ -318,26 +344,6 @@ export function TrendsKpi({ company }: { company: string }) {
           </p>
         </div>
         <div className="trend-controls">
-          <div
-            className="segmented"
-            role="group"
-            aria-label="Reporting cadence"
-          >
-            <button
-              className={period === "annual" ? "active" : ""}
-              aria-pressed={period === "annual"}
-              onClick={() => setCadence("annual")}
-            >
-              Annual
-            </button>
-            <button
-              className={period === "quarterly" ? "active" : ""}
-              aria-pressed={period === "quarterly"}
-              onClick={() => setCadence("quarterly")}
-            >
-              Quarterly
-            </button>
-          </div>
           <details className="range-filter">
             <summary className="range-button">
               <CalendarDays size={15} />
@@ -347,7 +353,7 @@ export function TrendsKpi({ company }: { company: string }) {
               <label>
                 From
                 <select
-                  value={range.start}
+                  value={rangeStart}
                   onChange={(event) => updateStart(Number(event.target.value))}
                 >
                   {periods.map((item, index) => (
@@ -363,7 +369,7 @@ export function TrendsKpi({ company }: { company: string }) {
               <label>
                 To
                 <select
-                  value={range.end}
+                  value={rangeEnd}
                   onChange={(event) => updateEnd(Number(event.target.value))}
                 >
                   {periods.map((item, index) => (
@@ -388,10 +394,10 @@ export function TrendsKpi({ company }: { company: string }) {
         </div>
       </div>
       <div className="kpi-strip">
-        {metrics.map(([label, value, delta, context]) => (
+        {displayMetrics.map(([label, value, delta, context]) => (
           <article className="kpi" key={label}>
             <p>{label}</p>
-            <span className="kpi-period">{periods[range.end]}</span>
+            <span className="kpi-period">{periods[rangeEnd]}</span>
             <strong>{value}</strong>
             <div>
               <b>{delta}</b>
@@ -490,14 +496,18 @@ export function TrendsKpi({ company }: { company: string }) {
             {chart === "performance" ? (
               <RevenueChart
                 quarterly={quarterly}
-                start={range.start}
-                end={range.end}
+                start={rangeStart}
+                end={rangeEnd}
+                data={quarterly ? undefined : trends.data}
+                labels={quarterly ? undefined : trends.data?.periods}
               />
             ) : (
               <CashFlowChart
                 quarterly={quarterly}
-                start={range.start}
-                end={range.end}
+                start={rangeStart}
+                end={rangeEnd}
+                data={quarterly ? undefined : trends.data}
+                labels={quarterly ? undefined : trends.data?.periods}
               />
             )}
           </div>
@@ -510,15 +520,14 @@ export function TrendsKpi({ company }: { company: string }) {
             </div>
             <div className="quality-bars">
               {[
-                ["Recurring revenue", "88%", 88, "teal"],
-                ["Transaction take rate", "0.62%", 52, "blue"],
-                ["Cost-to-income ratio", "69.8%", 70, "blue"],
+                ["Operating margin", `${source.margin[last].toFixed(1)}%`, Math.min(100, Math.max(0, source.margin[last])), "teal"],
+                ["Operating cash conversion", `${source.conversion[last].toFixed(1)}%`, Math.min(100, Math.max(0, source.conversion[last])), "blue"],
               ].map(([label, val, width, tone]) => (
                 <div className="quality-row" key={label as string}>
                   <div>
                     <span>
                       {label}{" "}
-                      {label === "Recurring revenue" && <Info size={13} />}
+                      {label === "Operating margin" && <Info size={13} />}
                     </span>
                     <b>{val}</b>
                   </div>
@@ -534,8 +543,7 @@ export function TrendsKpi({ company }: { company: string }) {
             <div className="analyst-take">
               <h3>Analyst take</h3>
               <p>
-                Earnings quality remains high, supported by recurring revenue
-                and scalable operating leverage.
+                Ratios are calculated from the selected company&apos;s published income and cash-flow statements.
               </p>
             </div>
           </article>
@@ -549,7 +557,7 @@ export function TrendsKpi({ company }: { company: string }) {
                 <thead>
                   <tr>
                     <th>Metric</th>
-                    {annualPeriods.map((year) => (
+                    {periods.map((year) => (
                       <th key={year}>{year.replace("FY", "20")}</th>
                     ))}
                     <th>5Y trend</th>
@@ -557,14 +565,12 @@ export function TrendsKpi({ company }: { company: string }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map(([label, values, change, negative]) => (
+                  {displayRows.map(([label, values, change, negative]) => (
                     <tr key={label}>
                       <th>{label}</th>
                       {values.map((value, index) => (
                         <td key={`${label}-${index}`}>
-                          {typeof value === "number"
-                            ? `${value}${label === "Net debt / EBITDA" ? "x" : "%"}`
-                            : value}
+                          {typeof value === "number" ? `${value.toFixed(1)}%` : value}
                         </td>
                       ))}
                       <td>
@@ -599,19 +605,15 @@ export function TrendsKpi({ company }: { company: string }) {
         <ul>
           <li>
             <Check size={15} />
-            Adjusted EBITDA margin expanded by 4.8pp to 30.2%, driven by
-            operating leverage and a lower cost-to-income ratio.
+            Operating margin was {source.margin[last].toFixed(1)}% in {periods[last]}.
           </li>
           <li>
             <Check size={15} />
-            Free cash flow conversion climbed to 35.2%, up 6.3pp year over year,
-            reflecting higher profitability and disciplined working capital
-            management.
+            Operating cash conversion was {source.conversion[last].toFixed(1)}% in {periods[last]}.
           </li>
           <li>
             <TrendingUp size={15} />
-            Revenue growth moderated to 16.7% in 2024 but remains strong, with
-            continued customer growth and higher cross-border volumes.
+            Revenue changed by {growth.toFixed(1)}% versus the prior published fiscal year.
           </li>
         </ul>
       </aside>
