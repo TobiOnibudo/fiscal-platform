@@ -283,7 +283,7 @@ export function Workspace() {
                     </button>
                   )}
                 </div>
-                <details className="display-options">
+                <details className="display-options" open>
                   <summary>
                     Fiscal range ·{" "}
                     {selectedFrom && selectedTo

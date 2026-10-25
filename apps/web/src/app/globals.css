@@ -248,26 +248,48 @@ main {
   padding-bottom: 10px;
 }
 .statement-workspace .page-heading {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 .statement-workspace .page-heading h1 {
-  font-size: 28px;
+  font-size: 22px;
+}
+.statement-workspace .page-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 .statement-workspace .page-heading p {
-  margin-top: 2px;
-  font-size: 13px;
+  margin-top: 0;
+  font-size: 12px;
+}
+.statement-workspace .publication-badge {
+  padding: 5px 8px;
+  font-size: 11px;
 }
 .statement-workspace .statement-tabs {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 .statement-workspace .statement-tabs button {
-  padding: 7px 0;
+  padding: 5px 0;
 }
 .statement-workspace .statement-heading {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+}
+.statement-workspace .statement-heading h2 {
+  font-size: 16px;
+}
+.statement-workspace .statement-heading > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 .statement-workspace .statement-heading p {
-  margin-top: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+}
+.statement-workspace .statement-heading .button {
+  min-height: 34px;
+  padding: 7px 10px;
 }
 .statement-workspace .sample-note {
   margin-bottom: 8px;
@@ -275,6 +297,9 @@ main {
 }
 .statement-workspace .table-toolbar {
   margin-bottom: 6px;
+}
+.statement-workspace .coverage-note {
+  display: none;
 }
 .page-heading {
   display: flex;
@@ -412,7 +437,8 @@ main {
   width: 100%;
   border: 0;
   background: transparent;
-  padding: 11px 0;
+  padding: 7px 0;
+  min-height: 32px;
 }
 .search-field kbd {
   font-size: 12px;
@@ -514,6 +540,104 @@ details p {
   flex: 1;
   min-height: 0;
   flex-direction: column;
+}
+.statement-workspace #statement-panel {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  column-gap: 14px;
+}
+.statement-workspace #statement-panel > .statement-heading {
+  flex: 0 0 100%;
+}
+.statement-workspace #statement-panel > .display-options,
+.statement-workspace #statement-panel > .table-toolbar {
+  display: contents;
+}
+.statement-workspace #statement-panel > .display-options > summary {
+  order: 2;
+  align-self: center;
+  white-space: nowrap;
+}
+.statement-workspace #statement-panel > .display-options > .filter-row {
+  order: 3;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  align-items: center;
+}
+.statement-workspace #statement-panel > .display-options > .filter-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.statement-workspace #statement-panel > .display-options > .filter-row select {
+  min-height: 34px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.statement-workspace
+  #statement-panel
+  > .display-options
+  > .filter-row
+  .text-button {
+  min-height: 34px;
+  padding-block: 6px;
+}
+.statement-workspace #statement-panel > .table-toolbar > .search-field {
+  order: 1;
+  flex: 1 1 360px;
+  max-width: none;
+}
+.statement-workspace #statement-panel > .table-toolbar > .historical-toggle {
+  order: 4;
+}
+.statement-workspace #statement-panel > .table-scroll {
+  order: 5;
+  flex: 1 0 100%;
+  width: 100%;
+}
+/* Keep the statement controls in one compact toolbar above the table. */
+.statement-workspace #statement-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) auto auto;
+  gap: 8px 14px;
+}
+.statement-workspace #statement-panel > .statement-heading {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+.statement-workspace #statement-panel > .display-options {
+  display: flex !important;
+  grid-column: 2;
+  grid-row: 2;
+  align-items: center;
+  margin: 0;
+}
+.statement-workspace #statement-panel > .display-options > summary {
+  display: none;
+}
+.statement-workspace #statement-panel > .display-options > .filter-row {
+  display: flex;
+  margin: 0;
+}
+.statement-workspace #statement-panel > .table-toolbar {
+  display: contents;
+}
+.statement-workspace #statement-panel > .table-toolbar > .search-field {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+.statement-workspace #statement-panel > .table-toolbar > .historical-toggle {
+  grid-column: 3;
+  grid-row: 2;
+}
+.statement-workspace #statement-panel > .table-scroll {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  width: auto;
 }
 .statement-workspace #statement-panel .table-scroll {
   flex: 1;
