@@ -29,6 +29,7 @@ const quarterlyData = {
 type TrendResponse = TrendSeries & {
   periods: string[];
   currency: string;
+  currencies?: Array<string | null>;
   unit: string;
 };
 
@@ -431,16 +432,13 @@ export function TrendsKpi({ company }: { company: string }) {
   const conversionLast = source.conversion[cashIndex] ?? 0;
   const conversionPrior = source.conversion[cashPriorIndex] ?? conversionLast;
   const growth = (revenueLast / revenuePrior - 1) * 100;
-  const symbol =
-    source.currency === "EUR"
-      ? "€"
-      : source.currency === "GBP"
-        ? "£"
-        : `${source.currency} `;
+  const selectedSymbol = currencySymbol(
+    source.currencies?.[revenueIndex] ?? source.currency,
+  );
   const displayMetrics = [
     [
       "Revenue",
-      `${symbol}${revenueLast.toFixed(1)} ${source.unit}`,
+      `${selectedSymbol}${revenueLast.toFixed(1)} ${source.unit}`,
       `${growth >= 0 ? "+" : ""}${percentage(growth)}`,
       "vs. prior period",
       periods[revenueIndex],
@@ -461,7 +459,7 @@ export function TrendsKpi({ company }: { company: string }) {
     ],
     [
       "Operating cash flow",
-      `${symbol}${cashLast.toFixed(1)} ${source.unit}`,
+      `${selectedSymbol}${cashLast.toFixed(1)} ${source.unit}`,
       percentagePoints(conversionLast - conversionPrior),
       "cash conversion vs. prior period",
       periods[cashIndex],
@@ -673,7 +671,7 @@ export function TrendsKpi({ company }: { company: string }) {
                 end={rangeEnd}
                 data={quarterly ? undefined : trends.data}
                 labels={quarterly ? undefined : trends.data?.periods}
-                currency={source.currency}
+                currency={source.currencies?.[rangeEnd] ?? source.currency}
               />
             ) : (
               <CashFlowChart
@@ -682,7 +680,7 @@ export function TrendsKpi({ company }: { company: string }) {
                 end={rangeEnd}
                 data={quarterly ? undefined : trends.data}
                 labels={quarterly ? undefined : trends.data?.periods}
-                currency={source.currency}
+                currency={source.currencies?.[rangeEnd] ?? source.currency}
               />
             )}
           </div>

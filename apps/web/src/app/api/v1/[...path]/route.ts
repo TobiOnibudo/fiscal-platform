@@ -16,6 +16,7 @@ export const dynamic = "force-dynamic";
 
 type Metric = {
   values: Map<string, number | null>;
+  currencies: Map<string, string | null>;
   currency: string;
   unit: string;
 };
@@ -34,13 +35,12 @@ function scaleToMillions(unit: string) {
 function metric(
   statement: Statement,
   ids: string[],
-  currency?: string,
+  currencies?: Map<string, string | null>,
 ): Metric | undefined {
   const candidates = statement.rows.filter(
     (item) =>
-      (!currency || item.currency === currency) &&
-      (ids.includes(item.id) ||
-        ids.some((id) => item.label.toLowerCase().includes(id))),
+      ids.includes(item.id) ||
+      ids.some((id) => item.label.toLowerCase().includes(id)),
   );
   const rows = candidates.toSorted(
     (left, right) =>
@@ -52,14 +52,28 @@ function metric(
   return {
     currency: row.currency,
     unit: "m",
+    currencies: new Map(
+      statement.periods.map((period) => {
+        const year = period.end.slice(0, 4);
+        const source = rows.find(
+          (candidate) =>
+            (!currencies || candidate.currency === currencies.get(year)) &&
+            candidate.cells[period.id]?.value !== null,
+        );
+        return [year, source?.currency ?? null];
+      }),
+    ),
     values: new Map(
       statement.periods.map((period) => {
+        const year = period.end.slice(0, 4);
         const source = rows.find(
-          (candidate) => candidate.cells[period.id]?.value !== null,
+          (candidate) =>
+            (!currencies || candidate.currency === currencies.get(year)) &&
+            candidate.cells[period.id]?.value !== null,
         );
         const value = source?.cells[period.id]?.value;
         return [
-          period.end.slice(0, 4),
+          year,
           value && source ? Number(value) * scaleToMillions(source.unit) : null,
         ];
       }),
@@ -91,7 +105,7 @@ function trends(statements: Statement[]) {
       "income before net finance",
       "income before interest income",
     ],
-    revenue?.currency,
+    revenue?.currencies,
   );
   const cash = metric(
     cashflow,
@@ -102,7 +116,7 @@ function trends(statements: Statement[]) {
       "cash generated from operations",
       "net cash provided by operating activities",
     ],
-    revenue?.currency,
+    revenue?.currencies,
   );
   if (!revenue || !profit || !cash)
     throw new ReviewError(
@@ -125,6 +139,7 @@ function trends(statements: Statement[]) {
   return {
     periods: periods.map((year) => `FY${year.slice(2)}`),
     currency: revenue.currency,
+    currencies: periods.map((year) => revenue.currencies.get(year)),
     unit: revenue.unit,
     revenue: revenueValues,
     margin: profitValues.map((value, index) =>

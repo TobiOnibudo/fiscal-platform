@@ -291,48 +291,44 @@ export function Workspace() {
                   <div className="filter-row fiscal-range-picker">
                     <label>
                       From
-                      <input
-                        type="number"
+                      <select
                         aria-label="From fiscal year"
-                        inputMode="numeric"
-                        step="1"
                         value={selectedFrom}
-                        min={years[0]}
-                        max={selectedTo}
                         disabled={!data}
                         onChange={(event) => {
                           setFrom(event.target.value);
                           setSelected(null);
                         }}
-                      />
+                      >
+                        {years
+                          .filter((year) => year <= selectedTo)
+                          .map((year) => (
+                            <option key={year} value={year}>
+                              FY{year.slice(2)}
+                            </option>
+                          ))}
+                      </select>
                     </label>
                     <label>
                       To
-                      <input
-                        type="number"
+                      <select
                         aria-label="To fiscal year"
-                        inputMode="numeric"
-                        step="1"
                         value={selectedTo}
-                        min={selectedFrom}
-                        max={years.at(-1)}
                         disabled={!data}
                         onChange={(event) => {
                           setTo(event.target.value);
                           setSelected(null);
                         }}
-                      />
+                      >
+                        {years
+                          .filter((year) => year >= selectedFrom)
+                          .map((year) => (
+                            <option key={year} value={year}>
+                              FY{year.slice(2)}
+                            </option>
+                          ))}
+                      </select>
                     </label>
-                    <button
-                      className="text-button"
-                      disabled={!data}
-                      onClick={() => {
-                        setFrom("");
-                        setTo("");
-                      }}
-                    >
-                      All published periods
-                    </button>
                   </div>
                 </details>
                 <div className="table-toolbar">
