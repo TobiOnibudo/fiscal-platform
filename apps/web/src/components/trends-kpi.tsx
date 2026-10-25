@@ -19,7 +19,11 @@ const quarterlyData = {
   cashFlow: [78.4, 91.2, 105.8, 147.7, 161.9],
   conversion: [28.5, 31.2, 33.4, 44.4, 44.9],
 };
-type TrendResponse = typeof annualData & { periods: string[]; currency: string; unit: string };
+type TrendResponse = typeof annualData & {
+  periods: string[];
+  currency: string;
+  unit: string;
+};
 
 function points(
   values: number[],
@@ -89,10 +93,9 @@ function RevenueChart({
   labels?: string[];
 }) {
   const series = data ?? (quarterly ? quarterlyData : annualData);
-  const periods = (labels ?? (quarterly ? quarterlyPeriods : annualPeriods)).slice(
-    start,
-    end + 1,
-  );
+  const periods = (
+    labels ?? (quarterly ? quarterlyPeriods : annualPeriods)
+  ).slice(start, end + 1);
   const revenue = series.revenue.slice(start, end + 1);
   const margin = series.margin.slice(start, end + 1);
   const revenueMax = quarterly ? 400 : 1400;
@@ -194,10 +197,9 @@ function CashFlowChart({
   labels?: string[];
 }) {
   const series = data ?? (quarterly ? quarterlyData : annualData);
-  const periods = (labels ?? (quarterly ? quarterlyPeriods : annualPeriods)).slice(
-    start,
-    end + 1,
-  );
+  const periods = (
+    labels ?? (quarterly ? quarterlyPeriods : annualPeriods)
+  ).slice(start, end + 1);
   const cashFlow = series.cashFlow.slice(start, end + 1);
   const conversionData = series.conversion.slice(start, end + 1);
   const max = quarterly ? 180 : 500;
@@ -272,8 +274,27 @@ export function TrendsKpi({ company }: { company: string }) {
   const [chart, setChart] = useState<"performance" | "cashflow">("performance");
   const [panel, setPanel] = useState<"trends" | "kpis">("trends");
   const [range, setRange] = useState({ start: 0, end: 4 });
-  if (trends.loading) return <section className="trends-view"><div className="table-loading" role="status"><span />Loading published trend data…</div></section>;
-  if (trends.error || !trends.data) return <section className="trends-view"><div className="empty-state"><h2>Trend data unavailable</h2><p>Published income and cash-flow data are required to calculate this view.</p></div></section>;
+  if (trends.loading)
+    return (
+      <section className="trends-view">
+        <div className="table-loading" role="status">
+          <span />
+          Loading published trend data…
+        </div>
+      </section>
+    );
+  if (trends.error || !trends.data)
+    return (
+      <section className="trends-view">
+        <div className="empty-state">
+          <h2>Trend data unavailable</h2>
+          <p>
+            Published income and cash-flow data are required to calculate this
+            view.
+          </p>
+        </div>
+      </section>
+    );
   const quarterly = false;
   const source = trends.data;
   const periods = source.periods;
@@ -287,16 +308,48 @@ export function TrendsKpi({ company }: { company: string }) {
   const title = company === "adyen" ? "Adyen" : "Wise";
   const last = source.revenue.length - 1;
   const prior = Math.max(0, last - 1);
-  const growth = ((source.revenue[last] / source.revenue[prior]) - 1) * 100;
-  const symbol = source.currency === "EUR" ? "€" : source.currency === "GBP" ? "£" : `${source.currency} `;
+  const growth = (source.revenue[last] / source.revenue[prior] - 1) * 100;
+  const symbol =
+    source.currency === "EUR"
+      ? "€"
+      : source.currency === "GBP"
+        ? "£"
+        : `${source.currency} `;
   const displayMetrics = [
-    ["Revenue", `${symbol}${source.revenue[last].toFixed(1)} ${source.unit}`, `${growth >= 0 ? "+" : ""}${growth.toFixed(1)}%`, "vs. prior period"],
-    ["Revenue growth", `${growth.toFixed(1)}%`, "Calculated from published revenue", "vs. prior period"],
-    ["Operating margin", `${source.margin[last].toFixed(1)}%`, `${(source.margin[last] - source.margin[prior]).toFixed(1)}pp`, "vs. prior period"],
-    ["Operating cash flow", `${symbol}${source.cashFlow[last].toFixed(1)} ${source.unit}`, `${(source.conversion[last] - source.conversion[prior]).toFixed(1)}pp`, "cash conversion vs. prior period"],
+    [
+      "Revenue",
+      `${symbol}${source.revenue[last].toFixed(1)} ${source.unit}`,
+      `${growth >= 0 ? "+" : ""}${growth.toFixed(1)}%`,
+      "vs. prior period",
+    ],
+    [
+      "Revenue growth",
+      `${growth.toFixed(1)}%`,
+      "Calculated from published revenue",
+      "vs. prior period",
+    ],
+    [
+      "Operating margin",
+      `${source.margin[last].toFixed(1)}%`,
+      `${(source.margin[last] - source.margin[prior]).toFixed(1)}pp`,
+      "vs. prior period",
+    ],
+    [
+      "Operating cash flow",
+      `${symbol}${source.cashFlow[last].toFixed(1)} ${source.unit}`,
+      `${(source.conversion[last] - source.conversion[prior]).toFixed(1)}pp`,
+      "cash conversion vs. prior period",
+    ],
   ];
   const displayRows = [
-    ["Revenue growth", source.revenue.map((value, index) => index ? ((value / source.revenue[index - 1]) - 1) * 100 : 0), "pp", false],
+    [
+      "Revenue growth",
+      source.revenue.map((value, index) =>
+        index ? (value / source.revenue[index - 1] - 1) * 100 : 0,
+      ),
+      "pp",
+      false,
+    ],
     ["Operating margin", source.margin, "pp", false],
     ["Operating cash conversion", source.conversion, "pp", false],
   ] as const;
@@ -333,6 +386,8 @@ export function TrendsKpi({ company }: { company: string }) {
     ["FCF margin", annualData.conversion, "+20.9pp", false],
     ["Net debt / EBITDA", [1.8, 1.5, 1.2, 0.8, 0.3], "-1.5x", true],
   ] as const;
+  void metrics;
+  void rows;
   return (
     <section className="trends-view" aria-label="Trends and KPI analysis">
       <div className="trend-heading">
@@ -520,8 +575,18 @@ export function TrendsKpi({ company }: { company: string }) {
             </div>
             <div className="quality-bars">
               {[
-                ["Operating margin", `${source.margin[last].toFixed(1)}%`, Math.min(100, Math.max(0, source.margin[last])), "teal"],
-                ["Operating cash conversion", `${source.conversion[last].toFixed(1)}%`, Math.min(100, Math.max(0, source.conversion[last])), "blue"],
+                [
+                  "Operating margin",
+                  `${source.margin[last].toFixed(1)}%`,
+                  Math.min(100, Math.max(0, source.margin[last])),
+                  "teal",
+                ],
+                [
+                  "Operating cash conversion",
+                  `${source.conversion[last].toFixed(1)}%`,
+                  Math.min(100, Math.max(0, source.conversion[last])),
+                  "blue",
+                ],
               ].map(([label, val, width, tone]) => (
                 <div className="quality-row" key={label as string}>
                   <div>
@@ -543,7 +608,8 @@ export function TrendsKpi({ company }: { company: string }) {
             <div className="analyst-take">
               <h3>Analyst take</h3>
               <p>
-                Ratios are calculated from the selected company&apos;s published income and cash-flow statements.
+                Ratios are calculated from the selected company&apos;s published
+                income and cash-flow statements.
               </p>
             </div>
           </article>
@@ -570,7 +636,9 @@ export function TrendsKpi({ company }: { company: string }) {
                       <th>{label}</th>
                       {values.map((value, index) => (
                         <td key={`${label}-${index}`}>
-                          {typeof value === "number" ? `${value.toFixed(1)}%` : value}
+                          {typeof value === "number"
+                            ? `${value.toFixed(1)}%`
+                            : value}
                         </td>
                       ))}
                       <td>
@@ -605,15 +673,18 @@ export function TrendsKpi({ company }: { company: string }) {
         <ul>
           <li>
             <Check size={15} />
-            Operating margin was {source.margin[last].toFixed(1)}% in {periods[last]}.
+            Operating margin was {source.margin[last].toFixed(1)}% in{" "}
+            {periods[last]}.
           </li>
           <li>
             <Check size={15} />
-            Operating cash conversion was {source.conversion[last].toFixed(1)}% in {periods[last]}.
+            Operating cash conversion was {source.conversion[last].toFixed(1)}%
+            in {periods[last]}.
           </li>
           <li>
             <TrendingUp size={15} />
-            Revenue changed by {growth.toFixed(1)}% versus the prior published fiscal year.
+            Revenue changed by {growth.toFixed(1)}% versus the prior published
+            fiscal year.
           </li>
         </ul>
       </aside>

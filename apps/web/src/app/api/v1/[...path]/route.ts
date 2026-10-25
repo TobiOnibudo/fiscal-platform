@@ -16,24 +16,74 @@ export const dynamic = "force-dynamic";
 
 function metric(statement: Statement, ids: string[]) {
   const row = statement.rows.find(
-    (item) => ids.includes(item.id) || ids.some((id) => item.label.toLowerCase().includes(id)),
+    (item) =>
+      ids.includes(item.id) ||
+      ids.some((id) => item.label.toLowerCase().includes(id)),
   );
-  return new Map(statement.periods.map((period) => [period.end.slice(0, 4), row?.cells[period.id]?.value ? Number(row.cells[period.id].value) : null]));
+  return new Map(
+    statement.periods.map((period) => [
+      period.end.slice(0, 4),
+      row?.cells[period.id]?.value ? Number(row.cells[period.id].value) : null,
+    ]),
+  );
 }
 
 function trends(statements: Statement[]) {
   const income = statements.find((statement) => statement.id === "income");
   const cashflow = statements.find((statement) => statement.id === "cashflow");
-  if (!income || !cashflow) throw new ReviewError("TREND_DATA_UNAVAILABLE", "Published income and cash-flow statements are required for trends.", 422);
-  const revenue = metric(income, ["revenue", "net revenue", "non-interest revenue"]);
-  const profit = metric(income, ["adjusted-ebitda", "operating-profit", "operating profit"]);
-  const cash = metric(cashflow, ["net-operating", "cash-from-operations", "net cash from operating", "cash generated from operations"]);
-  const periods = income.periods.map((period) => period.end.slice(0, 4)).filter((year) => revenue.get(year) !== null && profit.get(year) !== null && cash.get(year) !== null).slice(-5);
-  if (periods.length < 2) throw new ReviewError("TREND_DATA_UNAVAILABLE", "Published trend metrics need at least two complete fiscal years.", 422);
+  if (!income || !cashflow)
+    throw new ReviewError(
+      "TREND_DATA_UNAVAILABLE",
+      "Published income and cash-flow statements are required for trends.",
+      422,
+    );
+  const revenue = metric(income, [
+    "revenue",
+    "net revenue",
+    "non-interest revenue",
+  ]);
+  const profit = metric(income, [
+    "adjusted-ebitda",
+    "operating-profit",
+    "operating profit",
+  ]);
+  const cash = metric(cashflow, [
+    "net-operating",
+    "cash-from-operations",
+    "net cash from operating",
+    "cash generated from operations",
+  ]);
+  const periods = income.periods
+    .map((period) => period.end.slice(0, 4))
+    .filter(
+      (year) =>
+        revenue.get(year) !== null &&
+        profit.get(year) !== null &&
+        cash.get(year) !== null,
+    )
+    .slice(-5);
+  if (periods.length < 2)
+    throw new ReviewError(
+      "TREND_DATA_UNAVAILABLE",
+      "Published trend metrics need at least two complete fiscal years.",
+      422,
+    );
   const revenueValues = periods.map((year) => revenue.get(year) as number);
   const profitValues = periods.map((year) => profit.get(year) as number);
   const cashValues = periods.map((year) => cash.get(year) as number);
-  return { periods: periods.map((year) => `FY${year.slice(2)}`), currency: income.currency, unit: income.unit, revenue: revenueValues, margin: profitValues.map((value, index) => value / revenueValues[index] * 100), cashFlow: cashValues, conversion: cashValues.map((value, index) => value / revenueValues[index] * 100) };
+  return {
+    periods: periods.map((year) => `FY${year.slice(2)}`),
+    currency: income.currency,
+    unit: income.unit,
+    revenue: revenueValues,
+    margin: profitValues.map(
+      (value, index) => (value / revenueValues[index]) * 100,
+    ),
+    cashFlow: cashValues,
+    conversion: cashValues.map(
+      (value, index) => (value / revenueValues[index]) * 100,
+    ),
+  };
 }
 
 export async function GET(
@@ -152,7 +202,11 @@ export async function GET(
     )
       throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
     const company = path[1];
-    if (!["filings", "statements", "quality", "trends", "export"].includes(path[2]))
+    if (
+      !["filings", "statements", "quality", "trends", "export"].includes(
+        path[2],
+      )
+    )
       throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
     if (path[2] === "export" && !q.version)
       throw new ReviewError(
@@ -201,7 +255,15 @@ export async function GET(
         requestId,
       });
     if (path[2] === "trends")
-      return Response.json({ datasetVersion: snapshot.version, kind: snapshot.data.kind, ...trends(snapshot.data.statements), requestId }, { headers: { "Cache-Control": "no-store" } });
+      return Response.json(
+        {
+          datasetVersion: snapshot.version,
+          kind: snapshot.data.kind,
+          ...trends(snapshot.data.statements),
+          requestId,
+        },
+        { headers: { "Cache-Control": "no-store" } },
+      );
     if (!["statements", "export"].includes(path[2]))
       throw new ReviewError("NOT_FOUND", "This API route does not exist.", 404);
     const original = snapshot.data.statements.find((s) => s.id === q.statement);
