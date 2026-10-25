@@ -289,54 +289,36 @@ export function Workspace() {
                       : "Awaiting published periods"}
                   </summary>
                   <div className="filter-row fiscal-range-picker">
-                    <fieldset disabled={!data}>
-                      <legend>From fiscal year</legend>
-                      <div className="year-grid">
-                        {years.length ? (
-                          years
-                            .filter((year) => year <= selectedTo)
-                            .map((year) => (
-                              <button
-                                type="button"
-                                aria-pressed={selectedFrom === year}
-                                onClick={() => {
-                                  setFrom(year);
-                                  setSelected(null);
-                                }}
-                                key={year}
-                              >
-                                {year}
-                              </button>
-                            ))
-                        ) : (
-                          <span>Not published</span>
-                        )}
-                      </div>
-                    </fieldset>
-                    <fieldset disabled={!data}>
-                      <legend>To fiscal year</legend>
-                      <div className="year-grid">
-                        {years.length ? (
-                          years
-                            .filter((year) => year >= selectedFrom)
-                            .map((year) => (
-                              <button
-                                type="button"
-                                aria-pressed={selectedTo === year}
-                                onClick={() => {
-                                  setTo(year);
-                                  setSelected(null);
-                                }}
-                                key={year}
-                              >
-                                {year}
-                              </button>
-                            ))
-                        ) : (
-                          <span>Not published</span>
-                        )}
-                      </div>
-                    </fieldset>
+                    <label>
+                      From
+                      <input
+                        type="date"
+                        aria-label="From fiscal year"
+                        value={selectedFrom ? `${selectedFrom}-01-01` : ""}
+                        min={years.length ? `${years[0]}-01-01` : undefined}
+                        max={selectedTo ? `${selectedTo}-12-31` : undefined}
+                        disabled={!data}
+                        onChange={(event) => {
+                          setFrom(event.target.value.slice(0, 4));
+                          setSelected(null);
+                        }}
+                      />
+                    </label>
+                    <label>
+                      To
+                      <input
+                        type="date"
+                        aria-label="To fiscal year"
+                        value={selectedTo ? `${selectedTo}-12-31` : ""}
+                        min={selectedFrom ? `${selectedFrom}-01-01` : undefined}
+                        max={years.length ? `${years.at(-1)}-12-31` : undefined}
+                        disabled={!data}
+                        onChange={(event) => {
+                          setTo(event.target.value.slice(0, 4));
+                          setSelected(null);
+                        }}
+                      />
+                    </label>
                     <button
                       className="text-button"
                       disabled={!data}
