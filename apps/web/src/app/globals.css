@@ -175,6 +175,7 @@ nav button {
   display: flex;
   align-items: center;
   gap: 12px;
+  white-space: nowrap;
   min-height: 44px;
   padding: 12px;
   border: 0;
