@@ -59,6 +59,20 @@ function chartMaximum(values: Array<number | null>) {
   return Math.ceil(highest / magnitude) * magnitude;
 }
 
+function lastAvailableIndex(
+  values: Array<number | null>,
+  start: number,
+  end: number,
+) {
+  for (let index = end; index >= start; index -= 1)
+    if (values[index] !== null) return index;
+  return start;
+}
+
+function previousAvailableIndex(values: Array<number | null>, end: number) {
+  return lastAvailableIndex(values, 0, Math.max(0, end - 1));
+}
+
 function points(
   values: number[],
   width: number,
@@ -387,24 +401,22 @@ export function TrendsKpi({ company }: { company: string }) {
       end,
     }));
   const title = company === "adyen" ? "Adyen" : "Wise";
-  const last = Math.max(
-    0,
-    source.revenue.findLastIndex(
-      (value, index) =>
-        value !== null &&
-        source.margin[index] !== null &&
-        source.cashFlow[index] !== null &&
-        source.conversion[index] !== null,
-    ),
+  const revenueIndex = lastAvailableIndex(source.revenue, rangeStart, rangeEnd);
+  const revenuePriorIndex = previousAvailableIndex(
+    source.revenue,
+    revenueIndex,
   );
-  const prior = Math.max(0, last - 1);
-  const revenueLast = source.revenue[last] ?? 0;
-  const revenuePrior = source.revenue[prior] ?? revenueLast;
-  const marginLast = source.margin[last] ?? 0;
-  const marginPrior = source.margin[prior] ?? marginLast;
-  const cashLast = source.cashFlow[last] ?? 0;
-  const conversionLast = source.conversion[last] ?? 0;
-  const conversionPrior = source.conversion[prior] ?? conversionLast;
+  const marginIndex = lastAvailableIndex(source.margin, rangeStart, rangeEnd);
+  const marginPriorIndex = previousAvailableIndex(source.margin, marginIndex);
+  const cashIndex = lastAvailableIndex(source.cashFlow, rangeStart, rangeEnd);
+  const cashPriorIndex = previousAvailableIndex(source.conversion, cashIndex);
+  const revenueLast = source.revenue[revenueIndex] ?? 0;
+  const revenuePrior = source.revenue[revenuePriorIndex] ?? revenueLast;
+  const marginLast = source.margin[marginIndex] ?? 0;
+  const marginPrior = source.margin[marginPriorIndex] ?? marginLast;
+  const cashLast = source.cashFlow[cashIndex] ?? 0;
+  const conversionLast = source.conversion[cashIndex] ?? 0;
+  const conversionPrior = source.conversion[cashPriorIndex] ?? conversionLast;
   const growth = (revenueLast / revenuePrior - 1) * 100;
   const symbol =
     source.currency === "EUR"
@@ -418,24 +430,28 @@ export function TrendsKpi({ company }: { company: string }) {
       `${symbol}${revenueLast.toFixed(1)} ${source.unit}`,
       `${growth >= 0 ? "+" : ""}${percentage(growth)}`,
       "vs. prior period",
+      periods[revenueIndex],
     ],
     [
       "Revenue growth",
       percentage(growth),
       "Calculated from published revenue",
       "vs. prior period",
+      periods[revenueIndex],
     ],
     [
       "Operating margin",
       percentage(marginLast),
       percentagePoints(marginLast - marginPrior),
       "vs. prior period",
+      periods[marginIndex],
     ],
     [
       "Operating cash flow",
       `${symbol}${cashLast.toFixed(1)} ${source.unit}`,
       percentagePoints(conversionLast - conversionPrior),
       "cash conversion vs. prior period",
+      periods[cashIndex],
     ],
   ];
   const displayRows = [
@@ -548,10 +564,10 @@ export function TrendsKpi({ company }: { company: string }) {
         </div>
       </div>
       <div className="kpi-strip">
-        {displayMetrics.map(([label, value, delta, context]) => (
+        {displayMetrics.map(([label, value, delta, context, period]) => (
           <article className="kpi" key={label}>
             <p>{label}</p>
-            <span className="kpi-period">{periods[rangeEnd]}</span>
+            <span className="kpi-period">{period}</span>
             <strong>{value}</strong>
             <div>
               <b>{delta}</b>
@@ -772,12 +788,13 @@ export function TrendsKpi({ company }: { company: string }) {
         <ul>
           <li>
             <Check size={15} />
-            Operating margin was {percentage(marginLast)} in {periods[last]}.
+            Operating margin was {percentage(marginLast)} in{" "}
+            {periods[marginIndex]}.
           </li>
           <li>
             <Check size={15} />
             Operating cash conversion was {percentage(conversionLast)} in{" "}
-            {periods[last]}.
+            {periods[cashIndex]}.
           </li>
           <li>
             <TrendingUp size={15} />
