@@ -98,7 +98,7 @@ function CashFlowChart({ quarterly, start, end }: { quarterly: boolean; start: n
 export function TrendsKpi({ company }: { company: string }) {
   const [period, setPeriod] = useState<"annual" | "quarterly">("annual");
   const [chart, setChart] = useState<"performance" | "cashflow">("performance");
-  const [rangeOpen, setRangeOpen] = useState(false);
+  const [panel, setPanel] = useState<"trends" | "kpis">("trends");
   const [range, setRange] = useState({ start: 0, end: 4 });
   const quarterly = period === "quarterly";
   const periods = quarterly ? quarterlyPeriods : annualPeriods;
@@ -125,18 +125,23 @@ export function TrendsKpi({ company }: { company: string }) {
       <div><h1>{title}: Trends &amp; KPIs</h1><p>Key financial trends, operating metrics and quality indicators for fundamental analysis.</p></div>
       <div className="trend-controls">
         <div className="segmented" role="group" aria-label="Reporting cadence"><button className={period === "annual" ? "active" : ""} aria-pressed={period === "annual"} onClick={() => setCadence("annual")}>Annual</button><button className={period === "quarterly" ? "active" : ""} aria-pressed={period === "quarterly"} onClick={() => setCadence("quarterly")}>Quarterly</button></div>
-        <div className="range-filter">
-          <button className="range-button" aria-expanded={rangeOpen} aria-controls="period-range-options" onClick={() => setRangeOpen((open) => !open)}><CalendarDays size={15} />{periodRange}</button>
-          {rangeOpen && <div className="range-popover" id="period-range-options">
-            <fieldset><legend>Start period</legend><div className="period-grid">{periods.map((item, index) => <button type="button" aria-pressed={range.start === index} onClick={() => updateStart(index)} key={item}>{item}</button>)}</div></fieldset>
-            <fieldset><legend>End period</legend><div className="period-grid">{periods.map((item, index) => <button type="button" aria-pressed={range.end === index} onClick={() => updateEnd(index)} key={item}>{item}</button>)}</div></fieldset>
-            <button type="button" onClick={() => setRangeOpen(false)}>Apply range</button>
-          </div>}
-        </div>
+        <details className="range-filter">
+          <summary className="range-button"><CalendarDays size={15} />{periodRange}</summary>
+          <div className="range-popover">
+            <label>From<select value={range.start} onChange={(event) => updateStart(Number(event.target.value))}>{periods.map((item, index) => <option value={index} key={item}>{item}</option>)}</select></label>
+            <span className="range-separator" aria-hidden="true">to</span>
+            <label>To<select value={range.end} onChange={(event) => updateEnd(Number(event.target.value))}>{periods.map((item, index) => <option value={index} key={item}>{item}</option>)}</select></label>
+            <button type="button" onClick={(event) => event.currentTarget.closest("details")?.removeAttribute("open")}>Done</button>
+          </div>
+        </details>
       </div>
     </div>
     <div className="kpi-strip">{metrics.map(([label, value, delta, context]) => <article className="kpi" key={label}><p>{label}</p><span className="kpi-period">{periods[range.end]}</span><strong>{value}</strong><div><b>{delta}</b><span>{context}</span></div></article>)}</div>
-    <div className="trends-dashboard">
+    <div className="analysis-tabs" role="tablist" aria-label="Trends and KPIs content">
+      <button id="analysis-trends-tab" role="tab" aria-selected={panel === "trends"} aria-controls="analysis-panel" tabIndex={panel === "trends" ? 0 : -1} onClick={() => setPanel("trends")}>Trend analysis</button>
+      <button id="analysis-kpis-tab" role="tab" aria-selected={panel === "kpis"} aria-controls="analysis-panel" tabIndex={panel === "kpis" ? 0 : -1} onClick={() => setPanel("kpis")}>Operating KPIs</button>
+    </div>
+    <div id="analysis-panel" role="tabpanel" aria-labelledby={`analysis-${panel}-tab`} className={`trends-dashboard ${panel}`}>
       <article className="chart-panel chart-workspace">
         <div className="panel-title chart-workspace-title"><div><h2>{chart === "performance" ? "Revenue & profitability" : "Free cash flow conversion"}</h2><p>{chart === "performance" ? "Group revenue and adjusted EBITDA margin." : "Free cash flow and conversion as a % of revenue."}</p></div><div className="legend"><span><i className="legend-revenue" />{chart === "performance" ? "Revenue (LHS)" : "Free cash flow"}</span><span><i className="legend-margin" />{chart === "performance" ? "EBITDA margin (RHS)" : "FCF conversion"}</span></div></div>
         <div className="chart-tabs" role="tablist" aria-label="Trend charts">
