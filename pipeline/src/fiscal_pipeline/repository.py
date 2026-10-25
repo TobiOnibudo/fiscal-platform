@@ -308,6 +308,62 @@ def _row_display_label(company_id: str, statement: str, concept_id: str, raw_lab
     )
 
 
+def _equivalent_clean_rows(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    """Return whether two rows are duplicate extractions of the same measure.
+
+    This is deliberately conservative: a match requires the same reported
+    periods and the same value/state in every period.  Similar wording alone
+    is never enough to merge two financial measures.
+    """
+    left_cells = left["cells"]
+    right_cells = right["cells"]
+    if set(left_cells) != set(right_cells):
+        return False
+    return all(
+        (left_cells[period]["value"], left_cells[period]["state"])
+        == (right_cells[period]["value"], right_cells[period]["state"])
+        for period in left_cells
+    )
+
+
+def _resolve_duplicate_display_labels(
+    statement_id: str, rows: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Merge duplicate extractions and deterministically name distinct measures.
+
+    Issuer-specific historical renames are handled by ``ROW_LABEL_ALIASES``
+    before this step.  This final safeguard handles future PDFs without
+    allowing two clean-view rows to have the same visible label.  Balance
+    sheets conventionally print non-current items before current items, so an
+    otherwise unqualified pair is named accordingly from its source order.
+    """
+    by_label: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for row in rows:
+        by_label.setdefault((row["label"], row["currency"]), []).append(row)
+
+    resolved: list[dict[str, Any]] = []
+    for (label, _currency), matching_rows in by_label.items():
+        retained: list[dict[str, Any]] = []
+        for row in matching_rows:
+            duplicate = next(
+                (candidate for candidate in retained if _equivalent_clean_rows(candidate, row)),
+                None,
+            )
+            if duplicate is None:
+                retained.append(row)
+                continue
+            duplicate["aliases"] = sorted(set(duplicate["aliases"]) | set(row["aliases"]))
+
+        if len(retained) == 2 and statement_id == "balance":
+            retained[0]["label"] = f"{label} — non-current"
+            retained[1]["label"] = f"{label} — current"
+        elif len(retained) > 1:
+            for index, row in enumerate(retained, start=1):
+                row["label"] = f"{label} — reported item {index}"
+        resolved.extend(retained)
+    return resolved
+
+
 def _unit_scale(unit: str, currency: str) -> tuple[str, Decimal]:
     """Return a unit dimension and base-unit multiplier for safe display conversion."""
     normalized = unit.casefold().replace("_", " ").replace("’", "'").replace("−", "-")
@@ -699,6 +755,7 @@ def materialize_automated_dataset(session: Session, company_id: str) -> Dataset:
                     "cells": cells,
                 }
             )
+        public_rows = _resolve_duplicate_display_labels(statement_id, public_rows)
         duplicate_labels = {
             (row["label"], row["currency"])
             for row in public_rows

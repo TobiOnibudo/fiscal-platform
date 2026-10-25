@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from fiscal_pipeline.domain import logical_hash
 from fiscal_pipeline.models import Dataset
 from fiscal_pipeline.repository import (
+    _resolve_duplicate_display_labels,
     _row_alias_key,
     _row_display_label,
     _unit_scale,
@@ -111,6 +112,39 @@ def test_same_printed_balance_labels_remain_distinct_when_the_pdf_has_two_measur
     assert _row_display_label("adyen", "balance", "lease-liability-2", "Lease liability") == (
         "Lease liability — current"
     )
+
+
+def test_duplicate_display_labels_are_merged_or_resolved_deterministically() -> None:
+    def row(identifier: str, value: str, aliases: list[str]) -> dict[str, object]:
+        return {
+            "id": identifier,
+            "label": "Cash",
+            "currency": "GBP",
+            "aliases": aliases,
+            "cells": {"2024-03-31": {"value": value, "state": "reported"}},
+        }
+
+    duplicate = row("one", "10", ["Cash and equivalents"])
+    assert _resolve_duplicate_display_labels("income", [duplicate, row("two", "10", ["Cash"])]) == [
+        {
+            **duplicate,
+            "aliases": ["Cash", "Cash and equivalents"],
+        }
+    ]
+    resolved_balance = _resolve_duplicate_display_labels(
+        "balance", [row("one", "10", []), row("three", "5", [])]
+    )
+    assert [row["label"] for row in resolved_balance] == [
+        "Cash — non-current",
+        "Cash — current",
+    ]
+    resolved_income = _resolve_duplicate_display_labels(
+        "income", [row("one", "10", []), row("three", "5", [])]
+    )
+    assert [row["label"] for row in resolved_income] == [
+        "Cash — reported item 1",
+        "Cash — reported item 2",
+    ]
 
 
 def synthetic_release() -> tuple[dict, dict]:  # type: ignore[type-arg]
