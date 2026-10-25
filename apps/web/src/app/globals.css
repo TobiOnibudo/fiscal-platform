@@ -639,6 +639,32 @@ details p {
   grid-row: 3;
   width: auto;
 }
+.statement-workspace #statement-panel > .table-toolbar > .search-field {
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .statement-workspace #statement-panel {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .statement-workspace #statement-panel > .table-toolbar > .search-field {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+  }
+  .statement-workspace #statement-panel > .table-toolbar > .historical-toggle {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .statement-workspace #statement-panel > .display-options {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: start;
+  }
+  .statement-workspace #statement-panel > .table-scroll {
+    grid-row: 4;
+  }
+}
 .statement-workspace #statement-panel .table-scroll {
   flex: 1;
   min-height: 0;
