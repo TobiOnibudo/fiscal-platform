@@ -34,12 +34,16 @@ export function FilingsView({
     `companies/${company}/filings?${params}`,
     retry,
   );
+  const titleSuggestions = Array.from(
+    new Set(state.data?.items.map((filing) => filing.title) ?? []),
+  );
+  const availableYears = Array.from(
+    { length: new Date().getFullYear() - 1999 },
+    (_, index) => new Date().getFullYear() - index,
+  );
   return (
     <section className="secondary-view">
       <h2>Source filings</h2>
-      <p className="muted">
-        Document discovery does not establish verified statement coverage.
-      </p>
       <div className="filter-row">
         <label>
           <span>Search reports</span>
@@ -50,7 +54,13 @@ export function FilingsView({
               resetPagination();
             }}
             placeholder="Report title"
+            list="filing-title-suggestions"
           />
+          <datalist id="filing-title-suggestions">
+            {titleSuggestions.map((title) => (
+              <option key={title} value={title} />
+            ))}
+          </datalist>
         </label>
         <label>
           <span>Classification</span>
@@ -69,25 +79,28 @@ export function FilingsView({
         </label>
         <label>
           <span>Publication year</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]{4}"
-            maxLength={4}
+          <select
             value={year}
             onChange={(e) => {
               setYear(e.target.value);
               resetPagination();
             }}
-            placeholder="All years"
-          />
+          >
+            <option value="">All years</option>
+            {availableYears.map((availableYear) => (
+              <option key={availableYear} value={availableYear}>
+                {availableYear}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
       {state.loading ? (
         <p role="status">Loading filings…</p>
       ) : state.error ? (
         <p role="alert">
-          The filing inventory could not load. Use Retry data above.
+          The filing inventory could not load. Please refresh the page to try
+          again.
         </p>
       ) : state.data?.items.length ? (
         <>
@@ -186,7 +199,7 @@ export function QualityView({
       <h2>Data quality and coverage</h2>
       <p className="readable">
         Verified means the source transcription, reporting scope, label mapping,
-        and selected comparative passed the automatic publication checks.
+        and selected comparative passed review.
         Passing arithmetic checks alone does not establish accuracy.
       </p>
       {state.loading ? (
@@ -207,17 +220,11 @@ export function QualityView({
           <p>
             {state.error.code === "NO_PUBLISHED_DATASET"
               ? "No coverage results are available for this company yet."
-              : "Please use Retry data above to try again."}
+              : "Please refresh the page to try again."}
           </p>
         </div>
       ) : (
         <>
-          {state.data?.kind === "sample" ? (
-            <p className="readable">
-              These sample figures have not passed the automatic publication
-              checks and are not intended for financial analysis.
-            </p>
-          ) : null}
           <h3>
             {state.data?.kind === "sample"
               ? `${state.data.coverage.expectedPeriods} periods available`
@@ -226,11 +233,6 @@ export function QualityView({
           <ul className="gap-list">
             {state.data?.coverage.gaps.map((gap) => <li key={gap}>{gap}</li>)}
           </ul>
-          <p>
-            {state.data?.kind === "sample"
-              ? "Dataset status: Automatically published sample"
-              : "Automatic publication checks: Complete"}
-          </p>
         </>
       )}
     </section>

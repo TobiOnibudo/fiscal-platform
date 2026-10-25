@@ -3,14 +3,11 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowDownToLine,
-  ArrowUpRight,
   BookOpen,
   ChevronRight,
-  Database,
   FileText,
   Layers,
   Search,
-  ShieldCheck,
   TrendingUp,
   X,
 } from "lucide-react";
@@ -22,7 +19,7 @@ import {
 } from "./review-client";
 import { SourceDrawer } from "./source-drawer";
 import { StatementTable } from "./statement-table";
-import { FilingsView, QualityView } from "./collection-views";
+import { FilingsView } from "./collection-views";
 import { TrendsKpi } from "./trends-kpi";
 const statementTypes = [
   { id: "income", label: "Income statement" },
@@ -78,7 +75,6 @@ export function Workspace() {
     retry,
   );
   const data = response.data;
-  const isSample = data?.kind === "sample";
   const years = Array.from(
     new Set(data?.statement.periods.map((p) => p.end.slice(0, 4)) ?? []),
   ).sort();
@@ -111,9 +107,7 @@ export function Workspace() {
       ? "Trends & KPIs"
       : view === "filings"
         ? "Filings"
-        : view === "quality"
-          ? "Data quality"
-          : "Financial statements";
+        : "Financial statements";
   const exportParams = new URLSearchParams({
     statement,
     version: data?.datasetVersion ?? "",
@@ -161,7 +155,6 @@ export function Workspace() {
             { id: "statements", name: "Statements", icon: BookOpen },
             { id: "trends", name: "Trends & KPIs", icon: TrendingUp },
             { id: "filings", name: "Filings", icon: FileText },
-            { id: "quality", name: "Data quality", icon: ShieldCheck },
           ].map((item) => (
             <button
               key={item.id}
@@ -183,31 +176,25 @@ export function Workspace() {
             {viewLabel} <ChevronRight size={14} />
             <strong>{selectedCompany.name}</strong>
           </span>
-          <button
-            className="text-button"
-            onClick={() => setRetry((r) => r + 1)}
-          >
-            <Database size={15} /> Retry data
-          </button>
         </header>
         <main
           id="workspace"
-          className={view === "statements" ? "statement-workspace" : undefined}
+          className={
+            view === "statements"
+              ? "statement-workspace"
+              : view === "trends"
+                ? "trends-workspace"
+                : undefined
+          }
         >
-          <div className="page-heading">
-            <div>
-              <h1>{selectedCompany.name}</h1>
-              <p>Consolidated financial statements</p>
+          {view !== "trends" ? (
+            <div className="page-heading">
+              <div>
+                <h1>{selectedCompany.name}</h1>
+                <p>Consolidated financial statements</p>
+              </div>
             </div>
-            <span className={`publication-badge ${data ? "available" : ""}`}>
-              <span className="status-dot" />
-              {data
-                ? isSample
-                  ? "Automatically published sample"
-                  : "Automatically published dataset"
-                : "Awaiting published data"}
-            </span>
-          </div>
+          ) : null}
           {view === "statements" ? (
             <>
               <div
@@ -298,56 +285,22 @@ export function Workspace() {
                   <summary>
                     Fiscal range ·{" "}
                     {selectedFrom && selectedTo
-                      ? `${selectedFrom}–${selectedTo}`
+                      ? `${selectedFrom} to ${selectedTo}`
                       : "Awaiting published periods"}
                   </summary>
-                  <div className="filter-row">
-                    <label>
-                      From fiscal year
-                      <select
-                        value={selectedFrom}
-                        disabled={!data}
-                        onChange={(e) => {
-                          setFrom(e.target.value);
-                          setSelected(null);
-                        }}
-                      >
-                        {years.length ? (
-                          years
-                            .filter((year) => year <= selectedTo)
-                            .map((year) => (
-                              <option key={year} value={year}>
-                                {year}
-                              </option>
-                            ))
-                        ) : (
-                          <option value="">Not published</option>
-                        )}
-                      </select>
-                    </label>
-                    <label>
-                      To fiscal year
-                      <select
-                        value={selectedTo}
-                        disabled={!data}
-                        onChange={(e) => {
-                          setTo(e.target.value);
-                          setSelected(null);
-                        }}
-                      >
-                        {years.length ? (
-                          years
-                            .filter((year) => year >= selectedFrom)
-                            .map((year) => (
-                              <option key={year} value={year}>
-                                {year}
-                              </option>
-                            ))
-                        ) : (
-                          <option value="">Not published</option>
-                        )}
-                      </select>
-                    </label>
+                  <div className="filter-row fiscal-range-picker">
+                    <fieldset disabled={!data}>
+                      <legend>From fiscal year</legend>
+                      <div className="year-grid">
+                        {years.length ? years.filter((year) => year <= selectedTo).map((year) => <button type="button" aria-pressed={selectedFrom === year} onClick={() => { setFrom(year); setSelected(null); }} key={year}>{year}</button>) : <span>Not published</span>}
+                      </div>
+                    </fieldset>
+                    <fieldset disabled={!data}>
+                      <legend>To fiscal year</legend>
+                      <div className="year-grid">
+                        {years.length ? years.filter((year) => year >= selectedFrom).map((year) => <button type="button" aria-pressed={selectedTo === year} onClick={() => { setTo(year); setSelected(null); }} key={year}>{year}</button>) : <span>Not published</span>}
+                      </div>
+                    </fieldset>
                     <button
                       className="text-button"
                       disabled={!data}
@@ -403,20 +356,6 @@ export function Workspace() {
                   />
                 ) : data ? (
                   <>
-                    <div className="coverage-note">
-                      {isSample
-                        ? `${data.coverage.expectedPeriods} periods available`
-                        : `${data.coverage.verifiedPeriods} / ${data.coverage.expectedPeriods} target periods verified`}
-                      {!isSample && data.coverage.gaps.length
-                        ? ` · ${data.coverage.gaps.length} coverage gaps`
-                        : ""}
-                      <button
-                        className="text-button"
-                        onClick={() => setView("quality")}
-                      >
-                        View coverage <ArrowUpRight size={14} />
-                      </button>
-                    </div>
                     <StatementTable
                       key={statement}
                       statement={visibleStatement ?? data.statement}
@@ -432,13 +371,7 @@ export function Workspace() {
             <TrendsKpi key={company} company={company} />
           ) : view === "filings" ? (
             <FilingsView key={company} company={company} retry={retry} />
-          ) : (
-            <QualityView
-              company={company}
-              version={data?.datasetVersion}
-              retry={retry}
-            />
-          )}
+          ) : null}
         </main>
       </div>
       {selected && data ? (

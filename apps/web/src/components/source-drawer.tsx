@@ -71,7 +71,7 @@ function reportYear(source: Filing | null) {
   return (
     source?.published_on?.slice(0, 4) ??
     source?.title.match(/\b(?:19|20)\d{2}\b/)?.[0] ??
-    "—"
+    "Not available"
   );
 }
 

@@ -71,8 +71,6 @@ describe("statement and evidence rendering with synthetic data", () => {
     );
     expect(html).toContain("8 of 10 target periods verified");
     expect(html).toContain("FY2017 income statement");
-    expect(html).toContain("Automatic publication checks:");
-    expect(html).toContain("Complete");
     expect(html).not.toContain("<pre");
     expect(html).not.toContain("private-validation-detail");
     expect(html).not.toContain("Validation results");
