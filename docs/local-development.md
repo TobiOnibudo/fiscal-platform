@@ -225,3 +225,29 @@ The implementation session installed a local Python 3.12 runtime and project dep
 The host's original Node 22.1 runtime was below newer tooling requirements. A checksum-verified Node 22.23.4 runtime was used for current application checks. The repository requires Node 22.14 or newer and records 22.23.4 in `.node-version`. npm 10.7 encountered a peer-resolution bug while updating Vitest; npm 10.9.4 completed the installation. A normal current supported npm installation does not need machine-specific executable paths.
 
 Docker client commands were present, but Engine container/version endpoints returned internal errors during readiness attempts. Container service startup has therefore not been demonstrated by the native test results. No cloud database, GitHub Actions run, production migration or Vercel deployment has been performed in this milestone.
+
+## Running the local web workspace (Windows / PowerShell)
+
+The Next.js client lives in `apps/web`. Run these commands from the `fiscal-platform` directory:
+
+```powershell
+Set-Location apps/web
+npm.cmd run dev
+```
+
+Use the URL printed by Next.js (normally `http://localhost:3000`) and navigate to **Trends & KPIs** in the left sidebar. The development server hot-reloads source changes. If the browser appears to show an old client bundle, use a hard refresh with `Ctrl+Shift+R`.
+
+### Recovering from an old build or stale dev server
+
+1. In the terminal that is running Next.js, press `Ctrl+C` to stop the server.
+2. Confirm that the terminal has returned to a prompt, then start it again with `npm.cmd run dev` from `fiscal-platform/apps/web`.
+3. Visit the URL printed by that new process, rather than a previously opened preview URL, and hard refresh the page with `Ctrl+Shift+R`.
+4. If port 3000 is already occupied, either stop the older process or use the alternative URL/port emitted by Next.js.
+
+PowerShell can block `npm.ps1` under its execution-policy settings. `npm.cmd` is the Windows command-wrapper equivalent and avoids changing the user's execution policy. Use the same form for local checks:
+
+```powershell
+npm.cmd run typecheck
+npm.cmd run lint
+npm.cmd run build
+```

@@ -11,6 +11,7 @@ import {
   Layers,
   Search,
   ShieldCheck,
+  TrendingUp,
   X,
 } from "lucide-react";
 import { searchRows, type Cell, type Company } from "@/lib/contracts";
@@ -22,6 +23,7 @@ import {
 import { SourceDrawer } from "./source-drawer";
 import { StatementTable } from "./statement-table";
 import { FilingsView, QualityView } from "./collection-views";
+import { TrendsKpi } from "./trends-kpi";
 const statementTypes = [
   { id: "income", label: "Income statement" },
   { id: "balance", label: "Balance sheet" },
@@ -104,6 +106,14 @@ export function Workspace() {
         : "Currency and units available after publication";
   const historicalCount =
     data?.statement.rows.filter((r) => r.historical).length ?? 0;
+  const viewLabel =
+    view === "trends"
+      ? "Trends & KPIs"
+      : view === "filings"
+        ? "Filings"
+        : view === "quality"
+          ? "Data quality"
+          : "Financial statements";
   const exportParams = new URLSearchParams({
     statement,
     version: data?.datasetVersion ?? "",
@@ -149,6 +159,7 @@ export function Workspace() {
         <nav aria-label="Workspace navigation">
           {[
             { id: "statements", name: "Statements", icon: BookOpen },
+            { id: "trends", name: "Trends & KPIs", icon: TrendingUp },
             { id: "filings", name: "Filings", icon: FileText },
             { id: "quality", name: "Data quality", icon: ShieldCheck },
           ].map((item) => (
@@ -169,7 +180,7 @@ export function Workspace() {
       <div className="main-shell">
         <header className="topbar">
           <span>
-            Financial statements <ChevronRight size={14} />
+            {viewLabel} <ChevronRight size={14} />
             <strong>{selectedCompany.name}</strong>
           </span>
           <button
@@ -417,6 +428,8 @@ export function Workspace() {
                 ) : null}
               </section>
             </>
+          ) : view === "trends" ? (
+            <TrendsKpi key={company} company={company} />
           ) : view === "filings" ? (
             <FilingsView key={company} company={company} retry={retry} />
           ) : (
