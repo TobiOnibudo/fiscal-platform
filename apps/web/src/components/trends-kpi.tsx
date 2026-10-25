@@ -7,7 +7,14 @@ import { useReview } from "./review-client";
 const annualPeriods = ["FY20", "FY21", "FY22", "FY23", "FY24"];
 const quarterlyPeriods = ["Q1 24", "Q2 24", "Q3 24", "Q4 24", "Q1 25"];
 
-const annualData = {
+type TrendSeries = {
+  revenue: Array<number | null>;
+  margin: Array<number | null>;
+  cashFlow: Array<number | null>;
+  conversion: Array<number | null>;
+};
+
+const annualData: TrendSeries = {
   revenue: [302.1, 536.4, 806.2, 1030.4, 1201.8],
   margin: [10.6, 16.4, 21.9, 25.4, 30.2],
   cashFlow: [43.1, 90.7, 168.1, 297.8, 423.1],
@@ -19,11 +26,38 @@ const quarterlyData = {
   cashFlow: [78.4, 91.2, 105.8, 147.7, 161.9],
   conversion: [28.5, 31.2, 33.4, 44.4, 44.9],
 };
-type TrendResponse = typeof annualData & {
+type TrendResponse = TrendSeries & {
   periods: string[];
   currency: string;
   unit: string;
 };
+
+function percentage(value: number) {
+  return `${Number(value.toFixed(2))}%`;
+}
+
+function percentagePoints(value: number) {
+  return `${Number(value.toFixed(2))}pp`;
+}
+
+function percentageWidth(value: number) {
+  return Number(value.toFixed(2));
+}
+
+function currencySymbol(currency: string) {
+  if (currency === "EUR") return "€";
+  if (currency === "GBP") return "£";
+  return `${currency} `;
+}
+
+function chartMaximum(values: Array<number | null>) {
+  const highest = Math.max(
+    ...values.filter((value): value is number => value !== null),
+    1,
+  );
+  const magnitude = 10 ** Math.floor(Math.log10(highest));
+  return Math.ceil(highest / magnitude) * magnitude;
+}
 
 function points(
   values: number[],
@@ -85,12 +119,14 @@ function RevenueChart({
   end,
   data,
   labels,
+  currency = "GBP",
 }: {
   quarterly: boolean;
   start: number;
   end: number;
-  data?: typeof annualData;
+  data?: TrendSeries;
   labels?: string[];
+  currency?: string;
 }) {
   const series = data ?? (quarterly ? quarterlyData : annualData);
   const periods = (
@@ -98,8 +134,14 @@ function RevenueChart({
   ).slice(start, end + 1);
   const revenue = series.revenue.slice(start, end + 1);
   const margin = series.margin.slice(start, end + 1);
-  const revenueMax = quarterly ? 400 : 1400;
-  const marginPoints = points(margin, 700, 270, 35).split(" ");
+  const revenueMax = chartMaximum(revenue);
+  const symbol = currencySymbol(currency);
+  const marginPoints = points(
+    margin.map((value) => value ?? 0),
+    700,
+    270,
+    35,
+  ).split(" ");
   const x = (i: number) => 55 + (i * 575) / Math.max(periods.length - 1, 1);
   const yRevenue = (value: number) => 242 - (value / revenueMax) * 185;
   return (
@@ -121,18 +163,20 @@ function RevenueChart({
       ))}
       {[0, 1, 2, 3, 4].map((grid) => (
         <text key={grid} x="8" y={246 - grid * 46} className="chart-axis">
-          £{Math.round((revenueMax / 4) * grid)}m
+          {symbol}
+          {Math.round((revenueMax / 4) * grid)}m
         </text>
       ))}
-      {[0, 10, 20, 30, 40].map((grid) => (
-        <text key={grid} x="642" y={246 - grid * 46} className="chart-axis">
+      {[0, 10, 20, 30, 40].map((grid, index) => (
+        <text key={grid} x="642" y={246 - index * 46} className="chart-axis">
           {grid}%
         </text>
       ))}
       <line x1="55" x2="55" y1="55" y2="242" className="chart-axis-line" />
       <line x1="630" x2="630" y1="55" y2="242" className="chart-axis-line" />
       {revenue.map((value, index) => {
-        const barWidth = quarterly ? 60 : 74;
+        const barWidth = Math.min(74, 460 / periods.length);
+        if (value === null) return null;
         return (
           <g key={periods[index]}>
             <rect
@@ -149,7 +193,8 @@ function RevenueChart({
               textAnchor="middle"
               className="chart-value"
             >
-              £{value.toFixed(quarterly ? 0 : 1)}m
+              {symbol}
+              {value.toFixed(quarterly ? 0 : 1)}m
             </text>
             <text
               x={x(index)}
@@ -162,8 +207,14 @@ function RevenueChart({
           </g>
         );
       })}
-      <polyline points={marginPoints.join(" ")} className="chart-line" />
+      <polyline
+        points={marginPoints
+          .filter((_, index) => margin[index] !== null)
+          .join(" ")}
+        className="chart-line"
+      />
       {marginPoints.map((point, index) => {
+        if (margin[index] === null) return null;
         const [cx, cy] = point.split(",");
         return (
           <g key={periods[index]}>
@@ -174,7 +225,7 @@ function RevenueChart({
               textAnchor="middle"
               className="chart-margin"
             >
-              {margin[index]}%
+              {percentage(margin[index] as number)}
             </text>
           </g>
         );
@@ -189,12 +240,14 @@ function CashFlowChart({
   end,
   data,
   labels,
+  currency = "GBP",
 }: {
   quarterly: boolean;
   start: number;
   end: number;
-  data?: typeof annualData;
+  data?: TrendSeries;
   labels?: string[];
+  currency?: string;
 }) {
   const series = data ?? (quarterly ? quarterlyData : annualData);
   const periods = (
@@ -202,8 +255,14 @@ function CashFlowChart({
   ).slice(start, end + 1);
   const cashFlow = series.cashFlow.slice(start, end + 1);
   const conversionData = series.conversion.slice(start, end + 1);
-  const max = quarterly ? 180 : 500;
-  const conversion = points(conversionData, 600, 230, 28).split(" ");
+  const max = chartMaximum(cashFlow);
+  const symbol = currencySymbol(currency);
+  const conversion = points(
+    conversionData.map((value) => value ?? 0),
+    600,
+    230,
+    28,
+  ).split(" ");
   const x = (i: number) => 48 + (i * 490) / Math.max(periods.length - 1, 1);
   const y = (value: number) => 204 - (value / max) * 145;
   return (
@@ -223,33 +282,43 @@ function CashFlowChart({
           className="chart-grid"
         />
       ))}
-      {[0, 200, 400, 600].map((grid, i) => (
-        <text key={grid} x="2" y={208 - i * 48} className="chart-axis">
-          £{quarterly ? Math.round(grid / 3) : grid}m
+      {[0, 1, 2, 3].map((grid) => (
+        <text key={grid} x="2" y={208 - grid * 48} className="chart-axis">
+          {symbol}
+          {Math.round((max / 3) * grid)}m
         </text>
       ))}
-      {cashFlow.map((value, index) => (
-        <g key={periods[index]}>
-          <rect
-            x={x(index) - 29}
-            y={y(value)}
-            width="58"
-            height={204 - y(value)}
-            rx="2"
-            className="chart-bar"
-          />
-          <text
-            x={x(index)}
-            y="231"
-            textAnchor="middle"
-            className="chart-label"
-          >
-            {periods[index]}
-          </text>
-        </g>
-      ))}
-      <polyline points={conversion.join(" ")} className="chart-line" />
+      {cashFlow.map((value, index) => {
+        if (value === null) return null;
+        return (
+          <g key={periods[index]}>
+            <rect
+              x={x(index) - 29}
+              y={y(value)}
+              width="58"
+              height={204 - y(value)}
+              rx="2"
+              className="chart-bar"
+            />
+            <text
+              x={x(index)}
+              y="231"
+              textAnchor="middle"
+              className="chart-label"
+            >
+              {periods[index]}
+            </text>
+          </g>
+        );
+      })}
+      <polyline
+        points={conversion
+          .filter((_, index) => conversionData[index] !== null)
+          .join(" ")}
+        className="chart-line"
+      />
       {conversion.map((point, index) => {
+        if (conversionData[index] === null) return null;
         const [cx, cy] = point.split(",");
         return (
           <g key={periods[index]}>
@@ -260,7 +329,7 @@ function CashFlowChart({
               textAnchor="middle"
               className="chart-margin"
             >
-              {conversionData[index]}%
+              {percentage(conversionData[index] as number)}
             </text>
           </g>
         );
@@ -273,7 +342,9 @@ export function TrendsKpi({ company }: { company: string }) {
   const trends = useReview<TrendResponse>(`companies/${company}/trends`, 0);
   const [chart, setChart] = useState<"performance" | "cashflow">("performance");
   const [panel, setPanel] = useState<"trends" | "kpis">("trends");
-  const [range, setRange] = useState({ start: 0, end: 4 });
+  const [range, setRange] = useState<{ start: number; end: number } | null>(
+    null,
+  );
   if (trends.loading)
     return (
       <section className="trends-view">
@@ -298,17 +369,43 @@ export function TrendsKpi({ company }: { company: string }) {
   const quarterly = false;
   const source = trends.data;
   const periods = source.periods;
-  const rangeStart = Math.min(range.start, periods.length - 1);
-  const rangeEnd = Math.min(range.end, periods.length - 1);
+  const selectedRange = range ?? {
+    start: Math.max(0, periods.length - 5),
+    end: periods.length - 1,
+  };
+  const rangeStart = Math.min(selectedRange.start, periods.length - 1);
+  const rangeEnd = Math.min(selectedRange.end, periods.length - 1);
   const periodRange = `${periods[rangeStart]} to ${periods[rangeEnd]}`;
   const updateStart = (start: number) =>
-    setRange((current) => ({ start, end: Math.max(start, current.end) }));
+    setRange((current) => ({
+      start,
+      end: Math.max(start, current?.end ?? periods.length - 1),
+    }));
   const updateEnd = (end: number) =>
-    setRange((current) => ({ start: Math.min(current.start, end), end }));
+    setRange((current) => ({
+      start: Math.min(current?.start ?? 0, end),
+      end,
+    }));
   const title = company === "adyen" ? "Adyen" : "Wise";
-  const last = source.revenue.length - 1;
+  const last = Math.max(
+    0,
+    source.revenue.findLastIndex(
+      (value, index) =>
+        value !== null &&
+        source.margin[index] !== null &&
+        source.cashFlow[index] !== null &&
+        source.conversion[index] !== null,
+    ),
+  );
   const prior = Math.max(0, last - 1);
-  const growth = (source.revenue[last] / source.revenue[prior] - 1) * 100;
+  const revenueLast = source.revenue[last] ?? 0;
+  const revenuePrior = source.revenue[prior] ?? revenueLast;
+  const marginLast = source.margin[last] ?? 0;
+  const marginPrior = source.margin[prior] ?? marginLast;
+  const cashLast = source.cashFlow[last] ?? 0;
+  const conversionLast = source.conversion[last] ?? 0;
+  const conversionPrior = source.conversion[prior] ?? conversionLast;
+  const growth = (revenueLast / revenuePrior - 1) * 100;
   const symbol =
     source.currency === "EUR"
       ? "€"
@@ -318,26 +415,26 @@ export function TrendsKpi({ company }: { company: string }) {
   const displayMetrics = [
     [
       "Revenue",
-      `${symbol}${source.revenue[last].toFixed(1)} ${source.unit}`,
-      `${growth >= 0 ? "+" : ""}${growth.toFixed(1)}%`,
+      `${symbol}${revenueLast.toFixed(1)} ${source.unit}`,
+      `${growth >= 0 ? "+" : ""}${percentage(growth)}`,
       "vs. prior period",
     ],
     [
       "Revenue growth",
-      `${growth.toFixed(1)}%`,
+      percentage(growth),
       "Calculated from published revenue",
       "vs. prior period",
     ],
     [
       "Operating margin",
-      `${source.margin[last].toFixed(1)}%`,
-      `${(source.margin[last] - source.margin[prior]).toFixed(1)}pp`,
+      percentage(marginLast),
+      percentagePoints(marginLast - marginPrior),
       "vs. prior period",
     ],
     [
       "Operating cash flow",
-      `${symbol}${source.cashFlow[last].toFixed(1)} ${source.unit}`,
-      `${(source.conversion[last] - source.conversion[prior]).toFixed(1)}pp`,
+      `${symbol}${cashLast.toFixed(1)} ${source.unit}`,
+      percentagePoints(conversionLast - conversionPrior),
       "cash conversion vs. prior period",
     ],
   ];
@@ -345,7 +442,9 @@ export function TrendsKpi({ company }: { company: string }) {
     [
       "Revenue growth",
       source.revenue.map((value, index) =>
-        index ? (value / source.revenue[index - 1] - 1) * 100 : 0,
+        index && value !== null && source.revenue[index - 1] !== null
+          ? (value / (source.revenue[index - 1] as number) - 1) * 100
+          : null,
       ),
       "pp",
       false,
@@ -555,6 +654,7 @@ export function TrendsKpi({ company }: { company: string }) {
                 end={rangeEnd}
                 data={quarterly ? undefined : trends.data}
                 labels={quarterly ? undefined : trends.data?.periods}
+                currency={source.currency}
               />
             ) : (
               <CashFlowChart
@@ -563,6 +663,7 @@ export function TrendsKpi({ company }: { company: string }) {
                 end={rangeEnd}
                 data={quarterly ? undefined : trends.data}
                 labels={quarterly ? undefined : trends.data?.periods}
+                currency={source.currency}
               />
             )}
           </div>
@@ -577,14 +678,14 @@ export function TrendsKpi({ company }: { company: string }) {
               {[
                 [
                   "Operating margin",
-                  `${source.margin[last].toFixed(1)}%`,
-                  Math.min(100, Math.max(0, source.margin[last])),
+                  percentage(marginLast),
+                  Math.min(100, Math.max(0, marginLast)),
                   "teal",
                 ],
                 [
                   "Operating cash conversion",
-                  `${source.conversion[last].toFixed(1)}%`,
-                  Math.min(100, Math.max(0, source.conversion[last])),
+                  percentage(conversionLast),
+                  Math.min(100, Math.max(0, conversionLast)),
                   "blue",
                 ],
               ].map(([label, val, width, tone]) => (
@@ -599,7 +700,7 @@ export function TrendsKpi({ company }: { company: string }) {
                   <div className="quality-track">
                     <i
                       className={tone as string}
-                      style={{ width: `${width}%` }}
+                      style={{ width: `${percentageWidth(width as number)}%` }}
                     />
                   </div>
                 </div>
@@ -636,9 +737,7 @@ export function TrendsKpi({ company }: { company: string }) {
                       <th>{label}</th>
                       {values.map((value, index) => (
                         <td key={`${label}-${index}`}>
-                          {typeof value === "number"
-                            ? `${value.toFixed(1)}%`
-                            : value}
+                          {typeof value === "number" ? percentage(value) : "—"}
                         </td>
                       ))}
                       <td>
@@ -673,17 +772,16 @@ export function TrendsKpi({ company }: { company: string }) {
         <ul>
           <li>
             <Check size={15} />
-            Operating margin was {source.margin[last].toFixed(1)}% in{" "}
-            {periods[last]}.
+            Operating margin was {percentage(marginLast)} in {periods[last]}.
           </li>
           <li>
             <Check size={15} />
-            Operating cash conversion was {source.conversion[last].toFixed(1)}%
-            in {periods[last]}.
+            Operating cash conversion was {percentage(conversionLast)} in{" "}
+            {periods[last]}.
           </li>
           <li>
             <TrendingUp size={15} />
-            Revenue changed by {growth.toFixed(1)}% versus the prior published
+            Revenue changed by {percentage(growth)} versus the prior published
             fiscal year.
           </li>
         </ul>
