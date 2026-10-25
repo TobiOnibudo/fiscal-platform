@@ -735,6 +735,40 @@ tr:hover th {
   color: var(--accent);
   font-weight: 600;
 }
+.section-toggle,
+.table-density-toggle {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+}
+.section-toggle small {
+  margin: 0 0 0 auto;
+  color: var(--muted);
+  font-weight: 400;
+}
+.section-toggle:focus-visible,
+.table-density-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.table-density-toggle {
+  display: block;
+  margin-top: 5px;
+  padding: 0;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+}
 .amount {
   background: transparent;
   border: 0;

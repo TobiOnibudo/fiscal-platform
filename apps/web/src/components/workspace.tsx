@@ -407,9 +407,11 @@ export function Workspace() {
                       </button>
                     </div>
                     <StatementTable
+                      key={statement}
                       statement={visibleStatement ?? data.statement}
                       rows={rows}
                       inspect={setSelected}
+                      forceExpanded={Boolean(query.trim())}
                     />
                   </>
                 ) : null}

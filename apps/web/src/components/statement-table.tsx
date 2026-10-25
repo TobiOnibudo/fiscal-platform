@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   displayDecimal,
   type Cell,
@@ -46,6 +48,79 @@ type DisplayRow = {
   alternateUnits: Record<string, string>;
   hasMixedUnits: boolean;
 };
+
+type DisplayGroup = {
+  id: string;
+  label: string;
+  rows: DisplayRow[];
+};
+
+function groupLabel(statement: Statement, row: Row) {
+  const label = row.label.toLocaleLowerCase("en");
+  if (statement.id === "income") {
+    if (
+      /per share|earnings per share|weighted average shares|basic|diluted/.test(
+        label,
+      )
+    )
+      return "Per-share data";
+    if (
+      /comprehensive|foreign currency translation|available-for-sale/.test(
+        label,
+      )
+    )
+      return "Other comprehensive income";
+    if (/revenue|customer balances/.test(label)) return "Revenue";
+    if (/cost of sales|cost of revenue|costs?/.test(label)) return "Costs";
+    if (
+      /operating expense|research|administrative|employee|marketing/.test(label)
+    )
+      return "Operating expenses";
+    if (/profit|income before|income after|taxation|tax expense/.test(label))
+      return "Profitability";
+  }
+  if (statement.id === "balance") {
+    if (
+      /cash|asset|receivable|inventory|property|equipment|goodwill/.test(label)
+    )
+      return "Assets";
+    if (/liabilit|payable|borrowings|debt|deposit/.test(label))
+      return "Liabilities";
+    if (/equity|share capital|retained earnings/.test(label)) return "Equity";
+  }
+  if (statement.id === "cashflow") {
+    if (/operating|profit|income tax/.test(label))
+      return "Operating activities";
+    if (/investing|property|equipment|intangible|acquisition/.test(label))
+      return "Investing activities";
+    if (/financing|borrowings|debt|dividend|share capital/.test(label))
+      return "Financing activities";
+  }
+  return "Other reported items";
+}
+
+function groupDisplayRows(
+  statement: Statement,
+  rows: DisplayRow[],
+): DisplayGroup[] {
+  const groups = new Map<string, DisplayGroup>();
+  for (const row of rows) {
+    const label = groupLabel(statement, row.row);
+    const current = groups.get(label);
+    if (current) current.rows.push(row);
+    else
+      groups.set(label, {
+        id: `${label}-${groups.size}`,
+        label,
+        rows: [row],
+      });
+  }
+  return [...groups.values()].sort(
+    (left, right) =>
+      Number(left.label === "Other reported items") -
+      Number(right.label === "Other reported items"),
+  );
+}
 
 function consolidateRows(
   rows: Row[],
@@ -179,15 +254,46 @@ export function StatementTable({
   statement,
   rows,
   inspect,
+  forceExpanded = false,
 }: {
   statement: Statement;
   rows: Row[];
   inspect: (cell: Cell) => void;
+  forceExpanded?: boolean;
 }) {
   const primaryUnit = primaryUnitKey(rows);
   const primaryRow = rows.find((row) => unitKey(row) === primaryUnit);
   const mixedUnits = new Set(rows.map(unitKey)).size > 1;
   const displayRows = consolidateRows(rows, primaryUnit);
+  const displayGroups = groupDisplayRows(statement, displayRows);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    () =>
+      new Set(
+        displayGroups.length > 1
+          ? displayGroups
+              .filter((group) => group.label === "Other reported items")
+              .map((group) => group.id)
+          : [],
+      ),
+  );
+  const allExpanded =
+    forceExpanded ||
+    displayGroups.every((group) => !collapsedGroups.has(group.id));
+
+  function toggleGroup(id: string) {
+    setCollapsedGroups((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllGroups() {
+    setCollapsedGroups(
+      allExpanded ? new Set(displayGroups.map((group) => group.id)) : new Set(),
+    );
+  }
   return (
     <div
       className="table-scroll"
@@ -210,6 +316,15 @@ export function StatementTable({
               {primaryRow ? (
                 <small className="primary-unit">{unitLabel(primaryRow)}</small>
               ) : null}
+              {displayGroups.length > 1 ? (
+                <button
+                  type="button"
+                  className="table-density-toggle"
+                  onClick={toggleAllGroups}
+                >
+                  {allExpanded ? "Collapse sections" : "Expand sections"}
+                </button>
+              ) : null}
             </th>
             {statement.periods.map((period) => (
               <th scope="col" key={period.id}>
@@ -220,16 +335,41 @@ export function StatementTable({
           </tr>
         </thead>
         <tbody>
-          {displayRows.map(({ row, alternateUnits, hasMixedUnits }) => (
-            <StatementRow
-              key={row.id}
-              row={row}
-              statement={statement}
-              inspect={inspect}
-              alternateUnits={alternateUnits}
-              hasMixedUnits={hasMixedUnits}
-            />
-          ))}
+          {displayGroups.flatMap((group) => {
+            const expanded = forceExpanded || !collapsedGroups.has(group.id);
+            return [
+              <tr className="section" key={`${group.id}-heading`}>
+                <th scope="rowgroup" colSpan={statement.periods.length + 1}>
+                  <button
+                    type="button"
+                    className="section-toggle"
+                    aria-expanded={expanded}
+                    onClick={() => toggleGroup(group.id)}
+                  >
+                    {expanded ? (
+                      <ChevronDown size={15} aria-hidden="true" />
+                    ) : (
+                      <ChevronRight size={15} aria-hidden="true" />
+                    )}
+                    <span>{group.label}</span>
+                    <small>{group.rows.length} items</small>
+                  </button>
+                </th>
+              </tr>,
+              ...(expanded
+                ? group.rows.map(({ row, alternateUnits, hasMixedUnits }) => (
+                    <StatementRow
+                      key={row.id}
+                      row={row}
+                      statement={statement}
+                      inspect={inspect}
+                      alternateUnits={alternateUnits}
+                      hasMixedUnits={hasMixedUnits}
+                    />
+                  ))
+                : []),
+            ];
+          })}
         </tbody>
       </table>
       {rows.length === 0 ? (
