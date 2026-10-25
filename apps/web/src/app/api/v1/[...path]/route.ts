@@ -14,18 +14,57 @@ import type { Statement } from "@/lib/contracts";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function metric(statement: Statement, ids: string[]) {
-  const row = statement.rows.find(
+type Metric = {
+  values: Map<string, number | null>;
+  currency: string;
+  unit: string;
+};
+
+function scaleToMillions(unit: string) {
+  const normalized = unit.toLowerCase();
+  if (
+    normalized.includes("thousand") ||
+    normalized.includes("'000") ||
+    normalized.includes("000s")
+  )
+    return 0.001;
+  return 1;
+}
+
+function metric(
+  statement: Statement,
+  ids: string[],
+  currency?: string,
+): Metric | undefined {
+  const candidates = statement.rows.filter(
     (item) =>
-      ids.includes(item.id) ||
-      ids.some((id) => item.label.toLowerCase().includes(id)),
+      (!currency || item.currency === currency) &&
+      (ids.includes(item.id) ||
+        ids.some((id) => item.label.toLowerCase().includes(id))),
   );
-  return new Map(
-    statement.periods.map((period) => [
-      period.end.slice(0, 4),
-      row?.cells[period.id]?.value ? Number(row.cells[period.id].value) : null,
-    ]),
+  const rows = candidates.toSorted(
+    (left, right) =>
+      Object.values(right.cells).filter((cell) => cell.value !== null).length -
+      Object.values(left.cells).filter((cell) => cell.value !== null).length,
   );
+  const row = rows[0];
+  if (!row) return undefined;
+  return {
+    currency: row.currency,
+    unit: "m",
+    values: new Map(
+      statement.periods.map((period) => {
+        const source = rows.find(
+          (candidate) => candidate.cells[period.id]?.value !== null,
+        );
+        const value = source?.cells[period.id]?.value;
+        return [
+          period.end.slice(0, 4),
+          value && source ? Number(value) * scaleToMillions(source.unit) : null,
+        ];
+      }),
+    ),
+  };
 }
 
 function trends(statements: Statement[]) {
@@ -42,46 +81,62 @@ function trends(statements: Statement[]) {
     "net revenue",
     "non-interest revenue",
   ]);
-  const profit = metric(income, [
-    "adjusted-ebitda",
-    "operating-profit",
-    "operating profit",
-  ]);
-  const cash = metric(cashflow, [
-    "net-operating",
-    "cash-from-operations",
-    "net cash from operating",
-    "cash generated from operations",
-  ]);
+  const profit = metric(
+    income,
+    [
+      "adjusted-ebitda",
+      "operating-profit",
+      "operating profit",
+      "operating income",
+      "income before net finance",
+      "income before interest income",
+    ],
+    revenue?.currency,
+  );
+  const cash = metric(
+    cashflow,
+    [
+      "net-operating",
+      "cash-from-operations",
+      "net cash from operating",
+      "cash generated from operations",
+      "net cash provided by operating activities",
+    ],
+    revenue?.currency,
+  );
+  if (!revenue || !profit || !cash)
+    throw new ReviewError(
+      "TREND_DATA_UNAVAILABLE",
+      "Published trend metrics are not available in a consistent currency.",
+      422,
+    );
   const periods = income.periods
     .map((period) => period.end.slice(0, 4))
-    .filter(
-      (year) =>
-        revenue.get(year) !== null &&
-        profit.get(year) !== null &&
-        cash.get(year) !== null,
-    )
-    .slice(-5);
+    .filter((year) => revenue.values.get(year) !== null);
   if (periods.length < 2)
     throw new ReviewError(
       "TREND_DATA_UNAVAILABLE",
-      "Published trend metrics need at least two complete fiscal years.",
+      "Published revenue needs at least two fiscal years for trends.",
       422,
     );
-  const revenueValues = periods.map((year) => revenue.get(year) as number);
-  const profitValues = periods.map((year) => profit.get(year) as number);
-  const cashValues = periods.map((year) => cash.get(year) as number);
+  const revenueValues = periods.map((year) => revenue.values.get(year) ?? null);
+  const profitValues = periods.map((year) => profit.values.get(year) ?? null);
+  const cashValues = periods.map((year) => cash.values.get(year) ?? null);
   return {
     periods: periods.map((year) => `FY${year.slice(2)}`),
-    currency: income.currency,
-    unit: income.unit,
+    currency: revenue.currency,
+    unit: revenue.unit,
     revenue: revenueValues,
-    margin: profitValues.map(
-      (value, index) => (value / revenueValues[index]) * 100,
+    margin: profitValues.map((value, index) =>
+      value !== null && revenueValues[index] !== null
+        ? (value / revenueValues[index]) * 100
+        : null,
     ),
     cashFlow: cashValues,
-    conversion: cashValues.map(
-      (value, index) => (value / revenueValues[index]) * 100,
+    conversion: cashValues.map((value, index) =>
+      value !== null && revenueValues[index] !== null
+        ? (value / revenueValues[index]) * 100
+        : null,
     ),
   };
 }
