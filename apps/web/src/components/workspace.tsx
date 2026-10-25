@@ -62,6 +62,7 @@ export function Workspace() {
   const [historical, setHistorical] = useState(false);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [yearQuery, setYearQuery] = useState("");
   const [retry, setRetry] = useState(0);
   const [selected, setSelected] = useState<Cell | null>(null);
   const companyData = useReview<{ items: Company[] }>("companies", retry);
@@ -80,6 +81,12 @@ export function Workspace() {
   ).sort();
   const selectedFrom = from || years[0] || "";
   const selectedTo = to || years.at(-1) || "";
+  const matchingYears = years.filter((year) => {
+    const matchesQuery = `fiscal year ${year}`.includes(
+      yearQuery.trim().toLowerCase(),
+    );
+    return matchesQuery || year === selectedFrom || year === selectedTo;
+  });
   const visibleStatement = data
     ? {
         ...data.statement,
@@ -122,6 +129,7 @@ export function Workspace() {
     setQuery("");
     setFrom("");
     setTo("");
+    setYearQuery("");
   }
   return (
     <div className="app-shell">
@@ -283,12 +291,22 @@ export function Workspace() {
                 </div>
                 <details className="display-options" open>
                   <summary>
-                    Fiscal range ·{" "}
+                    Fiscal years ·{" "}
                     {selectedFrom && selectedTo
                       ? `${selectedFrom} to ${selectedTo}`
                       : "Awaiting published periods"}
                   </summary>
                   <div className="filter-row fiscal-range-picker">
+                    <label className="fiscal-year-search">
+                      Search fiscal years
+                      <input
+                        type="search"
+                        value={yearQuery}
+                        onChange={(event) => setYearQuery(event.target.value)}
+                        placeholder="e.g. 2021"
+                        disabled={!data}
+                      />
+                    </label>
                     <label>
                       From
                       <select
@@ -300,11 +318,11 @@ export function Workspace() {
                           setSelected(null);
                         }}
                       >
-                        {years
+                        {matchingYears
                           .filter((year) => year <= selectedTo)
                           .map((year) => (
                             <option key={year} value={year}>
-                              FY{year.slice(2)}
+                              {year}
                             </option>
                           ))}
                       </select>
@@ -320,11 +338,11 @@ export function Workspace() {
                           setSelected(null);
                         }}
                       >
-                        {years
+                        {matchingYears
                           .filter((year) => year >= selectedFrom)
                           .map((year) => (
                             <option key={year} value={year}>
-                              FY{year.slice(2)}
+                              {year}
                             </option>
                           ))}
                       </select>

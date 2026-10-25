@@ -2,13 +2,13 @@
 
 :root {
   color-scheme: dark;
-  --background: #07111f;
-  --surface: #0b1727;
-  --raised: #102239;
-  --border: #203850;
-  --foreground: #f4f7fb;
-  --muted: #97a9c0;
-  --accent: #3693ff;
+  --background: #0c1215;
+  --surface: #111b20;
+  --raised: #19262b;
+  --border: #2a3a3f;
+  --foreground: #eef4f2;
+  --muted: #a0b0af;
+  --accent: #4fc3a4;
   --space-4: 16px;
   --space-5: 20px;
   --topbar-height: 48px;
@@ -53,8 +53,8 @@ select {
 }
 input,
 select {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--raised);
+  border: 0;
   border-radius: 6px;
   padding: 10px 12px;
   min-height: 42px;
@@ -189,8 +189,8 @@ nav button:hover {
   color: var(--foreground);
 }
 nav button[aria-current] {
-  background: #102f55;
-  color: #ddecff;
+  background: #2a4943;
+  color: #e3f8f1;
 }
 .nav-chevron {
   margin-left: auto;
@@ -349,8 +349,8 @@ main {
   font-size: 12px;
 }
 .button {
-  border: 1px solid #2a496a;
-  background: #102239;
+  border: 0;
+  background: var(--raised);
   min-height: 40px;
   padding: 10px 14px;
   border-radius: 6px;
@@ -364,8 +364,7 @@ main {
   white-space: nowrap;
 }
 .button:hover:not(:disabled) {
-  background: #153052;
-  border-color: #4f94d5;
+  background: #26373c;
 }
 .text-button {
   display: inline-flex;
@@ -402,10 +401,10 @@ main {
   gap: 7px;
   min-height: 36px;
   padding: 7px 11px;
-  border: 1px solid #29455f;
+  border: 0;
   border-radius: 5px;
-  background: #091829;
-  color: #c5d2e2;
+  background: var(--raised);
+  color: var(--foreground);
   font-size: 11px;
   cursor: pointer;
   list-style: none;
@@ -416,8 +415,8 @@ main {
 }
 .display-options[open] > summary,
 .range-filter[open] > .range-button {
-  border-color: #52a5f5;
-  color: #e3f2ff;
+  background: #26393a;
+  color: #dff7ef;
 }
 .display-options .filter-row {
   position: absolute;
@@ -430,18 +429,18 @@ main {
   margin: 0;
   padding: 14px;
   align-items: end;
-  border: 1px solid #315b80;
+  border: 0;
   border-radius: 6px;
-  background: #0b1e32;
+  background: var(--surface);
   box-shadow: 0 12px 24px rgb(0 0 0 / 28%);
 }
 .search-field {
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 6px;
-  background: var(--surface);
+  background: var(--raised);
   padding: 0 12px;
   max-width: 420px;
   width: 100%;
@@ -457,7 +456,7 @@ main {
 }
 .search-field kbd {
   font-size: 12px;
-  border: 1px solid var(--border);
+  border: 0;
   padding: 0 5px;
   border-radius: 3px;
 }
@@ -566,26 +565,54 @@ details p {
 .statement-workspace #statement-panel > .display-options > .filter-row {
   gap: 8px;
 }
+.statement-workspace
+  #statement-panel
+  > .display-options
+  > .filter-row.fiscal-range-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(390px, calc(100vw - 40px));
+}
 .fiscal-range-picker label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  display: grid;
+  min-width: 0;
+  gap: 5px;
   color: #9fb4cb;
   font-size: 11px;
-  white-space: nowrap;
+}
+.fiscal-range-picker .fiscal-year-search {
+  grid-column: 1 / -1;
+}
+.fiscal-year-search input {
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 9px;
+  font-size: 12px;
 }
 .fiscal-range-picker select {
-  width: 78px;
+  width: 100%;
   min-height: 34px;
   padding: 5px 26px 5px 8px;
-  border-color: #29455f;
-  background-color: #091829;
-  color: #e3f2ff;
+  border: 0;
+  background-color: var(--raised);
+  color: var(--foreground);
   font: inherit;
 }
 .fiscal-range-picker select:focus-visible {
   outline: none;
-  border-color: #6b839a;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+@media (max-width: 420px) {
+  .statement-workspace
+    #statement-panel
+    > .display-options
+    > .filter-row.fiscal-range-picker {
+    grid-template-columns: 1fr;
+    width: min(280px, calc(100vw - 40px));
+  }
+  .fiscal-range-picker .fiscal-year-search {
+    grid-column: auto;
+  }
 }
 .range-popover label {
   display: grid;
@@ -872,9 +899,9 @@ tr:hover th {
 .segmented {
   display: flex;
   padding: 3px;
-  border: 1px solid #29455f;
+  border: 0;
   border-radius: 5px;
-  background: #091829;
+  background: var(--raised);
 }
 .segmented button {
   min-height: 30px;
@@ -886,9 +913,8 @@ tr:hover th {
   font-size: 11px;
 }
 .segmented button.active {
-  background: #123d68;
-  color: #bfe0ff;
-  box-shadow: inset 0 0 0 1px #3589df;
+  background: #2a4943;
+  color: #e3f8f1;
 }
 .range-filter {
   position: relative;
@@ -903,18 +929,18 @@ tr:hover th {
   width: max-content;
   padding: 14px;
   align-items: end;
-  border: 1px solid #315b80;
+  border: 0;
   border-radius: 6px;
-  background: #0b1e32;
+  background: var(--surface);
   box-shadow: 0 12px 24px rgb(0 0 0 / 28%);
 }
 .range-popover button {
   min-height: 34px;
   padding-inline: 11px;
-  border: 1px solid #3589df;
+  border: 0;
   border-radius: 4px;
-  background: #123d68;
-  color: #dceeff;
+  background: #2a4943;
+  color: #e3f8f1;
   font-size: 12px;
 }
 .kpi-strip {
