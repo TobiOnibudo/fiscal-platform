@@ -60,7 +60,7 @@ export function Workspace() {
   const [statement, setStatement] = useState("income");
   const [view, setView] = useState("statements");
   const [query, setQuery] = useState("");
-  const [historical, setHistorical] = useState(false);
+  const historical = false;
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [retry, setRetry] = useState(0);
@@ -107,8 +107,6 @@ export function Workspace() {
       : data
         ? `${data.statement.currency} · ${data.statement.unit}`
         : "Currency and units available after publication";
-  const historicalCount =
-    data?.statement.rows.filter((r) => r.historical).length ?? 0;
   const viewLabel =
     view === "trends"
       ? "Trends & KPIs"
@@ -265,7 +263,7 @@ export function Workspace() {
                     </h2>
                     <p>
                       {data
-                        ? `${unitSummary} · ${data.statement.basis} · ${data.statement.scope} · Select any reported value to inspect its source, currency, and filing history.`
+                        ? `${unitSummary} · Select any reported value to inspect its source, currency, and filing history.`
                         : `Fiscal year end: ${selectedCompany.fiscal_year_end_month === 3 ? "31 March" : "31 December"} · ${unitSummary}`}
                     </p>
                   </div>
@@ -304,13 +302,11 @@ export function Workspace() {
                 <div className="table-toolbar">
                   <label className="search-field">
                     <Search size={16} />
-                    <span className="sr-only">
-                      Search line items and historical labels
-                    </span>
+                    <span className="sr-only">Search line items</span>
                     <input
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Find a line item or historical label"
+                      placeholder="Find a line item"
                       disabled={!data}
                     />
                     {query ? (
@@ -321,15 +317,6 @@ export function Workspace() {
                         <X size={15} />
                       </button>
                     ) : null}
-                  </label>
-                  <label className="historical-toggle">
-                    <input
-                      type="checkbox"
-                      checked={historical}
-                      onChange={(e) => setHistorical(e.target.checked)}
-                      disabled={!historicalCount}
-                    />
-                    Historical items ({historicalCount})
                   </label>
                 </div>
                 {response.loading ? (

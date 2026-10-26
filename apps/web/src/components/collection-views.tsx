@@ -14,11 +14,13 @@ export function FilingsView({
   retry: number;
 }) {
   const [query, setQuery] = useState("");
+  const [titleSuggestionsOpen, setTitleSuggestionsOpen] = useState(false);
   const [classification, setClassification] = useState("");
   const [year, setYear] = useState("");
   const [page, setPage] = useState(0);
   const [pageCursors, setPageCursors] = useState([""]);
   const cursor = pageCursors[page] ?? "";
+  const selectedYear = /^(19|20)\d{2}$/.test(year) ? year : "";
   const resetPagination = () => {
     setPage(0);
     setPageCursors([""]);
@@ -27,7 +29,7 @@ export function FilingsView({
     q: query,
     limit: String(FILINGS_PER_PAGE),
     ...(classification ? { classification } : {}),
-    ...(year ? { year } : {}),
+    ...(selectedYear ? { year: selectedYear } : {}),
     ...(cursor ? { cursor } : {}),
   });
   const state = useReview<{ items: Filing[]; nextCursor: string | null }>(
@@ -37,6 +39,11 @@ export function FilingsView({
   const titleSuggestions = Array.from(
     new Set(state.data?.items.map((filing) => filing.title) ?? []),
   );
+  const matchingTitles = titleSuggestions
+    .filter((title) =>
+      title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+    )
+    .slice(0, 5);
   const availableYears = Array.from(
     { length: new Date().getFullYear() - 1999 },
     (_, index) => new Date().getFullYear() - index,
@@ -53,14 +60,33 @@ export function FilingsView({
               setQuery(e.target.value);
               resetPagination();
             }}
+            onFocus={() => setTitleSuggestionsOpen(true)}
+            onBlur={() => setTitleSuggestionsOpen(false)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setTitleSuggestionsOpen(false);
+            }}
             placeholder="Report title"
-            list="filing-title-suggestions"
           />
-          <datalist id="filing-title-suggestions">
-            {titleSuggestions.map((title) => (
-              <option key={title} value={title} />
-            ))}
-          </datalist>
+          {titleSuggestionsOpen && query.trim() && matchingTitles.length ? (
+            <div className="filing-title-suggestions" role="listbox">
+              {matchingTitles.map((title) => (
+                <button
+                  key={title}
+                  type="button"
+                  role="option"
+                  aria-selected={title === query}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => {
+                    setQuery(title);
+                    setTitleSuggestionsOpen(false);
+                    resetPagination();
+                  }}
+                >
+                  {title}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </label>
         <label>
           <span>Classification</span>
@@ -79,20 +105,27 @@ export function FilingsView({
         </label>
         <label>
           <span>Publication year</span>
-          <select
+          <input
+            type="search"
+            inputMode="numeric"
+            pattern="(19|20)[0-9]{2}"
+            maxLength={4}
             value={year}
             onChange={(e) => {
               setYear(e.target.value);
               resetPagination();
             }}
-          >
-            <option value="">All years</option>
+            placeholder="All years"
+            aria-label="Publication year; enter a four-digit year"
+            list="publication-year-suggestions"
+          />
+          <datalist id="publication-year-suggestions">
             {availableYears.map((availableYear) => (
               <option key={availableYear} value={availableYear}>
                 {availableYear}
               </option>
             ))}
-          </select>
+          </datalist>
         </label>
       </div>
       {state.loading ? (
