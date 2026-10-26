@@ -311,13 +311,13 @@ describe("statement and evidence rendering with synthetic data", () => {
       />,
     );
     expect(html).toContain("9,007,199,254,740,993.123456789");
-    expect(html).toContain("XXX · per share");
+    expect(html).not.toContain("XXX · per share");
     expect(html).toContain(
       "9007199254740993.123456789 XXX per share; inspect source",
     );
     expect(html).not.toContain(">Restated<");
     expect(html).not.toMatch(/>R<|>U</);
-    expect(html).toContain('<th scope="col">Line item<small');
+    expect(html).not.toContain('<th scope="col">Line item<small');
     for (let index = 1; index < statement.rows.length; index++)
       expect(html.indexOf(`>${statement.rows[index - 1].label}<`)).toBeLessThan(
         html.indexOf(`>${statement.rows[index].label}<`),
