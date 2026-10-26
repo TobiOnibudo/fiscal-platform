@@ -991,7 +991,7 @@ tr:hover th {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-.amount-note {
+.amount-unit {
   display: block;
   margin-top: -4px;
   color: var(--muted);

@@ -165,6 +165,9 @@ export async function publishedHistory(
       row.label,
       ...row.aliases,
       ...Object.values(row.cells).map((cell) => cell.rawLabel),
+      ...(row.label.toLocaleLowerCase("en") === "transaction revenue"
+        ? ["Revenue"]
+        : []),
     ]),
   );
   // A report may spell its units or basis differently (for example,

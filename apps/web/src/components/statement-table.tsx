@@ -29,6 +29,10 @@ function consolidationLabel(row: Row) {
     : row.label;
 }
 
+function isLatestRevenueRow(row: Row) {
+  return row.label.toLocaleLowerCase("en") === "transaction revenue";
+}
+
 function financialAmount(value: string, row: Row) {
   const unit = row.unit.toLowerCase();
   const numeric = Number(value);
@@ -66,7 +70,6 @@ function groupRows(rows: Row[]) {
 type DisplayRow = {
   row: Row;
   alternateUnits: Record<string, string>;
-  restatedPeriods: Record<string, boolean>;
   hasMixedUnits: boolean;
 };
 
@@ -154,31 +157,27 @@ function consolidateRows(
         Number(unitKey(left) === primaryUnit),
     );
     const anchor = ordered[0];
+    const periodIds = new Set(
+      group.rows.flatMap((row) => Object.keys(row.cells)),
+    );
     const selected = new Map<string, Row>();
 
-    for (const row of ordered) {
-      for (const [periodId, cell] of Object.entries(row.cells)) {
-        const current = selected.get(periodId);
-        if (
-          !current ||
-          (current.cells[periodId].value === null && cell.value !== null)
-        )
-          selected.set(periodId, row);
-      }
+    for (const periodId of periodIds) {
+      const candidates = ordered.filter((row) => {
+        const cell = row.cells[periodId];
+        return cell?.value !== null && cell?.value !== undefined;
+      });
+      const newest = candidates.find(isLatestRevenueRow) ?? candidates[0];
+      if (!newest) continue;
+      selected.set(periodId, newest);
     }
 
     const alternateUnits: Record<string, string> = {};
-    const restatedPeriods: Record<string, boolean> = {};
     const cells = Object.fromEntries(
       [...selected.entries()].map(([periodId, sourceRow]) => {
         if (unitKey(sourceRow) !== unitKey(anchor))
           alternateUnits[periodId] =
             `${sourceRow.currency} · ${sourceRow.unit}`;
-        if (
-          consolidationLabel(sourceRow) === "Revenue" &&
-          sourceRow.currency === "USD"
-        )
-          restatedPeriods[periodId] = true;
         return [periodId, sourceRow.cells[periodId]];
       }),
     );
@@ -186,7 +185,6 @@ function consolidateRows(
     return {
       row: { ...anchor, label: consolidationLabel(anchor), cells },
       alternateUnits,
-      restatedPeriods,
       hasMixedUnits: new Set(group.rows.map(unitKey)).size > 1,
     };
   });
@@ -197,14 +195,12 @@ function StatementRow({
   statement,
   inspect,
   alternateUnits,
-  restatedPeriods,
   hasMixedUnits,
 }: {
   row: Row;
   statement: Statement;
   inspect: (cell: Cell) => void;
   alternateUnits: Record<string, string>;
-  restatedPeriods: Record<string, boolean>;
   hasMixedUnits: boolean;
 }) {
   return (
@@ -247,7 +243,6 @@ function StatementRow({
       {statement.periods.map((period) => {
         const cell = row.cells[period.id];
         const alternateUnit = alternateUnits[period.id];
-        const restated = restatedPeriods[period.id];
         return (
           <td key={period.id}>
             {row.kind === "section" ? null : cell?.value !== null &&
@@ -261,10 +256,9 @@ function StatementRow({
                   {financialAmount(cell.value, row)}
                 </button>
                 {alternateUnit ? (
-                  <span className="sr-only">{alternateUnit}</span>
-                ) : null}
-                {restated ? (
-                  <small className="amount-note">Restated USD</small>
+                  <small className="amount-unit">
+                    {alternateUnit.split(" · ")[0]}
+                  </small>
                 ) : null}
               </>
             ) : (
@@ -481,24 +475,16 @@ export function StatementTable({
                 </th>
               </tr>,
               ...(expanded
-                ? group.rows.map(
-                    ({
-                      row,
-                      alternateUnits,
-                      restatedPeriods,
-                      hasMixedUnits,
-                    }) => (
-                      <StatementRow
-                        key={row.id}
-                        row={row}
-                        statement={statement}
-                        inspect={inspect}
-                        alternateUnits={alternateUnits}
-                        restatedPeriods={restatedPeriods}
-                        hasMixedUnits={hasMixedUnits}
-                      />
-                    ),
-                  )
+                ? group.rows.map(({ row, alternateUnits, hasMixedUnits }) => (
+                    <StatementRow
+                      key={row.id}
+                      row={row}
+                      statement={statement}
+                      inspect={inspect}
+                      alternateUnits={alternateUnits}
+                      hasMixedUnits={hasMixedUnits}
+                    />
+                  ))
                 : []),
             ];
           })}
