@@ -19,6 +19,7 @@ function PopoverContent({
   className,
   align = "center",
   sideOffset = 6,
+  collisionPadding = 8,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   return (
@@ -27,8 +28,9 @@ function PopoverContent({
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}
+        collisionPadding={collisionPadding}
         className={cn(
-          "w-auto rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-lg outline-none",
+          "z-50 w-auto rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-lg outline-none",
           className,
         )}
         {...props}

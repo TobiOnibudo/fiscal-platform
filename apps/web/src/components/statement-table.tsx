@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   displayDecimal,
@@ -283,6 +283,12 @@ export function StatementTable({
   const mixedUnits = new Set(rows.map(unitKey)).size > 1;
   const displayRows = consolidateRows(rows, primaryUnit);
   const displayGroups = groupDisplayRows(statement, displayRows);
+  const periodCount = Math.max(statement.periods.length, 1);
+  const labelColumnPercent = periodCount <= 2 ? 42 : periodCount <= 4 ? 34 : 26;
+  const periodColumnPercent = (100 - labelColumnPercent) / periodCount;
+  const tableStyle = {
+    minWidth: `${Math.max(560, 240 + periodCount * 112)}px`,
+  } satisfies CSSProperties;
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     () => new Set(),
   );
@@ -308,9 +314,19 @@ export function StatementTable({
     <div
       className="table-scroll"
       tabIndex={0}
-      aria-label="Financial statement; scroll horizontally for more periods"
+      aria-label="Financial statement by fiscal year"
     >
-      <table>
+      <table
+        className="statement-table"
+        data-period-count={statement.periods.length}
+        style={tableStyle}
+      >
+        <colgroup>
+          <col style={{ width: `${labelColumnPercent}%` }} />
+          {statement.periods.map((period) => (
+            <col key={period.id} style={{ width: `${periodColumnPercent}%` }} />
+          ))}
+        </colgroup>
         <caption className="sr-only">
           {statement.title}.{" "}
           {mixedUnits
