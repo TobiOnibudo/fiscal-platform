@@ -291,6 +291,16 @@ main {
   margin-top: 0;
   font-size: 12px;
 }
+.filings-workspace .page-heading {
+  margin-bottom: 12px;
+}
+.filings-workspace .page-heading h1 {
+  font-size: 22px;
+}
+.filings-workspace .page-heading p {
+  margin-top: 2px;
+  font-size: 12px;
+}
 .statement-workspace .statement-tabs {
   margin-bottom: 4px;
 }
@@ -484,6 +494,13 @@ main {
   padding: 7px 0;
   min-height: 32px;
 }
+.search-field:focus-within {
+  background: var(--raised);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.search-field input:focus-visible {
+  outline: 0;
+}
 .search-field kbd {
   font-size: 12px;
   border: 1px solid var(--border);
@@ -663,7 +680,7 @@ details p {
 /* Keep the statement controls in one compact toolbar above the table. */
 .statement-workspace #statement-panel {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) auto auto;
+  grid-template-columns: minmax(280px, 420px) auto 1fr;
   gap: 8px 14px;
 }
 .statement-workspace #statement-panel > .statement-heading {
@@ -1500,8 +1517,31 @@ tr:hover th {
   font-size: 12px;
   color: var(--muted);
 }
-.filter-row input {
-  max-width: 240px;
+.filings-filter-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) minmax(140px, 180px) minmax(
+      140px,
+      180px
+    );
+  align-items: end;
+}
+.filings-filter-row label {
+  min-width: 0;
+}
+.filings-filter-row input,
+.filings-filter-row select {
+  width: 100%;
+  max-width: none;
+}
+.filings-filter-row input:focus-visible,
+.filings-filter-row select:focus-visible {
+  border-color: var(--border);
+  outline: 0;
+  background: var(--raised);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.filings-filter-row label:focus-within > span {
+  color: var(--foreground);
 }
 .filing-title-suggestions {
   position: absolute;
@@ -1509,7 +1549,9 @@ tr:hover th {
   top: calc(100% + 6px);
   left: 0;
   display: grid;
-  width: min(320px, calc(100vw - 32px));
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 4px;
   background: var(--raised);
   box-shadow: 0 12px 28px rgb(0 0 0 / 35%);

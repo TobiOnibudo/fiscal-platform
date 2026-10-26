@@ -189,7 +189,7 @@ export function Workspace() {
               ? "statement-workspace"
               : view === "trends"
                 ? "trends-workspace"
-                : undefined
+                : "filings-workspace"
           }
         >
           {view !== "trends" ? (
