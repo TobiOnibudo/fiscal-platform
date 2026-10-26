@@ -45,12 +45,26 @@
 * {
   box-sizing: border-box;
 }
+html,
 body {
+  width: 100%;
+  height: 100%;
   margin: 0;
+  overflow: auto;
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+body:has(.statement-workspace),
+body:has(.filings-workspace) {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+body:has(.trends-workspace) {
+  height: auto;
+  min-height: 100%;
 }
 button,
 input,
@@ -159,7 +173,9 @@ kbd {
 }
 .app-shell {
   display: flex;
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 .sidebar {
   width: 216px;
@@ -234,10 +250,26 @@ nav button[aria-current] {
   margin-top: 16px;
 }
 .main-shell {
+  display: flex;
   flex: 1;
+  height: 100dvh;
   min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+.app-shell:has(.trends-workspace) {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+}
+.main-shell:has(.trends-workspace) {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
 }
 .topbar {
+  flex: 0 0 var(--topbar-height);
   height: var(--topbar-height);
   padding: 0 24px;
   border-bottom: 1px solid var(--border);
@@ -257,12 +289,16 @@ nav button[aria-current] {
   color: var(--foreground);
 }
 main {
+  width: 100%;
+  min-width: 0;
   padding: 24px;
   max-width: 1900px;
   margin: 0 auto;
 }
 .statement-workspace {
   height: calc(100dvh - var(--topbar-height));
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -292,7 +328,8 @@ main {
   font-size: 12px;
 }
 .filings-workspace .page-heading {
-  margin-bottom: 12px;
+  flex: 0 0 auto;
+  margin-bottom: 6px;
 }
 .filings-workspace .page-heading h1 {
   font-size: 22px;
@@ -300,6 +337,42 @@ main {
 .filings-workspace .page-heading p {
   margin-top: 2px;
   font-size: 12px;
+}
+.filings-workspace {
+  display: flex;
+  height: calc(100dvh - var(--topbar-height));
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.filings-workspace .secondary-view {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding-top: 12px;
+}
+.filings-workspace .filter-row {
+  flex: 0 0 auto;
+  margin: 12px 0;
+}
+.filings-workspace .filing-list {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--border);
+}
+.filings-workspace .filing-list article {
+  padding: 14px 0;
+}
+.filings-workspace .pagination {
+  min-height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  margin-top: 10px;
 }
 .statement-workspace .statement-tabs {
   margin-bottom: 4px;
@@ -593,6 +666,7 @@ details p {
 .statement-workspace #statement-panel {
   display: flex;
   flex: 1;
+  min-width: 0;
   min-height: 0;
   flex-direction: column;
 }
@@ -681,7 +755,9 @@ details p {
 .statement-workspace #statement-panel {
   display: grid;
   grid-template-columns: minmax(280px, 420px) auto 1fr;
+  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 8px 14px;
+  overflow: hidden;
 }
 .statement-workspace #statement-panel > .statement-heading {
   grid-column: 1 / -1;
@@ -708,6 +784,7 @@ details p {
 .statement-workspace #statement-panel > .table-scroll {
   grid-column: 1 / -1;
   grid-row: 3;
+  min-width: 0;
   width: auto;
 }
 .statement-workspace #statement-panel > .table-loading {
@@ -721,6 +798,7 @@ details p {
 @media (max-width: 900px) {
   .statement-workspace #statement-panel {
     grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
   }
   .statement-workspace #statement-panel > .table-toolbar > .search-field {
     grid-column: 1;
@@ -743,6 +821,7 @@ details p {
 .statement-workspace #statement-panel .table-scroll {
   flex: 1;
   min-height: 0;
+  overscroll-behavior: contain;
 }
 table {
   border-spacing: 0;
@@ -2021,6 +2100,9 @@ pre {
   .app-shell {
     display: block;
   }
+  .main-shell {
+    height: calc(100dvh - 124px);
+  }
   .sidebar {
     height: 124px;
     width: 100%;
@@ -2063,7 +2145,8 @@ pre {
   main {
     padding: 12px;
   }
-  .statement-workspace {
+  .statement-workspace,
+  .filings-workspace {
     height: calc(100dvh - 124px - var(--topbar-height));
   }
   .page-heading {
