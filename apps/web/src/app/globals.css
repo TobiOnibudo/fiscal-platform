@@ -953,7 +953,7 @@ tr:hover th {
   font-size: 12px;
 }
 .period-picker-popover {
-  width: min(340px, calc(100vw - 24px));
+  width: min(300px, calc(100vw - 24px));
 }
 .period-picker-heading {
   display: flex;

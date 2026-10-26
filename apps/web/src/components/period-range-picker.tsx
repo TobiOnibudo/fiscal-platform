@@ -81,7 +81,7 @@ export function PeriodRangePicker({
           type="button"
           variant="outline"
           size="sm"
-          className="min-w-44 justify-start font-normal"
+          className="h-8 min-w-0 justify-start px-2.5 font-normal"
           disabled={disabled || sorted.length === 0}
           aria-label={`Fiscal period range: ${rangeLabel}`}
         >
