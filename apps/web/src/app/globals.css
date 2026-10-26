@@ -960,29 +960,22 @@ tr:hover th {
   font-size: 12px;
 }
 .period-picker-popover {
-  width: min(304px, calc(100vw - 24px));
+  width: min(248px, calc(100vw - 24px));
 }
 .period-picker-heading {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 2px 2px 12px;
+  gap: 8px;
+  padding: 0 0 8px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 .period-picker-heading p {
   color: var(--foreground);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
-}
-.period-picker-heading span {
-  display: block;
-  margin-top: 2px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.45;
 }
 .period-picker-popover [data-slot="button"] svg,
 [data-slot="popover-trigger"] svg {
@@ -992,18 +985,12 @@ tr:hover th {
 .period-picker-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
+  gap: 4px;
 }
 .period-picker-grid [data-slot="button"] {
   width: 100%;
   padding-inline: 8px;
   font-variant-numeric: tabular-nums;
-}
-.period-picker-summary {
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.4;
 }
 .kpi-strip {
   display: grid;

@@ -53,8 +53,6 @@ export function PeriodRangePicker({
   const last = sorted.at(-1);
   const fromIndex = sorted.findIndex((period) => period.value === from);
   const toIndex = sorted.findIndex((period) => period.value === to);
-  const selectedYearCount =
-    fromIndex >= 0 && toIndex >= fromIndex ? toIndex - fromIndex + 1 : 0;
 
   function selectYear(value: string) {
     if (!anchor) {
@@ -95,14 +93,7 @@ export function PeriodRangePicker({
       </PopoverTrigger>
       <PopoverContent align={align} className="period-picker-popover">
         <div className="period-picker-heading">
-          <div>
-            <p>Fiscal years</p>
-            <span>
-              {anchor
-                ? "Choose another year to complete the range."
-                : "Choose a year, then another to create a range."}
-            </span>
-          </div>
+          <p>Fiscal years</p>
           <Button
             type="button"
             variant="ghost"
@@ -131,8 +122,6 @@ export function PeriodRangePicker({
                 size="sm"
                 variant={selected ? "default" : "ghost"}
                 aria-pressed={selected}
-                data-range-start={period.value === from || undefined}
-                data-range-end={period.value === to || undefined}
                 onClick={() => selectYear(period.value)}
               >
                 {yearByValue.get(period.value)}
@@ -140,10 +129,11 @@ export function PeriodRangePicker({
             );
           })}
         </div>
-        <p className="period-picker-summary" aria-live="polite">
-          {selectedYearCount} {selectedYearCount === 1 ? "year" : "years"}{" "}
-          selected
-        </p>
+        <span className="sr-only" aria-live="polite">
+          {anchor
+            ? `${yearByValue.get(anchor) ?? anchor} selected. Choose another year to complete the range.`
+            : `Fiscal year range ${rangeLabel} selected.`}
+        </span>
       </PopoverContent>
     </Popover>
   );
