@@ -364,7 +364,7 @@ export async function GET(
     }));
     if (path[2] === "export") {
       return new Response(
-        statementCsv(snapshot, statement, q.q, q.historical === "true"),
+        `\uFEFF${statementCsv(snapshot, statement, q.q, q.historical === "true")}`,
         {
           headers: {
             "Content-Type": "text/csv; charset=utf-8",

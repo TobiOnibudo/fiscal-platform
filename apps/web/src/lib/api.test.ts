@@ -61,14 +61,17 @@ describe("public API boundary", () => {
     expect(published).toHaveBeenCalledWith("synthetic", version);
     expect((await response.json()).datasetVersion).toBe(version);
   });
-  it("requires a pinned export and retains the version in CSV", async () => {
+  it("requires a pinned export and returns an Excel-compatible CSV", async () => {
     expect((await call("companies/synthetic/export")).status).toBe(400);
     const response = await call(
       "companies/synthetic/export",
       `?version=${version}`,
     );
     expect(response.headers.get("X-Dataset-Version")).toBe(version);
-    expect(await response.text()).toContain(version);
+    const bytes = new Uint8Array(await response.clone().arrayBuffer());
+    expect([...bytes.slice(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
+    const csv = await response.text();
+    expect(csv).toContain('"Line item","Currency","Units","FY2025"');
   });
   it("requires company and version for source history", async () => {
     const response = await call("observations/synthetic/history");
