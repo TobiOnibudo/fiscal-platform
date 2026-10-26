@@ -9,6 +9,9 @@
   --foreground: #f4f7fb;
   --muted: #97a9c0;
   --accent: #3693ff;
+  --accent-strong: #257edb;
+  --accent-bright: #9bd0ff;
+  --accent-surface: #123d68;
   --space-4: 16px;
   --space-5: 20px;
   --topbar-height: 48px;
@@ -890,7 +893,7 @@ tr:hover th {
   font-size: 11px;
 }
 .segmented button.active {
-  background: #123d68;
+  background: var(--accent-surface);
   color: #bfe0ff;
   box-shadow: inset 0 0 0 1px #3589df;
 }
@@ -917,7 +920,7 @@ tr:hover th {
   padding-inline: 11px;
   border: 1px solid #3589df;
   border-radius: 4px;
-  background: #123d68;
+  background: var(--accent-surface);
   color: #dceeff;
   font-size: 12px;
 }
@@ -965,7 +968,7 @@ tr:hover th {
 }
 .kpi b,
 .positive-change {
-  color: #2cddb8;
+  color: var(--accent-bright);
 }
 .kpi div span {
   color: #9aacc2;
@@ -987,8 +990,8 @@ tr:hover th {
   font-weight: 600;
 }
 .analysis-tabs button[aria-selected="true"] {
-  border-color: #27c2a0;
-  color: #e6f5f2;
+  border-color: var(--accent);
+  color: #dceeff;
 }
 .trends-dashboard {
   display: grid;
@@ -1069,10 +1072,10 @@ tr:hover th {
   border-radius: 50%;
 }
 .legend-revenue {
-  background: #27c2a0;
+  background: var(--accent-strong);
 }
 .legend-margin {
-  background: #3693ff;
+  background: var(--accent-bright);
 }
 .chart-workspace {
   display: flex;
@@ -1095,8 +1098,8 @@ tr:hover th {
   font-size: 11px;
 }
 .chart-tabs button[aria-selected="true"] {
-  border-color: #27c2a0;
-  color: #e6f5f2;
+  border-color: var(--accent);
+  color: #dceeff;
 }
 .chart-canvas {
   display: flex;
@@ -1113,44 +1116,44 @@ tr:hover th {
   overflow: visible;
 }
 .chart-grid {
-  stroke: #23425e;
+  stroke: #315878;
   stroke-width: 1;
 }
 .chart-axis-line {
-  stroke: #6c96b7;
+  stroke: #7eabd0;
   stroke-width: 1;
 }
 .chart-axis {
-  fill: #a8c2da;
+  fill: #b8d6ef;
   font-size: 11px;
 }
 .chart-label {
-  fill: #a8c2da;
+  fill: #b8d6ef;
   font-size: 11px;
 }
 .chart-value {
-  fill: #d4eff2;
+  fill: #e2f2ff;
   font-size: 10px;
   font-weight: 600;
 }
 .chart-bar {
-  fill: #18ae94;
-  opacity: 0.9;
+  fill: var(--accent-strong);
+  opacity: 0.98;
 }
 .chart-line {
   fill: none;
-  stroke: #3693ff;
+  stroke: var(--accent-bright);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .chart-dot {
-  fill: #3693ff;
-  stroke: #d4edff;
+  fill: var(--accent-bright);
+  stroke: #e2f2ff;
   stroke-width: 2;
 }
 .chart-margin {
-  fill: #5aadff;
+  fill: #c9e5ff;
   font-size: 10px;
   font-weight: 600;
 }
@@ -1186,11 +1189,11 @@ tr:hover th {
   display: block;
   height: 100%;
 }
-.quality-track .teal {
-  background: #27c2a0;
+.quality-track .primary {
+  background: var(--accent-strong);
 }
-.quality-track .blue {
-  background: #3693ff;
+.quality-track .secondary {
+  background: var(--accent-bright);
 }
 .analyst-take {
   margin-top: auto;
@@ -1301,7 +1304,7 @@ tr:hover th {
 .what-changed li svg {
   flex: 0 0 auto;
   margin-top: 1px;
-  color: #35d7b5;
+  color: var(--accent-bright);
 }
 @media (max-width: 1050px) {
   .trends-workspace {

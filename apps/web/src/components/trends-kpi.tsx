@@ -107,7 +107,7 @@ function Sparkline({
       <polyline
         points={points(values, 86, 28, 4)}
         fill="none"
-        stroke={negative ? "#f0b567" : "#27c2a0"}
+        stroke={negative ? "#f0b567" : "var(--accent-bright)"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -120,7 +120,7 @@ function Sparkline({
             cx={x}
             cy={y}
             r="2"
-            fill={negative ? "#f0b567" : "#27c2a0"}
+            fill={negative ? "#f0b567" : "var(--accent-bright)"}
           />
         );
       })}
@@ -697,13 +697,13 @@ export function TrendsKpi({ company }: { company: string }) {
                   "Operating margin",
                   percentage(marginLast),
                   Math.min(100, Math.max(0, marginLast)),
-                  "teal",
+                  "primary",
                 ],
                 [
                   "Operating cash conversion",
                   percentage(conversionLast),
                   Math.min(100, Math.max(0, conversionLast)),
-                  "blue",
+                  "secondary",
                 ],
               ].map(([label, val, width, tone]) => (
                 <div className="quality-row" key={label as string}>

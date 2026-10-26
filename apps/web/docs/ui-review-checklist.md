@@ -14,7 +14,7 @@ Scope: one new statement review workspace, with secondary filings/quality views 
 - Versioning: the active dataset version travels internally to history/export without displaying internal identifiers. CSV identifies dataset, units, periods, sources, query and historical inclusion. Spreadsheet-active text escaped; exact decimal string preserved.
 - Accessibility: semantic labels, visible focus, keyboard tabs with arrow/Home/End, touch controls, contrast using muted #a4afad on #101315/#171b1e, reduced-motion rule.
 - Responsive: sidebar becomes compact top navigation at 700px; table scroll preserved; source drawer is full width on phone, fixed side drawer on desktop. No page-wide overflow.
-- Visual: restrained dark palette, subtle green accent, readable body text, tabular numeric data; spacing and typography defined centrally in globals.css; no decorative effects.
+- Visual: restrained dark palette, consistent blue accent, readable body text, tabular numeric data; spacing and typography defined centrally in globals.css; no decorative effects.
 - Read integrity: runtime validation rejects malformed values, missing reported values, duplicates, invalid periods, row currency errors and impossible coverage. Public reads require published verified payload, not approved candidates.
 
 Known initial contract limitations to report: original-report view not provided. Source inspector alternatives are limited to compatible observations selected in at most 100 published datasets, not every private extraction. No independent usability participant.
