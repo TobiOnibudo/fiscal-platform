@@ -307,6 +307,7 @@ describe("statement and evidence rendering with synthetic data", () => {
         statement={statement}
         rows={statement.rows}
         inspect={() => undefined}
+        forceExpanded
       />,
     );
     expect(html).toContain("9,007,199,254,740,993.123456789");
@@ -327,6 +328,7 @@ describe("statement and evidence rendering with synthetic data", () => {
         statement={statement}
         rows={[row]}
         inspect={() => undefined}
+        forceExpanded
       />,
     );
     expect(cleanedLabel).toContain(">Net revenue<");
@@ -342,6 +344,7 @@ describe("statement and evidence rendering with synthetic data", () => {
         statement={statement}
         rows={matched}
         inspect={() => undefined}
+        forceExpanded
       />,
     );
     expect(html).toContain(row.label);
@@ -359,6 +362,7 @@ describe("statement and evidence rendering with synthetic data", () => {
         statement={statement}
         rows={[row]}
         inspect={() => undefined}
+        forceExpanded
       />,
     );
     expect(aliasHtml).toContain("Earlier reporting names");
@@ -387,6 +391,7 @@ describe("statement and evidence rendering with synthetic data", () => {
         statement={statement}
         rows={[gbpRow, usdRow]}
         inspect={() => undefined}
+        forceExpanded
       />,
     );
     expect(html.match(/<tr class="item">/g)).toHaveLength(1);

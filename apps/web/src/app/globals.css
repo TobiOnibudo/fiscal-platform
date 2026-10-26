@@ -566,32 +566,16 @@ details p {
 .statement-workspace #statement-panel > .display-options > .filter-row {
   gap: 8px;
 }
-.statement-workspace
-  #statement-panel
-  > .display-options
-  > .filter-row.fiscal-range-picker {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: min(390px, calc(100vw - 40px));
-}
 .fiscal-range-picker label {
-  display: grid;
-  min-width: 0;
-  gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: #9fb4cb;
   font-size: 11px;
-}
-.fiscal-range-picker .fiscal-year-search {
-  grid-column: 1 / -1;
-}
-.fiscal-year-search input {
-  width: 100%;
-  min-height: 34px;
-  padding: 5px 9px;
-  font-size: 12px;
+  white-space: nowrap;
 }
 .fiscal-range-picker select {
-  width: 100%;
+  width: 88px;
   min-height: 34px;
   padding: 5px 26px 5px 8px;
   border-color: #29455f;
@@ -602,18 +586,6 @@ details p {
 .fiscal-range-picker select:focus-visible {
   outline: none;
   border-color: #6b839a;
-}
-@media (max-width: 420px) {
-  .statement-workspace
-    #statement-panel
-    > .display-options
-    > .filter-row.fiscal-range-picker {
-    grid-template-columns: 1fr;
-    width: min(280px, calc(100vw - 40px));
-  }
-  .fiscal-range-picker .fiscal-year-search {
-    grid-column: auto;
-  }
 }
 .range-popover label {
   display: grid;
@@ -732,7 +704,7 @@ thead th {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 10px 8px;
+  padding: 6px 8px;
   text-align: right;
   background: #102138;
   color: var(--foreground);
@@ -741,7 +713,7 @@ thead th {
 thead th small,
 tbody th small {
   display: block;
-  margin-top: 6px;
+  margin-top: 3px;
   font-size: 10px;
 }
 thead th:first-child {

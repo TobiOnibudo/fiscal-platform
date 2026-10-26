@@ -267,14 +267,7 @@ export function StatementTable({
   const displayRows = consolidateRows(rows, primaryUnit);
   const displayGroups = groupDisplayRows(statement, displayRows);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
-    () =>
-      new Set(
-        displayGroups.length > 1
-          ? displayGroups
-              .filter((group) => group.label === "Other reported items")
-              .map((group) => group.id)
-          : [],
-      ),
+    () => new Set(displayGroups.map((group) => group.id)),
   );
   const allExpanded =
     forceExpanded ||
