@@ -20,5 +20,11 @@ archive/
 *.tsbuildinfo
 .vercel/
 .run/
-tmp/
+tmp*/
+.tmp
 r2tmp/
+/.tmp-*/
+/tmp-*.png
+/tmp_*.py
+/ch*.pdf
+/wise*-cover.png
