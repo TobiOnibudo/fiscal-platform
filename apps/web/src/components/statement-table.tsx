@@ -24,7 +24,25 @@ function unitKey(row: Row) {
 }
 
 function unitLabel(row: Row) {
-  return `${row.currency} \u00b7 ${row.unit}`;
+  const symbol =
+    row.currency === "USD" ? "$" : row.currency === "EUR" ? "€" : "£";
+  const unit = row.unit.toLowerCase();
+  if (unit.includes("million") || unit.includes("'000") || unit.includes("000"))
+    return `${symbol}m`;
+  if (unit.includes("per share")) return `${symbol} per share`;
+  return row.currency;
+}
+
+function financialAmount(value: string, row: Row) {
+  const symbol =
+    row.currency === "USD" ? "$" : row.currency === "EUR" ? "€" : "£";
+  const unit = row.unit.toLowerCase();
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && unit.includes("thousand"))
+    return `${symbol}${displayDecimal((numeric / 1000).toFixed(1))}m`;
+  if (unit.includes("million") || unit.includes("'000") || unit.includes("000"))
+    return `${symbol}${displayDecimal(value)}m`;
+  return `${symbol}${displayDecimal(value)}`;
 }
 
 function primaryUnitKey(rows: Row[]) {
@@ -222,13 +240,8 @@ function StatementRow({
                   onClick={() => inspect(cell)}
                   aria-label={`${displayRowLabel(row.label)}, ${period.label}, ${cell.value} ${alternateUnit ?? `${row.currency} ${row.unit}`}; inspect source`}
                 >
-                  {displayDecimal(cell.value)}
+                  {financialAmount(cell.value, row)}
                 </button>
-                {alternateUnit ? (
-                  <small style={{ display: "block", color: "var(--muted)" }}>
-                    {alternateUnit}
-                  </small>
-                ) : null}
               </>
             ) : (
               <span
