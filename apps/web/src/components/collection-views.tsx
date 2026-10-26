@@ -51,8 +51,8 @@ export function FilingsView({
   return (
     <section className="secondary-view">
       <h2>Source filings</h2>
-      <div className="filter-row">
-        <label>
+      <div className="filter-row filings-filter-row">
+        <label className="filing-search-filter">
           <span>Search reports</span>
           <input
             value={query}
