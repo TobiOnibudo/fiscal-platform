@@ -145,7 +145,7 @@ describe("financial read contracts", () => {
       }).success,
     ).toBe(false);
   });
-  it("pins CSV identity, precision, sources, filters and protects text cells", () => {
+  it("exports the displayed table with blank unavailable values and protects text cells", () => {
     const statement = {
       id: "income" as const,
       title: " =SYNTHETIC()",
@@ -169,11 +169,13 @@ describe("financial read contracts", () => {
         coverage: { expectedPeriods: 1, verifiedPeriods: 0, gaps: [] },
       },
     };
+    statement.rows[0].cells["2025"].value = null;
+    statement.rows[0].cells["2025"].state = "not_reported";
     const csv = statementCsv(snapshot, statement);
-    expect(csv).toContain(cell.value);
-    expect(csv).toContain("' =SYNTHETIC()");
-    expect(csv).toContain("' =".replace(" ", ""));
-    expect(csv).toContain(snapshot.version);
-    expect(csv).toContain("PDF page 2");
+    expect(csv).toContain('"Line item","Currency","Units","FY2025"');
+    expect(csv).toContain('"\'=UNTRUSTED()","XXX","units",""');
+    expect(csv).not.toContain(snapshot.version);
+    expect(csv).not.toContain("PDF page 2");
+    expect(csv).not.toContain("not_reported");
   });
 });

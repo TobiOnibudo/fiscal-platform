@@ -20,6 +20,7 @@ import {
 import { SourceDrawer } from "./source-drawer";
 import { StatementTable } from "./statement-table";
 import { FilingsView } from "./collection-views";
+import { PeriodRangePicker } from "./period-range-picker";
 import { TrendsKpi } from "./trends-kpi";
 const statementTypes = [
   { id: "income", label: "Income statement" },
@@ -78,6 +79,12 @@ export function Workspace() {
   const years = Array.from(
     new Set(data?.statement.periods.map((p) => p.end.slice(0, 4)) ?? []),
   ).sort();
+  const fiscalPeriods =
+    data?.statement.periods.map((period) => ({
+      value: period.end.slice(0, 4),
+      label: period.label,
+      date: period.end,
+    })) ?? [];
   const selectedFrom = from || years[0] || "";
   const selectedTo = to || years.at(-1) || "";
   const visibleStatement = data
@@ -268,7 +275,7 @@ export function Workspace() {
                       href={`/api/v1/companies/${company}/export?${exportParams}`}
                     >
                       <ArrowDownToLine size={16} />
-                      Export CSV
+                      Export
                     </a>
                   ) : (
                     <button
@@ -277,60 +284,23 @@ export function Workspace() {
                       title="Export will be available when statements are ready."
                     >
                       <ArrowDownToLine size={16} />
-                      Export CSV
+                      Export
                     </button>
                   )}
                 </div>
-                <details className="display-options" open>
-                  <summary>
-                    Fiscal years ·{" "}
-                    {selectedFrom && selectedTo
-                      ? `${selectedFrom} to ${selectedTo}`
-                      : "Awaiting published periods"}
-                  </summary>
-                  <div className="filter-row fiscal-range-picker">
-                    <label>
-                      From
-                      <select
-                        aria-label="From fiscal year"
-                        value={selectedFrom}
-                        disabled={!data}
-                        onChange={(event) => {
-                          setFrom(event.target.value);
-                          setSelected(null);
-                        }}
-                      >
-                        {years
-                          .filter((year) => year <= selectedTo)
-                          .map((year) => (
-                            <option key={year} value={year}>
-                              {year}
-                            </option>
-                          ))}
-                      </select>
-                    </label>
-                    <label>
-                      To
-                      <select
-                        aria-label="To fiscal year"
-                        value={selectedTo}
-                        disabled={!data}
-                        onChange={(event) => {
-                          setTo(event.target.value);
-                          setSelected(null);
-                        }}
-                      >
-                        {years
-                          .filter((year) => year >= selectedFrom)
-                          .map((year) => (
-                            <option key={year} value={year}>
-                              {year}
-                            </option>
-                          ))}
-                      </select>
-                    </label>
-                  </div>
-                </details>
+                <div className="display-options">
+                  <PeriodRangePicker
+                    periods={fiscalPeriods}
+                    from={selectedFrom}
+                    to={selectedTo}
+                    disabled={!data}
+                    onChange={(nextFrom, nextTo) => {
+                      setFrom(nextFrom);
+                      setTo(nextTo);
+                      setSelected(null);
+                    }}
+                  />
+                </div>
                 <div className="table-toolbar">
                   <label className="search-field">
                     <Search size={16} />

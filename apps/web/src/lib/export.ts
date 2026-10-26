@@ -12,27 +12,11 @@ export function statementCsv(
   query = "",
   historical = false,
 ): string {
-  const records: string[][] = [
-    ["Dataset version", dataset.version],
-    ["Company", dataset.data.companyId],
-    ["Statement", statement.title],
-    ["Scope", statement.scope],
-    ["Basis", statement.basis],
-    ["Currency", statement.currency],
-    ["Units", statement.unit],
-    ["Search filter", query || "None"],
-    ["Historical items included", String(historical)],
-    [
-      "Line item",
-      "Currency",
-      "Units",
-      ...statement.periods.map(
-        (p) => `${p.label} (${p.start ?? "instant"} to ${p.end})`,
-      ),
-      "Sources",
-    ],
+  const output = [
+    ["Line item", "Currency", "Units", ...statement.periods.map((p) => p.label)]
+      .map((value) => csvCell(value))
+      .join(","),
   ];
-  const output = records.map((row) => row.map((v) => csvCell(v)).join(","));
   for (const row of searchRows(statement.rows, query, historical)) {
     output.push(
       [
@@ -43,19 +27,8 @@ export function statementCsv(
           const cell = row.cells[p.id];
           return cell?.value !== null && cell?.value !== undefined
             ? csvCell(cell.value, true)
-            : csvCell(cell?.state ?? "missing_history");
+            : csvCell("");
         }),
-        csvCell(
-          statement.periods
-            .map((p) => {
-              const cell = row.cells[p.id];
-              return cell
-                ? `${p.id}: filing ${cell.filingId}, PDF page ${cell.pdfPage}, observation ${cell.observationId}`
-                : "";
-            })
-            .filter(Boolean)
-            .join("; "),
-        ),
       ].join(","),
     );
   }
