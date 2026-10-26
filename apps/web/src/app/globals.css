@@ -991,6 +991,13 @@ tr:hover th {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+.amount-note {
+  display: block;
+  margin-top: -4px;
+  color: var(--muted);
+  font-size: 9px;
+  text-align: right;
+}
 .missing {
   color: #8295ad;
 }

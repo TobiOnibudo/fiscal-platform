@@ -401,6 +401,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     const gbpRow = {
       ...structuredClone(source),
       id: "metric-gbp",
+      label: "Revenue",
       currency: "GBP",
       unit: "millions",
       cells: { [firstPeriod.id]: source.cells[firstPeriod.id] },
@@ -408,6 +409,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     const usdRow = {
       ...structuredClone(source),
       id: "metric-usd",
+      label: "Transaction revenue",
       currency: "USD",
       unit: "millions",
       cells: { [secondPeriod.id]: source.cells[secondPeriod.id] },
@@ -421,7 +423,9 @@ describe("statement and evidence rendering with synthetic data", () => {
       />,
     );
     expect(html.match(/<tr class="item">/g)).toHaveLength(1);
+    expect(html).toContain(">Revenue<");
     expect(html).toContain("Mixed reporting units");
+    expect(html).toContain("Restated USD");
     expect(html).toContain("USD \u00b7 millions");
     expect(html).not.toContain("Reported in more than one currency or unit");
   });
