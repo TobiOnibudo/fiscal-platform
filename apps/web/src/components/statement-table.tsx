@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   displayDecimal,
@@ -278,10 +278,13 @@ export function StatementTable({
   const displayRows = consolidateRows(rows, primaryUnit);
   const displayGroups = groupDisplayRows(statement, displayRows);
   const periodCount = Math.max(statement.periods.length, 1);
-  const labelColumnPercent = periodCount <= 2 ? 42 : periodCount <= 4 ? 34 : 26;
-  const periodColumnPercent = (100 - labelColumnPercent) / periodCount;
+  const [labelColumnWidth, setLabelColumnWidth] = useState(260);
+  const resizeStart = useRef<{ x: number; width: number } | null>(null);
+  const periodColumnWidth = 140;
+  const tableWidth = labelColumnWidth + periodCount * periodColumnWidth;
   const tableStyle = {
-    minWidth: `${Math.max(560, 240 + periodCount * 112)}px`,
+    width: `${tableWidth}px`,
+    minWidth: `${tableWidth}px`,
   } satisfies CSSProperties;
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     () => new Set(),
@@ -304,6 +307,11 @@ export function StatementTable({
       allExpanded ? new Set(displayGroups.map((group) => group.id)) : new Set(),
     );
   }
+
+  function resizeLabelColumn(nextWidth: number) {
+    setLabelColumnWidth(Math.min(520, Math.max(180, nextWidth)));
+  }
+
   return (
     <div
       className="table-scroll"
@@ -316,9 +324,9 @@ export function StatementTable({
         style={tableStyle}
       >
         <colgroup>
-          <col style={{ width: `${labelColumnPercent}%` }} />
+          <col style={{ width: `${labelColumnWidth}px` }} />
           {statement.periods.map((period) => (
-            <col key={period.id} style={{ width: `${periodColumnPercent}%` }} />
+            <col key={period.id} style={{ width: `${periodColumnWidth}px` }} />
           ))}
         </colgroup>
         <caption className="sr-only">
@@ -333,6 +341,46 @@ export function StatementTable({
           <tr>
             <th scope="col">
               Line item
+              <span
+                className="column-resize-handle"
+                role="separator"
+                aria-label="Resize line item column"
+                aria-orientation="vertical"
+                aria-valuemin={180}
+                aria-valuemax={520}
+                aria-valuenow={labelColumnWidth}
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowLeft") {
+                    event.preventDefault();
+                    resizeLabelColumn(labelColumnWidth - 20);
+                  }
+                  if (event.key === "ArrowRight") {
+                    event.preventDefault();
+                    resizeLabelColumn(labelColumnWidth + 20);
+                  }
+                }}
+                onPointerDown={(event) => {
+                  resizeStart.current = {
+                    x: event.clientX,
+                    width: labelColumnWidth,
+                  };
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                }}
+                onPointerMove={(event) => {
+                  const start = resizeStart.current;
+                  if (
+                    !start ||
+                    !event.currentTarget.hasPointerCapture(event.pointerId)
+                  )
+                    return;
+                  resizeLabelColumn(start.width + event.clientX - start.x);
+                }}
+                onPointerUp={(event) => {
+                  resizeStart.current = null;
+                  event.currentTarget.releasePointerCapture(event.pointerId);
+                }}
+              />
               {displayGroups.length > 1 ? (
                 <button
                   type="button"

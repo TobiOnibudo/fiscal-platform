@@ -764,10 +764,26 @@ tbody th small {
   font-size: 10px;
 }
 thead th:first-child {
+  position: sticky;
   text-align: left;
   left: 0;
   z-index: 4;
   min-width: 190px;
+}
+.column-resize-handle {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: -4px;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.column-resize-handle:hover,
+.column-resize-handle:focus-visible {
+  background: var(--accent);
+  outline: none;
 }
 tbody th {
   position: sticky;
