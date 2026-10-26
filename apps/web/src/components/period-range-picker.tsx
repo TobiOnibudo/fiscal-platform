@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CalendarRange } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,8 +31,8 @@ export function PeriodRangePicker({
   disabled?: boolean;
   align?: "start" | "center" | "end";
 }) {
-  const fromId = useId();
-  const toId = useId();
+  const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<string | null>(null);
   const sorted = useMemo(
     () =>
       [...periods].sort((left, right) => left.date.localeCompare(right.date)),
@@ -56,8 +56,30 @@ export function PeriodRangePicker({
   const selectedYearCount =
     fromIndex >= 0 && toIndex >= fromIndex ? toIndex - fromIndex + 1 : 0;
 
+  function selectYear(value: string) {
+    if (!anchor) {
+      onChange(value, value);
+      setAnchor(value);
+      return;
+    }
+
+    const anchorIndex = sorted.findIndex((period) => period.value === anchor);
+    const selectedIndex = sorted.findIndex((period) => period.value === value);
+    const startIndex = Math.min(anchorIndex, selectedIndex);
+    const endIndex = Math.max(anchorIndex, selectedIndex);
+
+    onChange(sorted[startIndex].value, sorted[endIndex].value);
+    setAnchor(null);
+  }
+
   return (
-    <Popover>
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) setAnchor(null);
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -75,7 +97,11 @@ export function PeriodRangePicker({
         <div className="period-picker-heading">
           <div>
             <p>Fiscal years</p>
-            <span>Changes update the view immediately.</span>
+            <span>
+              {anchor
+                ? "Choose another year to complete the range."
+                : "Choose a year, then another to create a range."}
+            </span>
           </div>
           <Button
             type="button"
@@ -84,59 +110,39 @@ export function PeriodRangePicker({
             disabled={!first || !last}
             onClick={() => {
               if (first && last) onChange(first.value, last.value);
+              setAnchor(null);
             }}
           >
             All years
           </Button>
         </div>
-        <fieldset className="period-picker-fields">
-          <legend className="sr-only">Fiscal year range</legend>
-          <label htmlFor={fromId}>
-            <span>From</span>
-            <select
-              id={fromId}
-              value={from}
-              onChange={(event) => {
-                const nextFrom = event.target.value;
-                const nextFromIndex = sorted.findIndex(
-                  (period) => period.value === nextFrom,
-                );
-                onChange(nextFrom, toIndex < nextFromIndex ? nextFrom : to);
-              }}
-            >
-              {sorted.map((period) => (
-                <option key={period.value} value={period.value}>
-                  {yearByValue.get(period.value)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <span className="period-picker-separator" aria-hidden="true">
-            –
-          </span>
-          <label htmlFor={toId}>
-            <span>To</span>
-            <select
-              id={toId}
-              value={to}
-              onChange={(event) => {
-                const nextTo = event.target.value;
-                const nextToIndex = sorted.findIndex(
-                  (period) => period.value === nextTo,
-                );
-                onChange(fromIndex > nextToIndex ? nextTo : from, nextTo);
-              }}
-            >
-              {sorted.map((period) => (
-                <option key={period.value} value={period.value}>
-                  {yearByValue.get(period.value)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </fieldset>
+        <div
+          className="period-picker-grid"
+          role="group"
+          aria-label="Fiscal years"
+        >
+          {sorted.map((period, index) => {
+            const selected = index >= fromIndex && index <= toIndex;
+
+            return (
+              <Button
+                key={period.value}
+                type="button"
+                size="sm"
+                variant={selected ? "default" : "ghost"}
+                aria-pressed={selected}
+                data-range-start={period.value === from || undefined}
+                data-range-end={period.value === to || undefined}
+                onClick={() => selectYear(period.value)}
+              >
+                {yearByValue.get(period.value)}
+              </Button>
+            );
+          })}
+        </div>
         <p className="period-picker-summary" aria-live="polite">
-          {selectedYearCount} {selectedYearCount === 1 ? "year" : "years"}
+          {selectedYearCount} {selectedYearCount === 1 ? "year" : "years"}{" "}
+          selected
         </p>
       </PopoverContent>
     </Popover>

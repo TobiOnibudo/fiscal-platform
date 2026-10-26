@@ -960,7 +960,7 @@ tr:hover th {
   font-size: 12px;
 }
 .period-picker-popover {
-  width: min(280px, calc(100vw - 24px));
+  width: min(304px, calc(100vw - 24px));
 }
 .period-picker-heading {
   display: flex;
@@ -989,45 +989,18 @@ tr:hover th {
   width: 15px;
   height: 15px;
 }
-.period-picker-fields {
+.period-picker-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 10px;
-  align-items: end;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-.period-picker-fields label {
-  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 500;
 }
-.period-picker-fields select {
+.period-picker-grid [data-slot="button"] {
   width: 100%;
-  min-height: 38px;
-  padding: 7px 28px 7px 10px;
-  border-color: var(--border);
-  background: var(--background);
-  color: var(--foreground);
-  font-size: 13px;
+  padding-inline: 8px;
   font-variant-numeric: tabular-nums;
 }
-.period-picker-fields select:hover {
-  border-color: #3b6081;
-}
-.period-picker-fields select:focus-visible {
-  border-color: var(--accent);
-  outline-offset: 2px;
-}
-.period-picker-separator {
-  padding-bottom: 9px;
-  color: var(--muted);
-}
 .period-picker-summary {
-  margin-top: 9px;
+  margin-top: 10px;
   color: var(--muted);
   font-size: 11px;
   line-height: 1.4;
