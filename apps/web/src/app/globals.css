@@ -843,6 +843,13 @@ table {
 .statement-table .missing {
   max-width: 100%;
 }
+.line-item-unit {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
 th {
   font-weight: 400;
 }
@@ -889,7 +896,9 @@ thead th:first-child {
   background: #6386aa;
   content: "";
   transform: translateY(-50%);
-  transition: background 120ms ease, height 120ms ease;
+  transition:
+    background 120ms ease,
+    height 120ms ease;
 }
 .column-resize-handle:hover,
 .column-resize-handle:focus-visible {

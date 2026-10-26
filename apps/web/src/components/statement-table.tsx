@@ -24,14 +24,12 @@ function unitKey(row: Row) {
 }
 
 function financialAmount(value: string, row: Row) {
-  const symbol =
-    row.currency === "USD" ? "$" : row.currency === "EUR" ? "€" : "£";
   const unit = row.unit.toLowerCase();
   const numeric = Number(value);
   const formatAmount = (amount: string, suffix = "") => {
     const negative = amount.startsWith("-");
     const absoluteAmount = negative ? amount.slice(1) : amount;
-    return `${negative ? "−" : ""}${symbol}${displayDecimal(absoluteAmount)}${suffix}`;
+    return `${negative ? "−" : ""}${displayDecimal(absoluteAmount)}${suffix}`;
   };
   if (Number.isFinite(numeric) && unit.includes("thousand"))
     return formatAmount((numeric / 1000).toFixed(1), "m");
@@ -200,14 +198,18 @@ function StatementRow({
           }}
         >
           <span className="line-item-label">{displayRowLabel(row.label)}</span>
-          {hasMixedUnits ? (
-            <span
-              title="Values retain the unit reported for each year."
-              style={{ marginLeft: 6, color: "var(--muted)", fontSize: 10 }}
-            >
-              Mixed reporting units
-            </span>
-          ) : null}
+          <small
+            className="line-item-unit"
+            title={
+              hasMixedUnits
+                ? "Values retain the currency and unit reported for each year."
+                : undefined
+            }
+          >
+            {hasMixedUnits
+              ? "Mixed reporting units"
+              : `${row.currency} · ${row.unit}`}
+          </small>
           {row.aliases.length ? (
             <details style={{ marginTop: 3, border: 0, padding: 0 }}>
               <summary style={{ fontSize: 10 }}>
@@ -344,7 +346,6 @@ export function StatementTable({
         <thead>
           <tr>
             <th scope="col">
-
               <span
                 className="column-resize-handle"
                 role="separator"
@@ -385,9 +386,7 @@ export function StatementTable({
                   resizeStart.current = null;
                   event.currentTarget.releasePointerCapture(event.pointerId);
                 }}
-                onDoubleClick={() =>
-                  resizeLabelColumn(defaultLabelColumnWidth)
-                }
+                onDoubleClick={() => resizeLabelColumn(defaultLabelColumnWidth)}
               />
               {displayGroups.length > 1 ? (
                 <button

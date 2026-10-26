@@ -311,14 +311,16 @@ describe("statement and evidence rendering with synthetic data", () => {
       />,
     );
     expect(html).toContain("9,007,199,254,740,993.123456789");
-    expect(html).not.toContain("XXX · per share");
+    expect(html).toContain("XXX · per share");
     expect(html).toContain(
       "9007199254740993.123456789 XXX per share; inspect source",
     );
     expect(html).not.toContain(">Restated<");
     expect(html).not.toMatch(/>R<|>U</);
     expect(html).not.toContain('<th scope="col">Line item<small');
-    expect(html).toContain('aria-label="Resize line item column. Use left and right arrow keys, or drag."');
+    expect(html).toContain(
+      'aria-label="Resize line item column. Use left and right arrow keys, or drag."',
+    );
     expect(html).toContain('aria-valuemin="220"');
     expect(html).toContain('aria-valuemax="620"');
     for (let index = 1; index < statement.rows.length; index++)
@@ -337,7 +339,7 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(cleanedLabel).toContain(">Net revenue<");
     expect(cleanedLabel).not.toContain("Net revenue . . .");
   });
-  it("places a negative sign before the currency symbol", () => {
+  it("keeps negative values numeric and shows currency and units beneath the label", () => {
     const statement = datasetSchema.parse(fixture).statements[0];
     const row = statement.rows.find((r) => r.kind !== "section")!;
     const period = statement.periods.find((p) => row.cells[p.id])!;
@@ -354,8 +356,9 @@ describe("statement and evidence rendering with synthetic data", () => {
       />,
     );
 
-    expect(html).toContain("−€494.4m");
-    expect(html).not.toContain("€−494.4m");
+    expect(html).toContain("−494.4m");
+    expect(html).toContain("EUR · millions");
+    expect(html).not.toContain("€494.4m");
   });
   it("keeps alias matching row structure and historical visibility", () => {
     const statement = datasetSchema.parse(fixture).statements[0];
