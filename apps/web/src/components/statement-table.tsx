@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   displayDecimal,
@@ -282,14 +282,32 @@ export function StatementTable({
   const periodCount = Math.max(statement.periods.length, 1);
   // Keep the labels comfortably readable by default while letting analysts
   // make space for unusually long reporting names.
-  const defaultLabelColumnWidth = 340;
-  const [labelColumnWidth, setLabelColumnWidth] = useState(
+  const defaultLabelColumnWidth = 220;
+  const [labelColumnPreference, setLabelColumnPreference] = useState(
     defaultLabelColumnWidth,
   );
+  const [availableTableWidth, setAvailableTableWidth] = useState<number>();
+  const tableScrollRef = useRef<HTMLDivElement>(null);
   const resizeStart = useRef<{ x: number; width: number } | null>(null);
-  const periodColumnWidth = 140;
+  const minimumLabelColumnWidth = 180;
+  const minimumPeriodColumnWidth = 72;
+  const fallbackTableWidth =
+    defaultLabelColumnWidth + periodCount * (periodCount >= 8 ? 92 : 108);
+  const measuredWidth = availableTableWidth ?? fallbackTableWidth;
+  const labelColumnWidth = Math.min(
+    labelColumnPreference,
+    Math.max(
+      minimumLabelColumnWidth,
+      measuredWidth - periodCount * minimumPeriodColumnWidth,
+    ),
+  );
+  const periodColumnWidth = Math.max(
+    minimumPeriodColumnWidth,
+    Math.floor((measuredWidth - labelColumnWidth) / periodCount),
+  );
   const tableWidth = labelColumnWidth + periodCount * periodColumnWidth;
   const tableStyle = {
+    width: `${tableWidth}px`,
     minWidth: `${tableWidth}px`,
   } satisfies CSSProperties;
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
@@ -315,11 +333,22 @@ export function StatementTable({
   }
 
   function resizeLabelColumn(nextWidth: number) {
-    setLabelColumnWidth(Math.min(620, Math.max(220, nextWidth)));
+    setLabelColumnPreference(Math.min(620, Math.max(220, nextWidth)));
   }
+
+  useEffect(() => {
+    const element = tableScrollRef.current;
+    if (!element) return;
+    const updateWidth = () => setAvailableTableWidth(element.clientWidth);
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
+      ref={tableScrollRef}
       className="table-scroll"
       tabIndex={0}
       aria-label="Financial statement by fiscal year"

@@ -56,7 +56,6 @@ export function PeriodRangePicker({
 
   function selectYear(value: string) {
     if (!anchor) {
-      onChange(value, value);
       setAnchor(value);
       return;
     }
@@ -113,7 +112,9 @@ export function PeriodRangePicker({
           aria-label="Fiscal years"
         >
           {sorted.map((period, index) => {
-            const selected = index >= fromIndex && index <= toIndex;
+            const selected = anchor
+              ? period.value === anchor
+              : index >= fromIndex && index <= toIndex;
 
             return (
               <Button
