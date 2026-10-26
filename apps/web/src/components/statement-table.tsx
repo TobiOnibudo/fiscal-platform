@@ -23,16 +23,6 @@ function unitKey(row: Row) {
   return `${row.currency}\u0000${row.unit}`;
 }
 
-function unitLabel(row: Row) {
-  const symbol =
-    row.currency === "USD" ? "$" : row.currency === "EUR" ? "€" : "£";
-  const unit = row.unit.toLowerCase();
-  if (unit.includes("million") || unit.includes("'000") || unit.includes("000"))
-    return `${symbol}m`;
-  if (unit.includes("per share")) return `${symbol} per share`;
-  return row.currency;
-}
-
 function financialAmount(value: string, row: Row) {
   const symbol =
     row.currency === "USD" ? "$" : row.currency === "EUR" ? "€" : "£";
@@ -284,7 +274,6 @@ export function StatementTable({
   forceExpanded?: boolean;
 }) {
   const primaryUnit = primaryUnitKey(rows);
-  const primaryRow = rows.find((row) => unitKey(row) === primaryUnit);
   const mixedUnits = new Set(rows.map(unitKey)).size > 1;
   const displayRows = consolidateRows(rows, primaryUnit);
   const displayGroups = groupDisplayRows(statement, displayRows);
@@ -344,16 +333,6 @@ export function StatementTable({
           <tr>
             <th scope="col">
               Line item
-              {primaryRow ? (
-                <>
-                  <small className="primary-unit">
-                    {unitLabel(primaryRow)}
-                  </small>
-                  <span className="sr-only">
-                    {primaryRow.currency} · {primaryRow.unit}
-                  </span>
-                </>
-              ) : null}
               {displayGroups.length > 1 ? (
                 <button
                   type="button"

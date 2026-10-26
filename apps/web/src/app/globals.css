@@ -551,7 +551,8 @@ details p {
   text-align: left;
 }
 .table-loading {
-  height: 400px;
+  min-height: 56px;
+  padding: 16px 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -691,6 +692,10 @@ details p {
   grid-column: 1 / -1;
   grid-row: 3;
   width: auto;
+}
+.statement-workspace #statement-panel > .table-loading {
+  grid-column: 1 / -1;
+  grid-row: 3;
 }
 .statement-workspace #statement-panel > .table-toolbar > .search-field {
   overflow: hidden;
