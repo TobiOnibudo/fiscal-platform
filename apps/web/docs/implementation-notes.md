@@ -6,7 +6,7 @@ The Next.js review workspace reads published Postgres datasets. It does not call
 
 - `src/lib/repository.ts` reads published datasets only. The active pointer selects the default version; an explicit version can read an older publication. Approved private candidates remain unavailable.
 - `src/lib/contracts.ts` validates JSON financial payloads, exact decimal strings, row-specific units, identities, dates, and coverage relationships. Alembic owns database schema changes; generated Kysely types are in `src/lib/db.generated.ts`.
-- `src/app/api/v1/[...path]/route.ts` implements read-only API routes documented in `openapi.json`. Errors include stable code, message, and request ID. Export and evidence requests require a pinned dataset version.
+- `src/app/api/v1/[...path]/route.ts` implements read-only API routes. Errors include stable code, message, and request ID. Export and evidence requests require a pinned dataset version.
 - `src/components` separates workspace navigation, statement rendering, source inspection, collection views, and abortable version-aware reads. Fiscal range defaults to the latest ten available fiscal years and exports carry its range. Row search preserves statement order and section context.
 - Source manifest downloads represent the current filtered filing page. Their payload includes the next cursor and filter metadata so page scope is explicit.
 
