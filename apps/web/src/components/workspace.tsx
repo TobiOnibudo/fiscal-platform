@@ -258,7 +258,7 @@ export function Workspace() {
                     </h2>
                     <p>
                       {data
-                        ? `${unitSummary} · ${data.statement.basis} · ${data.statement.scope}`
+                        ? `${unitSummary} · ${data.statement.basis} · ${data.statement.scope} · Select any reported value to inspect its source, currency, and filing history.`
                         : `Fiscal year end: ${selectedCompany.fiscal_year_end_month === 3 ? "31 March" : "31 December"} · ${unitSummary}`}
                     </p>
                   </div>

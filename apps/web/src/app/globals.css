@@ -716,6 +716,10 @@ tbody th small {
   margin-top: 3px;
   font-size: 10px;
 }
+.primary-unit {
+  display: inline !important;
+  margin: 0 0 0 6px !important;
+}
 thead th:first-child {
   text-align: left;
   left: 0;
@@ -784,8 +788,8 @@ tr:hover th {
   outline-offset: -2px;
 }
 .table-density-toggle {
-  display: block;
-  margin-top: 5px;
+  display: inline;
+  margin-left: 10px;
   padding: 0;
   color: var(--accent);
   font-size: 10px;
