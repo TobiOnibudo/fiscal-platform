@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { BarChart3, CalendarDays, Check, Info, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { BarChart3, Check, Info, TrendingUp } from "lucide-react";
 import { useReview } from "./review-client";
+import { PeriodRangePicker } from "./period-range-picker";
 
 const annualPeriods = ["FY20", "FY21", "FY22", "FY23", "FY24"];
 const quarterlyPeriods = ["Q1 24", "Q2 24", "Q3 24", "Q4 24", "Q1 25"];
@@ -355,24 +356,11 @@ function CashFlowChart({
 
 export function TrendsKpi({ company }: { company: string }) {
   const trends = useReview<TrendResponse>(`companies/${company}/trends`, 0);
-  const rangeFilter = useRef<HTMLDetailsElement>(null);
   const [chart, setChart] = useState<"performance" | "cashflow">("performance");
   const [panel, setPanel] = useState<"trends" | "kpis">("trends");
   const [range, setRange] = useState<{ start: number; end: number } | null>(
     null,
   );
-  useEffect(() => {
-    const closeOnOutsidePress = (event: PointerEvent) => {
-      if (
-        rangeFilter.current?.open &&
-        !rangeFilter.current.contains(event.target as Node)
-      )
-        rangeFilter.current.open = false;
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePress);
-    return () =>
-      document.removeEventListener("pointerdown", closeOnOutsidePress);
-  }, []);
   if (trends.loading)
     return (
       <section className="trends-view">
@@ -404,16 +392,15 @@ export function TrendsKpi({ company }: { company: string }) {
   const rangeStart = Math.min(selectedRange.start, periods.length - 1);
   const rangeEnd = Math.min(selectedRange.end, periods.length - 1);
   const periodRange = `${periods[rangeStart]} to ${periods[rangeEnd]}`;
-  const updateStart = (start: number) =>
-    setRange((current) => ({
-      start,
-      end: Math.max(start, current?.end ?? periods.length - 1),
-    }));
-  const updateEnd = (end: number) =>
-    setRange((current) => ({
-      start: Math.min(current?.start ?? 0, end),
-      end,
-    }));
+  const fiscalMonth = company === "wise" ? "03-31" : "12-31";
+  const periodOptions = periods.map((label, index) => {
+    const shortYear = Number(label.match(/\d{2}$/)?.[0] ?? index);
+    return {
+      value: String(index),
+      label,
+      date: `${2000 + shortYear}-${fiscalMonth}`,
+    };
+  });
   const title = company === "adyen" ? "Adyen" : "Wise";
   const revenueIndex = lastAvailableIndex(source.revenue, rangeStart, rangeEnd);
   const revenuePriorIndex = previousAvailableIndex(
@@ -525,43 +512,17 @@ export function TrendsKpi({ company }: { company: string }) {
           </p>
         </div>
         <div className="trend-controls">
-          <details className="range-filter" ref={rangeFilter}>
-            <summary className="range-button">
-              <CalendarDays size={15} />
-              {periodRange}
-            </summary>
-            <div className="range-popover">
-              <label>
-                From
-                <select
-                  value={rangeStart}
-                  onChange={(event) => updateStart(Number(event.target.value))}
-                >
-                  {periods.map((item, index) => (
-                    <option value={index} key={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <span className="range-separator" aria-hidden="true">
-                to
-              </span>
-              <label>
-                To
-                <select
-                  value={rangeEnd}
-                  onChange={(event) => updateEnd(Number(event.target.value))}
-                >
-                  {periods.map((item, index) => (
-                    <option value={index} key={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          </details>
+          <PeriodRangePicker
+            periods={periodOptions}
+            from={String(rangeStart)}
+            to={String(rangeEnd)}
+            onChange={(start, end) =>
+              setRange({ start: Number(start), end: Number(end) })
+            }
+          />
+          <span className="sr-only" aria-live="polite">
+            Showing {periodRange}
+          </span>
         </div>
       </div>
       <div className="kpi-strip">
