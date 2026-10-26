@@ -168,7 +168,8 @@ function consolidateRows(
     const cells = Object.fromEntries(
       [...selected.entries()].map(([periodId, sourceRow]) => {
         if (unitKey(sourceRow) !== unitKey(anchor))
-          alternateUnits[periodId] = unitLabel(sourceRow);
+          alternateUnits[periodId] =
+            `${sourceRow.currency} · ${sourceRow.unit}`;
         return [periodId, sourceRow.cells[periodId]];
       }),
     );
@@ -242,6 +243,9 @@ function StatementRow({
                 >
                   {financialAmount(cell.value, row)}
                 </button>
+                {alternateUnit ? (
+                  <span className="sr-only">{alternateUnit}</span>
+                ) : null}
               </>
             ) : (
               <span
@@ -280,7 +284,7 @@ export function StatementTable({
   const displayRows = consolidateRows(rows, primaryUnit);
   const displayGroups = groupDisplayRows(statement, displayRows);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
-    () => new Set(displayGroups.map((group) => group.id)),
+    () => new Set(),
   );
   const allExpanded =
     forceExpanded ||
@@ -320,7 +324,14 @@ export function StatementTable({
             <th scope="col">
               Line item
               {primaryRow ? (
-                <small className="primary-unit">{unitLabel(primaryRow)}</small>
+                <>
+                  <small className="primary-unit">
+                    {unitLabel(primaryRow)}
+                  </small>
+                  <span className="sr-only">
+                    {primaryRow.currency} · {primaryRow.unit}
+                  </span>
+                </>
               ) : null}
               {displayGroups.length > 1 ? (
                 <button
