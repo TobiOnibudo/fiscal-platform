@@ -278,12 +278,16 @@ export function StatementTable({
   const displayRows = consolidateRows(rows, primaryUnit);
   const displayGroups = groupDisplayRows(statement, displayRows);
   const periodCount = Math.max(statement.periods.length, 1);
-  const [labelColumnWidth, setLabelColumnWidth] = useState(260);
+  // Keep the labels comfortably readable by default while letting analysts
+  // make space for unusually long reporting names.
+  const defaultLabelColumnWidth = 340;
+  const [labelColumnWidth, setLabelColumnWidth] = useState(
+    defaultLabelColumnWidth,
+  );
   const resizeStart = useRef<{ x: number; width: number } | null>(null);
   const periodColumnWidth = 140;
   const tableWidth = labelColumnWidth + periodCount * periodColumnWidth;
   const tableStyle = {
-    width: `${tableWidth}px`,
     minWidth: `${tableWidth}px`,
   } satisfies CSSProperties;
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
@@ -309,7 +313,7 @@ export function StatementTable({
   }
 
   function resizeLabelColumn(nextWidth: number) {
-    setLabelColumnWidth(Math.min(520, Math.max(180, nextWidth)));
+    setLabelColumnWidth(Math.min(620, Math.max(220, nextWidth)));
   }
 
   return (
@@ -340,16 +344,17 @@ export function StatementTable({
         <thead>
           <tr>
             <th scope="col">
-              Line item
+
               <span
                 className="column-resize-handle"
                 role="separator"
-                aria-label="Resize line item column"
+                aria-label="Resize line item column. Use left and right arrow keys, or drag."
                 aria-orientation="vertical"
-                aria-valuemin={180}
-                aria-valuemax={520}
+                aria-valuemin={220}
+                aria-valuemax={620}
                 aria-valuenow={labelColumnWidth}
                 tabIndex={0}
+                title="Drag to resize labels. Double-click to reset."
                 onKeyDown={(event) => {
                   if (event.key === "ArrowLeft") {
                     event.preventDefault();
@@ -380,6 +385,9 @@ export function StatementTable({
                   resizeStart.current = null;
                   event.currentTarget.releasePointerCapture(event.pointerId);
                 }}
+                onDoubleClick={() =>
+                  resizeLabelColumn(defaultLabelColumnWidth)
+                }
               />
               {displayGroups.length > 1 ? (
                 <button

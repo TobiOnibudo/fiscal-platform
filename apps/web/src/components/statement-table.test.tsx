@@ -318,6 +318,9 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(html).not.toContain(">Restated<");
     expect(html).not.toMatch(/>R<|>U</);
     expect(html).not.toContain('<th scope="col">Line item<small');
+    expect(html).toContain('aria-label="Resize line item column. Use left and right arrow keys, or drag."');
+    expect(html).toContain('aria-valuemin="220"');
+    expect(html).toContain('aria-valuemax="620"');
     for (let index = 1; index < statement.rows.length; index++)
       expect(html.indexOf(`>${statement.rows[index - 1].label}<`)).toBeLessThan(
         html.indexOf(`>${statement.rows[index].label}<`),

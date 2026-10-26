@@ -831,6 +831,9 @@ table {
 }
 .statement-table {
   table-layout: fixed;
+  /* Fill the available workspace; min-width from the component preserves
+     horizontally scrollable period columns on smaller screens. */
+  width: 100%;
 }
 .statement-table th,
 .statement-table td {
@@ -868,18 +871,34 @@ thead th:first-child {
 }
 .column-resize-handle {
   position: absolute;
-  z-index: 1;
+  z-index: 5;
   top: 0;
-  right: -4px;
+  right: -5px;
   bottom: 0;
-  width: 8px;
+  width: 10px;
   cursor: col-resize;
   touch-action: none;
 }
+.column-resize-handle::after {
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 2px;
+  height: 22px;
+  border-radius: 99px;
+  background: #6386aa;
+  content: "";
+  transform: translateY(-50%);
+  transition: background 120ms ease, height 120ms ease;
+}
 .column-resize-handle:hover,
 .column-resize-handle:focus-visible {
-  background: var(--accent);
   outline: none;
+}
+.column-resize-handle:hover::after,
+.column-resize-handle:focus-visible::after {
+  height: 30px;
+  background: var(--accent-bright);
 }
 tbody th {
   position: sticky;
