@@ -334,6 +334,26 @@ describe("statement and evidence rendering with synthetic data", () => {
     expect(cleanedLabel).toContain(">Net revenue<");
     expect(cleanedLabel).not.toContain("Net revenue . . .");
   });
+  it("places a negative sign before the currency symbol", () => {
+    const statement = datasetSchema.parse(fixture).statements[0];
+    const row = statement.rows.find((r) => r.kind !== "section")!;
+    const period = statement.periods.find((p) => row.cells[p.id])!;
+    row.currency = "EUR";
+    row.unit = "millions";
+    row.cells[period.id].value = "-494.4";
+
+    const html = renderToStaticMarkup(
+      <StatementTable
+        statement={statement}
+        rows={[row]}
+        inspect={() => undefined}
+        forceExpanded
+      />,
+    );
+
+    expect(html).toContain("−€494.4m");
+    expect(html).not.toContain("€−494.4m");
+  });
   it("keeps alias matching row structure and historical visibility", () => {
     const statement = datasetSchema.parse(fixture).statements[0];
     const row = statement.rows.find((r) => r.kind !== "section")!;

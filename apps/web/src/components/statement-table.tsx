@@ -38,11 +38,16 @@ function financialAmount(value: string, row: Row) {
     row.currency === "USD" ? "$" : row.currency === "EUR" ? "€" : "£";
   const unit = row.unit.toLowerCase();
   const numeric = Number(value);
+  const formatAmount = (amount: string, suffix = "") => {
+    const negative = amount.startsWith("-");
+    const absoluteAmount = negative ? amount.slice(1) : amount;
+    return `${negative ? "−" : ""}${symbol}${displayDecimal(absoluteAmount)}${suffix}`;
+  };
   if (Number.isFinite(numeric) && unit.includes("thousand"))
-    return `${symbol}${displayDecimal((numeric / 1000).toFixed(1))}m`;
+    return formatAmount((numeric / 1000).toFixed(1), "m");
   if (unit.includes("million") || unit.includes("'000") || unit.includes("000"))
-    return `${symbol}${displayDecimal(value)}m`;
-  return `${symbol}${displayDecimal(value)}`;
+    return formatAmount(value, "m");
+  return formatAmount(value);
 }
 
 function primaryUnitKey(rows: Row[]) {
